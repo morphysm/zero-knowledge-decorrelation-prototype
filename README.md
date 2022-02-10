@@ -1,8 +1,4 @@
 # ZicoBadges
-<<<<<<< Updated upstream
- Badges for web3 userss
-=======
- Badges for web3 users AAAAA
->>>>>>> Stashed changes
+ Badges for web3 users
 
  Part of EthDenver 2022 🙌
