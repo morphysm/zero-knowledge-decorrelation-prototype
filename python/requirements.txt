@@ -1,0 +1,10 @@
+aws-cdk-lib==2.10.0
+aws_cdk.aws_lambda_python_alpha==2.10.0a0
+black==21.9b0
+boto3==1.17.0
+flake8==3.9.2
+flake8-import-order==0.18.1
+mypy==0.780
+moto==3.0.0
+pytest==6.2.5
+pytest-cov==2.12.1
