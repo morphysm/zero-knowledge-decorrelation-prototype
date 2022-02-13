@@ -6,6 +6,7 @@
 
 # CDK variables that change each deployment
 cdk_deployment_outputs.json
+cdk.out/
 
 # Sublime junk
 *.sublime-project
@@ -13,3 +14,4 @@ cdk_deployment_outputs.json
 
 # Cached Python files
 *__pycache__*
+git rm --cached
