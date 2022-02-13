@@ -5,7 +5,6 @@ from typing import Any, Dict, Literal, Optional
 
 from aws_cdk import (
     aws_apigateway,
-    aws_cognito,
     aws_lambda,
     aws_lambda_nodejs,
     aws_lambda_python,
@@ -27,7 +26,6 @@ class Api(core.Construct):
         self,
         scope: core.Construct,
         id: str,
-        user_pool: aws_cognito.UserPool,
         **kwargs: Any,
     ) -> None:
         """Create the API Gateway defining an API.
@@ -44,19 +42,11 @@ class Api(core.Construct):
         rest_api = aws_apigateway.RestApi(
             scope=self,
             id=f"{id}RestApi",
-            default_method_options=aws_apigateway.MethodOptions(
-                authorization_type=aws_apigateway.AuthorizationType.COGNITO,
-                authorizer=aws_apigateway.CognitoUserPoolsAuthorizer(
-                    scope=self,
-                    id=f"{id}Authorizer",
-                    cognito_user_pools=[user_pool],
-                ),
-            ),
         )
 
         # Api Resources
         badges_resource = rest_api.root.add_resource("badges")
-        # available_badges_resource = rest_api.root.add_resource("avialable_badges")
+        # available_badges_resource = rest_api.root.add_resource("available_badges")
         # auth_resource = rest_api.root.add_resource("auth")
 
         # Handler definitions
