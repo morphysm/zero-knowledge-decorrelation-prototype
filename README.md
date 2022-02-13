@@ -3,6 +3,31 @@
 
  Part of EthDenver 2022 🙌
 
+# Setup
+
+## AWS CDK
+
+We use the Amazon Web Services Cloud Development Kit to manage our cloud resources. All resources are defined
+as Python classes, and running a "deployment" causes the cloud versions of those resources to be updated
+to match the current definitions in this repository.
+
+To deploy with the CDK, you need to have an IAM (Identity and Access Management) user with the proper permissions.
+TODO: Figure out what these are.
+
+Ask an admin to create an IAM users with API keys. Then, configure your
+[credentials and config files](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) with the keys
+under profile name {profile_name}.
+
+To deploy, run these commands:
+```
+export AWS_PROFILE={profile_name}
+cdk deploy Badges --outputs-file cdk_deployment_outputs.json
+```
+
+It will ask you for your permission to deploy resources that modify IAM permissions.
+Press Y and the deployment will proceed.
+
+If the deployment fails, log into the Coudformation console using your IAM user to debug.
 
 # Code Style
 
