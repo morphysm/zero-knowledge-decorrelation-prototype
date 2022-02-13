@@ -2,4 +2,5 @@
 import-order-style = smarkets
 application-import-names = lib, src, test
 max-line-length = 99
+extend-ignore = E501
 exclude = [ cdk.out, .venv ]

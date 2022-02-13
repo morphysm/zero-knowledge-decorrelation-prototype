@@ -69,3 +69,11 @@ To run tests, run the following command where suite is either "unit" or "integra
 ```
 pytest tests/{suite}
 ```
+
+## Javascript
+
+Use Typescript if possible (files end with .ts)
+
+Good references:
+
+* [Google Style Guide](https://google.github.io/styleguide/tsguide.html)
