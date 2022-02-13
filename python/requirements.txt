@@ -1,5 +1,8 @@
-aws-cdk-lib==2.10.0
-aws_cdk.aws_lambda_python_alpha==2.10.0a0
+aws-cdk.core==1.89.0
+aws_cdk.aws_apigateway==1.89.0
+aws_cdk.aws_lambda==1.89.0
+aws_cdk.aws_lambda_python==1.89.0
+aws_cdk.aws_lambda_nodejs==1.89.0
 black==21.9b0
 boto3==1.17.0
 flake8==3.9.2
@@ -8,3 +11,4 @@ mypy==0.780
 moto==3.0.0
 pytest==6.2.5
 pytest-cov==2.12.1
+wheel==0.36.2
