@@ -5,6 +5,18 @@
 
 # Setup
 
+## Env File
+
+Create a .env file in the root of the repo for environment variables. This is .gitignored,
+so it will not be applied to the repo by default.
+
+It should contain the following variables to allow our Smart Contracts to reference PolkaDot:
+
+```
+ALCHEMY_MUMBAI_URL=foo
+MUMBAI_PRIVATE_KEY=bar
+```
+
 ## AWS CDK
 
 We use the Amazon Web Services Cloud Development Kit to manage our cloud resources. All resources are defined
