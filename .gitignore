@@ -14,4 +14,3 @@ cdk.out/
 
 # Cached Python files
 *__pycache__*
-git rm --cached
