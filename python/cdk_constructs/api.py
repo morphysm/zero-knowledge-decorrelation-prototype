@@ -46,24 +46,24 @@ class Api(core.Construct):
 
         # Api Resources
         badges_resource = rest_api.root.add_resource("badges")
-        # available_badges_resource = rest_api.root.add_resource("available_badges")
-        # auth_resource = rest_api.root.add_resource("auth")
+        available_badges_resource = rest_api.root.add_resource("available_badges")
+        auth_resource = rest_api.root.add_resource("auth")
 
         # Handler definitions
         mint_badges_handler = self.create_nodejs_handler(
             method_name="mint_badges",
         )
-        # list_badges_handler = self.create_nodejs_handler(
-        #     method_name="list_badges",
-        # )
-        # list_available_badges = self.create_nodejs_handler(
-        #     method_name="list_available_badges",
-        # )
+        list_badges_handler = self.create_nodejs_handler(
+            method_name="list_badges",
+        )
+        list_available_badges = self.create_nodejs_handler(
+            method_name="list_available_badges",
+        )
 
-        # authenticate_platform = self.create_python_handler(
-        #     method_name="authenticate_platform",
-        #     environment=None,
-        # )
+        authenticate_platform = self.create_python_handler(
+            method_name="authenticate_platform",
+            environment=None,
+        )
 
         # Integration handlers with API resources
         self.integrate_lambda_and_resource(
@@ -72,23 +72,23 @@ class Api(core.Construct):
             api_resource=badges_resource,
         )
 
-        # self.integrate_lambda_and_resource(
-        #     lambda_handler=list_badges_handler,
-        #     http_method="GET",
-        #     api_resource=badges_resource,
-        # )
+        self.integrate_lambda_and_resource(
+            lambda_handler=list_badges_handler,
+            http_method="GET",
+            api_resource=badges_resource,
+        )
 
-        # self.integrate_lambda_and_resource(
-        #     lambda_handler=list_available_badges,
-        #     http_method="GET",
-        #     api_resource=available_badges_resource,
-        # )
+        self.integrate_lambda_and_resource(
+            lambda_handler=list_available_badges,
+            http_method="GET",
+            api_resource=available_badges_resource,
+        )
 
-        # self.integrate_lambda_and_resource(
-        #     lambda_handler=authenticate_platform,
-        #     http_method="POST",
-        #     api_resource=auth_resource,
-        # )
+        self.integrate_lambda_and_resource(
+            lambda_handler=authenticate_platform,
+            http_method="POST",
+            api_resource=auth_resource,
+        )
 
     @staticmethod
     def integrate_lambda_and_resource(
@@ -146,7 +146,7 @@ class Api(core.Construct):
             scope=self,
             id=method_id,
             entry=f"{str(entry_path)}/{method_name}.ts",
-            handler=method_name,
+            handler=f"{method_name}_handler",
             bundling=aws_lambda_nodejs.BundlingOptions(
                 environment=environment,
             ),
