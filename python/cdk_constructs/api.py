@@ -120,7 +120,8 @@ class Api(core.Construct):
         handler = aws_lambda_python.PythonFunction(
             scope=self,
             id=method_id,
-            entry=f"{str(entry_path)}/{method_name}.ts",
+            entry=str(entry_path),
+            index=f'{method_name}.py',
             handler=method_name,
             environment=environment,
             retry_attempts=0,
