@@ -51,7 +51,7 @@ class Api(core.Construct):
 
         # Handler definitions
         mint_badges_handler = self.create_nodejs_handler(
-            method_name="mint_badges",
+            method_name="mint_badge",
         )
         list_badges_handler = self.create_nodejs_handler(
             method_name="list_badges",
