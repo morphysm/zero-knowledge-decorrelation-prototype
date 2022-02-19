@@ -1,5 +1,4 @@
 import './Badges.css';
-import { Nav, Navbar, NavDropdown, NavItem, NavLink } from 'react-bootstrap';
 
 export interface IBadgesProps {
     discordImages: string[][]; // in array pos 0 is img pos 1 is description

@@ -1,4 +1,7 @@
 import { Nav, Navbar, NavDropdown, NavItem, NavLink } from 'react-bootstrap';
+import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
+import { Badges } from './Badges';
+import { LinkContainer } from 'react-router-bootstrap';
 
 
 interface IHeaderProps {
@@ -13,19 +16,29 @@ const Header: React.FunctionComponent<IHeaderProps> = (props) => {
                 <div className="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
                     <ul className="navbar-nav me-auto">
                         <li className="nav-item active">
-                            <Navbar.Brand href="/">ZEKO BADGES</Navbar.Brand>
+                            <LinkContainer to="/">
+                                <Navbar.Brand>ZEKO BADGES</Navbar.Brand>
+                            </LinkContainer>
                         </li>
                     </ul>
                 </div>
-                <div className="mx-auto order-0 ">
-                    {/* not sure why these botch formatting if they're nav.link */}
-                    <Navbar.Brand className="navbar-brand mx-auto" style={{ padding: '50px' }} href="/mint">Mint NFTs</Navbar.Brand>
-                    <Navbar.Brand className="navbar-brand mx-auto" href="/search">Search</Navbar.Brand>
+                <div className="mx-auto order-0 " >
+                    {/* LinkContainer botched formatting, added padding of*/}
+                    <LinkContainer className='p-4' to="/mint">
+                        <Navbar.Brand className="navbar-brand mx-auto" >Mint NFTs</Navbar.Brand>
+                    </LinkContainer>
+                    <LinkContainer className='p-4' to="/search">
+                        <Navbar.Brand className="navbar-brand mx-auto">Search</Navbar.Brand>
+                    </LinkContainer>
+                    {/* I can't get a non link in the header. strangely weird... */}
+                    {/* <Navbar.Brand onSelect={onSelect} className="navbar-brand mx-auto">Connect Metamask</Navbar.Brand> */}
                 </div>
                 <div className="navbar-collapse collapse w-100 order-3 dual-collapse2">
                     <ul className="navbar-nav ms-auto">
                         <li className="nav-item">
-                            <NavLink href="/about">About Us</NavLink>
+                            <LinkContainer to="/about">
+                                <NavLink>About Us</NavLink>
+                            </LinkContainer>
                         </li>
                     </ul>
                 </div>
