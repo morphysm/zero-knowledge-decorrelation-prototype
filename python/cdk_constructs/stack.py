@@ -14,6 +14,10 @@ class ZicoBadgesStack(core.Stack):
     ) -> None:
         """Stack representing one instance of the Badge service.
 
+        A "stack" is a collection of resources that AWS cloudformation
+        manages as one group. See:
+            https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacks.html
+
         Currently contains:
             API stack containing a full rest API with lambda
                 handlers for all endpoints.
