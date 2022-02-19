@@ -17,6 +17,32 @@ ALCHEMY_MUMBAI_URL=foo
 MUMBAI_PRIVATE_KEY=bar
 ```
 
+## Python Dependencies
+
+To manage Python dependencies, we recommend creating a virtual environment name ".venv"
+in the root of the repository and installing all requirements there.
+
+All of the requirements are detailed in `python/requirements.txt`. To install all
+
+To create the venv, activate, and install the project requirements you run the following commands on Unix:
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip3 install -r requirements.txt
+```
+
+And these on Windows:
+```
+python3 -m venv .venv
+.venv\Scripts\activate.bat
+pip3 install -r requirements.txt
+```
+
+Note: the name .venv is in the .gitignore file, so a virtual env of that name only will be ignored.
+If you wish to use a different name, make sure not to commit it to the repository.
+
+See [here](https://docs.python.org/3/tutorial/venv.html) for more details.
+
 ## AWS CDK
 
 We use the Amazon Web Services Cloud Development Kit to manage our cloud resources. All resources are defined
