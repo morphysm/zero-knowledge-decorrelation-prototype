@@ -1,7 +1,7 @@
 """REST API through API Gateway as well as lambda handlers for each method."""
 import os
 from pathlib import Path
-from typing import Any, Dict, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from aws_cdk import (
     aws_apigateway,
@@ -11,7 +11,9 @@ from aws_cdk import (
     core,
 )
 
-# Constnats
+import python.cdk_constructs.api_schemas as schemas
+
+# Constants
 NODEJS_BASE_PATH: Path = Path("nodejs", "src", "handlers")
 PYTHON_BASE_PATH: Path = Path("python", "src", "handlers")
 # Environment variables
@@ -39,14 +41,13 @@ class Api(core.Construct):
 
         super().__init__(scope=scope, id=id)
 
-        rest_api = aws_apigateway.RestApi(
+        rest_api = self.rest_api = aws_apigateway.RestApi(
             scope=self,
             id=f"{id}RestApi",
         )
 
         # Api Resources
         badges_resource = rest_api.root.add_resource("badges")
-        available_badges_resource = rest_api.root.add_resource("available_badges")
         auth_resource = rest_api.root.add_resource("auth")
 
         # Handler definitions
@@ -56,52 +57,156 @@ class Api(core.Construct):
         list_badges_handler = self.create_nodejs_handler(
             method_name="list_badges",
         )
-        list_available_badges = self.create_nodejs_handler(
-            method_name="list_available_badges",
-        )
 
         authenticate_platform = self.create_python_handler(
             method_name="authenticate_platform",
             environment=None,
         )
 
-        # Integration handlers with API resources
+        # Integrate handlers with API resources
         self.integrate_lambda_and_resource(
             lambda_handler=mint_badges_handler,
             http_method="POST",
             api_resource=badges_resource,
+            request_model=rest_api.add_model(
+                id="MintBadgeRequestModel",
+                content_type="application/json",
+                model_name="MintBadgeRequestModel",
+                schema=schemas.authenticate_platform_request_schema,
+            ),
+            method_responses=[
+                aws_apigateway.MethodResponse(
+                    status_code="200",
+                    response_models={
+                        "application/json": rest_api.add_model(
+                            id="MintBadgeResponseModel",
+                            content_type="application/json",
+                            model_name="MintBadgeResponseModel",
+                            schema=schemas.authenticate_platform_request_schema,
+                        ),
+                    },
+                ),
+                aws_apigateway.MethodResponse(
+                    status_code="400",
+                    response_models={
+                        "application/json": aws_apigateway.Model.ERROR_MODEL
+                    },
+                ),
+                aws_apigateway.MethodResponse(
+                    status_code="403",
+                    response_models={
+                        "application/json": aws_apigateway.Model.ERROR_MODEL
+                    },
+                ),
+                aws_apigateway.MethodResponse(
+                    status_code="404",
+                    response_models={
+                        "application/json": aws_apigateway.Model.ERROR_MODEL
+                    },
+                ),
+            ],
         )
 
         self.integrate_lambda_and_resource(
             lambda_handler=list_badges_handler,
             http_method="GET",
             api_resource=badges_resource,
-        )
-
-        self.integrate_lambda_and_resource(
-            lambda_handler=list_available_badges,
-            http_method="GET",
-            api_resource=available_badges_resource,
+            request_parameters={
+                "method.request.path.platform": True,
+                "method.request.path.status": False,
+                "method.request.path.since": False,
+                "method.request.path.limit": False,
+            },
+            method_responses=[
+                aws_apigateway.MethodResponse(
+                    status_code="200",
+                    response_models={
+                        "application/json": rest_api.add_model(
+                            id="ListBadgesResponseModel",
+                            content_type="application/json",
+                            model_name="ListBadgesResponseModel",
+                            schema=schemas.list_badges_response_schema,
+                        ),
+                    },
+                ),
+                aws_apigateway.MethodResponse(
+                    status_code="400",
+                    response_models={
+                        "application/json": aws_apigateway.Model.ERROR_MODEL
+                    },
+                ),
+            ],
         )
 
         self.integrate_lambda_and_resource(
             lambda_handler=authenticate_platform,
             http_method="POST",
             api_resource=auth_resource,
+            request_model=rest_api.add_model(
+                id="AuthenticatePlatformRequestModel",
+                content_type="application/json",
+                model_name="AuthenticatePlatformRequestModel",
+                schema=schemas.mint_badge_request_schema,
+            ),
+            method_responses=[
+                aws_apigateway.MethodResponse(
+                    status_code="200",
+                    response_models={
+                        "application/json": aws_apigateway.Model.EMPTY_MODEL
+                    },
+                ),
+                aws_apigateway.MethodResponse(
+                    status_code="400",
+                    response_models={
+                        "application/json": aws_apigateway.Model.ERROR_MODEL
+                    },
+                ),
+                aws_apigateway.MethodResponse(
+                    status_code="403",
+                    response_models={
+                        "application/json": aws_apigateway.Model.ERROR_MODEL
+                    },
+                ),
+                aws_apigateway.MethodResponse(
+                    status_code="404",
+                    response_models={
+                        "application/json": aws_apigateway.Model.ERROR_MODEL
+                    },
+                ),
+            ],
         )
 
-    @staticmethod
     def integrate_lambda_and_resource(
+        self,
         lambda_handler: aws_lambda.IFunction,
         http_method: Literal["POST", "GET", "PATCH", "PUT", "DELETE"],
         api_resource: aws_apigateway.Resource,
+        request_model: Optional[aws_apigateway.Model] = None,
+        request_parameters: Optional[Dict[str, bool]] = None,
+        method_responses: Optional[List[aws_apigateway.MethodResponse]] = None,
     ) -> None:
         lambda_integration = aws_apigateway.LambdaIntegration(handler=lambda_handler)
+
+        validator = aws_apigateway.RequestValidator(
+            scope=self,
+            id=f"{lambda_handler}{api_resource}Validator",
+            rest_api=self.rest_api,
+            validate_request_body=bool(request_model is not None),
+            validate_request_parameters=bool(request_parameters is not None),
+        )
+
+        request_models = None
+        if request_model is not None:
+            request_models = {"application/json": request_model}
 
         api_resource.add_method(
             http_method=http_method,
             integration=lambda_integration,
             api_key_required=False,
+            request_models=request_models,
+            method_responses=method_responses,
+            request_parameters=request_parameters,
+            request_validator=validator,
         )
 
     def create_python_handler(
@@ -121,7 +226,7 @@ class Api(core.Construct):
             scope=self,
             id=method_id,
             entry=str(entry_path),
-            index=f'{method_name}.py',
+            index=f"{method_name}.py",
             handler=method_name,
             environment=environment,
             retry_attempts=0,
