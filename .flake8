@@ -1,6 +1,6 @@
 [flake8]
 import-order-style = smarkets
-application-import-names = lib, src, test
+application-import-names = python
 max-line-length = 99
 extend-ignore = E501
 exclude = [ cdk.out, .venv ]
