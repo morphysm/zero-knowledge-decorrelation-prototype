@@ -1,0 +1,16 @@
+# Environment file
+.env
+
+# Python virtual environments
+.venv/
+
+# CDK variables that change each deployment
+cdk_deployment_outputs.json
+cdk.out/
+
+# Sublime junk
+*.sublime-project
+*.sublime-workspace
+
+# Cached Python files
+*__pycache__*

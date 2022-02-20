@@ -5,7 +5,6 @@ from typing import Any, Dict, Literal, Optional
 
 from aws_cdk import (
     aws_apigateway,
-    aws_cognito,
     aws_lambda,
     aws_lambda_nodejs,
     aws_lambda_python,
@@ -27,7 +26,6 @@ class Api(core.Construct):
         self,
         scope: core.Construct,
         id: str,
-        user_pool: aws_cognito.UserPool,
         **kwargs: Any,
     ) -> None:
         """Create the API Gateway defining an API.
@@ -44,36 +42,28 @@ class Api(core.Construct):
         rest_api = aws_apigateway.RestApi(
             scope=self,
             id=f"{id}RestApi",
-            default_method_options=aws_apigateway.MethodOptions(
-                authorization_type=aws_apigateway.AuthorizationType.COGNITO,
-                authorizer=aws_apigateway.CognitoUserPoolsAuthorizer(
-                    scope=self,
-                    id=f"{id}Authorizer",
-                    cognito_user_pools=[user_pool],
-                ),
-            ),
         )
 
         # Api Resources
         badges_resource = rest_api.root.add_resource("badges")
-        # available_badges_resource = rest_api.root.add_resource("avialable_badges")
-        # auth_resource = rest_api.root.add_resource("auth")
+        available_badges_resource = rest_api.root.add_resource("available_badges")
+        auth_resource = rest_api.root.add_resource("auth")
 
         # Handler definitions
         mint_badges_handler = self.create_nodejs_handler(
-            method_name="mint_badges",
+            method_name="mint_badge",
         )
-        # list_badges_handler = self.create_nodejs_handler(
-        #     method_name="list_badges",
-        # )
-        # list_available_badges = self.create_nodejs_handler(
-        #     method_name="list_available_badges",
-        # )
+        list_badges_handler = self.create_nodejs_handler(
+            method_name="list_badges",
+        )
+        list_available_badges = self.create_nodejs_handler(
+            method_name="list_available_badges",
+        )
 
-        # authenticate_platform = self.create_python_handler(
-        #     method_name="authenticate_platform",
-        #     environment=None,
-        # )
+        authenticate_platform = self.create_python_handler(
+            method_name="authenticate_platform",
+            environment=None,
+        )
 
         # Integration handlers with API resources
         self.integrate_lambda_and_resource(
@@ -82,23 +72,23 @@ class Api(core.Construct):
             api_resource=badges_resource,
         )
 
-        # self.integrate_lambda_and_resource(
-        #     lambda_handler=list_badges_handler,
-        #     http_method="GET",
-        #     api_resource=badges_resource,
-        # )
+        self.integrate_lambda_and_resource(
+            lambda_handler=list_badges_handler,
+            http_method="GET",
+            api_resource=badges_resource,
+        )
 
-        # self.integrate_lambda_and_resource(
-        #     lambda_handler=list_available_badges,
-        #     http_method="GET",
-        #     api_resource=available_badges_resource,
-        # )
+        self.integrate_lambda_and_resource(
+            lambda_handler=list_available_badges,
+            http_method="GET",
+            api_resource=available_badges_resource,
+        )
 
-        # self.integrate_lambda_and_resource(
-        #     lambda_handler=authenticate_platform,
-        #     http_method="POST",
-        #     api_resource=auth_resource,
-        # )
+        self.integrate_lambda_and_resource(
+            lambda_handler=authenticate_platform,
+            http_method="POST",
+            api_resource=auth_resource,
+        )
 
     @staticmethod
     def integrate_lambda_and_resource(
@@ -130,7 +120,8 @@ class Api(core.Construct):
         handler = aws_lambda_python.PythonFunction(
             scope=self,
             id=method_id,
-            entry=f"{str(entry_path)}/{method_name}.ts",
+            entry=str(entry_path),
+            index=f'{method_name}.py',
             handler=method_name,
             environment=environment,
             retry_attempts=0,
@@ -156,7 +147,7 @@ class Api(core.Construct):
             scope=self,
             id=method_id,
             entry=f"{str(entry_path)}/{method_name}.ts",
-            handler=method_name,
+            handler=f"{method_name}_handler",
             bundling=aws_lambda_nodejs.BundlingOptions(
                 environment=environment,
             ),

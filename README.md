@@ -3,6 +3,69 @@
 
  Part of EthDenver 2022 🙌
 
+# Setup
+
+## Env File
+
+Create a .env file in the root of the repo for environment variables. This is .gitignored,
+so it will not be applied to the repo by default.
+
+It should contain the following variables to allow our Smart Contracts to reference PolkaDot:
+
+```
+ALCHEMY_MUMBAI_URL=foo
+MUMBAI_PRIVATE_KEY=bar
+```
+
+## Python Dependencies
+
+To manage Python dependencies, we recommend creating a virtual environment name ".venv"
+in the root of the repository and installing all requirements there.
+
+All of the requirements are detailed in `python/requirements.txt`. To install all
+
+To create the venv, activate, and install the project requirements you run the following commands on Unix:
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip3 install -r requirements.txt
+```
+
+And these on Windows:
+```
+python3 -m venv .venv
+.venv\Scripts\activate.bat
+pip3 install -r requirements.txt
+```
+
+Note: the name .venv is in the .gitignore file, so a virtual env of that name only will be ignored.
+If you wish to use a different name, make sure not to commit it to the repository.
+
+See [here](https://docs.python.org/3/tutorial/venv.html) for more details.
+
+## AWS CDK
+
+We use the Amazon Web Services Cloud Development Kit to manage our cloud resources. All resources are defined
+as Python classes, and running a "deployment" causes the cloud versions of those resources to be updated
+to match the current definitions in this repository.
+
+To deploy with the CDK, you need to have an IAM (Identity and Access Management) user with the proper permissions.
+TODO: Figure out what these are.
+
+Ask an admin to create an IAM users with API keys. Then, configure your
+[credentials and config files](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) with the keys
+under profile name {profile_name}.
+
+To deploy, run these commands:
+```
+export AWS_PROFILE={profile_name}
+cdk deploy Badges --outputs-file cdk_deployment_outputs.json
+```
+
+It will ask you for your permission to deploy resources that modify IAM permissions.
+Press Y and the deployment will proceed.
+
+If the deployment fails, log into the Coudformation console using your IAM user to debug.
 
 # Code Style
 
