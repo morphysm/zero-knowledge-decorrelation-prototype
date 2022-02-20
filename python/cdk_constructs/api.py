@@ -63,6 +63,24 @@ class Api(core.Construct):
             environment=None,
         )
 
+        # Validators
+        # see here: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-validation-set-up.html
+        body_validator = aws_apigateway.RequestValidator(
+            scope=self,
+            id="BodyValidator",
+            rest_api=rest_api,
+            validate_request_body=True,
+            validate_request_parameters=False,
+        )
+
+        params_validator = aws_apigateway.RequestValidator(
+            scope=self,
+            id="RequestBodyAndParametersValidator",
+            rest_api=rest_api,
+            validate_request_body=False,
+            validate_request_parameters=True,
+        )
+
         # Integrate handlers with API resources
         self.integrate_lambda_and_resource(
             lambda_handler=mint_badges_handler,
@@ -72,7 +90,7 @@ class Api(core.Construct):
                 id="MintBadgeRequestModel",
                 content_type="application/json",
                 model_name="MintBadgeRequestModel",
-                schema=schemas.authenticate_platform_request_schema,
+                schema=schemas.mint_badge_request_schema,
             ),
             method_responses=[
                 aws_apigateway.MethodResponse(
@@ -82,7 +100,7 @@ class Api(core.Construct):
                             id="MintBadgeResponseModel",
                             content_type="application/json",
                             model_name="MintBadgeResponseModel",
-                            schema=schemas.authenticate_platform_request_schema,
+                            schema=schemas.mint_badge_response_schema,
                         ),
                     },
                 ),
@@ -105,6 +123,7 @@ class Api(core.Construct):
                     },
                 ),
             ],
+            validator=body_validator,
         )
 
         self.integrate_lambda_and_resource(
@@ -112,10 +131,10 @@ class Api(core.Construct):
             http_method="GET",
             api_resource=badges_resource,
             request_parameters={
-                "method.request.path.platform": True,
-                "method.request.path.status": False,
-                "method.request.path.since": False,
-                "method.request.path.limit": False,
+                "method.request.querystring.platform": True,
+                "method.request.querystring.status": False,
+                "method.request.querystring.since": False,
+                "method.request.querystring.limit": False,
             },
             method_responses=[
                 aws_apigateway.MethodResponse(
@@ -136,6 +155,7 @@ class Api(core.Construct):
                     },
                 ),
             ],
+            validator=params_validator,
         )
 
         self.integrate_lambda_and_resource(
@@ -146,7 +166,7 @@ class Api(core.Construct):
                 id="AuthenticatePlatformRequestModel",
                 content_type="application/json",
                 model_name="AuthenticatePlatformRequestModel",
-                schema=schemas.mint_badge_request_schema,
+                schema=schemas.authenticate_platform_request_schema,
             ),
             method_responses=[
                 aws_apigateway.MethodResponse(
@@ -174,6 +194,7 @@ class Api(core.Construct):
                     },
                 ),
             ],
+            validator=body_validator,
         )
 
     def integrate_lambda_and_resource(
@@ -181,19 +202,19 @@ class Api(core.Construct):
         lambda_handler: aws_lambda.IFunction,
         http_method: Literal["POST", "GET", "PATCH", "PUT", "DELETE"],
         api_resource: aws_apigateway.Resource,
+        validator: aws_apigateway.RequestValidator,
         request_model: Optional[aws_apigateway.Model] = None,
         request_parameters: Optional[Dict[str, bool]] = None,
         method_responses: Optional[List[aws_apigateway.MethodResponse]] = None,
     ) -> None:
-        lambda_integration = aws_apigateway.LambdaIntegration(handler=lambda_handler)
+        """Link a lambda function to an API gateway resource.
 
-        validator = aws_apigateway.RequestValidator(
-            scope=self,
-            id=f"{lambda_handler}{api_resource}Validator",
-            rest_api=self.rest_api,
-            validate_request_body=bool(request_model is not None),
-            validate_request_parameters=bool(request_parameters is not None),
-        )
+        Also set up validation.
+
+        See:
+            https://docs.aws.amazon.com/cdk/api/v1/docs/@aws-cdk_aws-apigateway.MethodOptions.html
+        """
+        lambda_integration = aws_apigateway.LambdaIntegration(handler=lambda_handler)
 
         request_models = None
         if request_model is not None:

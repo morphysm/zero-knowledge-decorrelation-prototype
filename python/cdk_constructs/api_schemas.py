@@ -61,7 +61,7 @@ auth_code_schema = aws_apigateway.JsonSchema(
 scopes_schema = aws_apigateway.JsonSchema(
     schema=aws_apigateway.JsonSchemaVersion.DRAFT7,
     type=aws_apigateway.JsonSchemaType.ARRAY,
-    items=aws_apigateway.JsonSchema(type=aws_apigateway.JsonSchemaType.STRING),
+    items=aws_apigateway.JsonSchema(title="Scope", type=aws_apigateway.JsonSchemaType.STRING),
     title="Scopes",
     description="Collection of OAuth2 Scopes.",
 )
