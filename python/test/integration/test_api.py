@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 from typing import Dict
 
@@ -22,7 +21,7 @@ class TestMintBadges:
         In the future, will will read from the blockchain
         to assert that an NFT was actually minted.
         """
-        body = json.dumps({"address": "foo", "description": "foo"})
+        body = {"address": "foo", "description": "bar"}
         resp = requests.post(f"{BASE_URL}/badges", json=body)
         assert resp.status_code == 200, resp.content
 
@@ -69,13 +68,11 @@ class TestAuthenticateApi:
 
         Currently just verify an "ok" response is returned.
         """
-        body = json.dumps(
-            {
-                "platform": platform.name,
-                "authorization_code": "123",
-                "scopes": ["read"],
-            }
-        )
+        body = {
+            "platform": platform.name,
+            "authorization_code": "123",
+            "scopes": ["read"],
+        }
         resp = requests.post(f"{BASE_URL}/auth", json=body)
         assert resp.status_code == 200, resp.content
 
