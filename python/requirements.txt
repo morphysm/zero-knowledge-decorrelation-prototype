@@ -11,4 +11,5 @@ mypy==0.780
 moto==3.0.0
 pytest==6.2.5
 pytest-cov==2.12.1
+pynamodb==5.2.1
 wheel==0.36.2

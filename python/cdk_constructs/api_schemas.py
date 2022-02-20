@@ -89,7 +89,12 @@ mint_badge_request_schema = aws_apigateway.JsonSchema(
     schema=aws_apigateway.JsonSchemaVersion.DRAFT7,
     title="Mint Badge Request",
     type=aws_apigateway.JsonSchemaType.OBJECT,
-    properties={"address": address_schema},
+    properties={
+        "address": address_schema,
+        "name": badge_name_schema,
+        "platform": platform_schema,
+        "description": description_schema,
+    },
     required=["address"],
 )
 
