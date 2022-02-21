@@ -18,12 +18,12 @@ class ZicoBadgesStack(core.Stack):
 
         A "stack" is a collection of resources that AWS cloudformation
         manages as one group. See:
-            https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacks.html
+            https://docs.aws.amazon.com/AWSCloudFormation/latest/AccountGuide/stacks.html
 
         Currently contains:
             API construct containing a full rest API with lambda
                 handlers for all endpoints.
-            Dynamo construct with user and badge tables.
+            Dynamo construct with account and badge tables.
 
         args:
             scope: construct that is scope for this stack. All CDK
@@ -33,5 +33,10 @@ class ZicoBadgesStack(core.Stack):
         """
         super().__init__(scope=scope, id=id, **kwargs)
 
-        Api(scope=self, id=f"{id}Api")
-        Dynamo(scope=self, id=f"{id}Database")
+        self.dynamo = Dynamo(scope=self, id=f"{id}Database")
+        self.api = Api(
+            scope=self,
+            id=f"{id}Api",
+            accounts_table=self.dynamo.accounts_table,
+            badges_table=self.dynamo.badges_table,
+        )

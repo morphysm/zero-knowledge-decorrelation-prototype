@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Literal, Optional
 
 from aws_cdk import (
     aws_apigateway,
+    aws_dynamodb,
     aws_lambda,
     aws_lambda_nodejs,
     aws_lambda_python,
@@ -15,8 +16,10 @@ from aws_cdk import (
 import python.cdk_constructs.api_schemas as schemas
 
 # Constants
-NODEJS_BASE_PATH: Path = Path("nodejs", "src", "handlers")
-PYTHON_BASE_PATH: Path = Path("python", "src", "handlers")
+BASE_PATH = Path(__file__).parent.parent.parent.absolute()
+NODEJS_BASE_PATH: Path = Path(BASE_PATH, "nodejs")
+PYTHON_BASE_PATH: Path = Path(BASE_PATH, "python")
+
 # Environment variables
 POLKADOT_ENVIRONMENT: Dict[str, str] = {
     "ALCHEMY_MUMBAI_URL": os.environ["ALCHEMY_MUMBAI_URL"],
@@ -78,6 +81,8 @@ class Api(core.Construct):
         self,
         scope: core.Construct,
         id: str,
+        accounts_table: aws_dynamodb.Table,
+        badges_table: aws_dynamodb.Table,
         **kwargs: Any,
     ) -> None:
         """Create the API Gateway defining an API.
@@ -93,32 +98,53 @@ class Api(core.Construct):
 
         rest_api = self.rest_api = aws_apigateway.RestApi(
             scope=self,
-            id=f"{id}RestApi",
+            id="RestApi",
         )
 
         # Api Resources
         badges_resource = rest_api.root.add_resource("badges")
         auth_resource = rest_api.root.add_resource("auth")
 
+        accounts_resource = rest_api.root.add_resource("accounts")
+        account_resource = accounts_resource.add_resource("{account}")
+
         # Handler definitions
-        mint_badges_handler = self.create_nodejs_handler(
+        self.mint_badges_handler = self.create_nodejs_handler(
             method_name="mint_badge",
         )
-        list_badges_handler = self.create_nodejs_handler(
+        self.list_badges_handler = self.create_nodejs_handler(
             method_name="list_badges",
         )
 
-        authenticate_platform = self.create_python_handler(
-            method_name="authenticate_platform",
-            environment=None,
+        self.authenticate_platform_handler = self.create_python_handler(
+            method_name="authenticate_platform"
         )
+
+        self.list_accounts_handler = self.create_python_handler(
+            method_name="list_accounts"
+        )
+        self.create_account_handler = self.create_python_handler(
+            method_name="create_account"
+        )
+        self.delete_account_handler = self.create_python_handler(
+            method_name="delete_account"
+        )
+
+        # Allow API handlers to read from DB
+        # Pynamo ORN requires full access
+        accounts_table.grant_full_access(self.list_accounts_handler)
+        accounts_table.grant_full_access(self.create_account_handler)
+        accounts_table.grant_full_access(self.delete_account_handler)
+
+        badges_table.grant_full_access(self.mint_badges_handler)
+        badges_table.grant_full_access(self.list_badges_handler)
 
         # Validators
         # see here: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-validation-set-up.html
         body_validator = aws_apigateway.RequestValidator(
             scope=self,
             id="BodyValidator",
-            rest_api=rest_api,
+            rest_api=self.rest_api,
             validate_request_body=True,
             validate_request_parameters=False,
         )
@@ -126,14 +152,14 @@ class Api(core.Construct):
         params_validator = aws_apigateway.RequestValidator(
             scope=self,
             id="RequestBodyAndParametersValidator",
-            rest_api=rest_api,
+            rest_api=self.rest_api,
             validate_request_body=False,
             validate_request_parameters=True,
         )
 
         # Integrate handlers with API resources
         self.integrate_lambda_and_resource(
-            lambda_handler=mint_badges_handler,
+            lambda_handler=self.mint_badges_handler,
             http_method="POST",
             api_resource=badges_resource,
             request_model=ApiModel(
@@ -154,7 +180,7 @@ class Api(core.Construct):
         )
 
         self.integrate_lambda_and_resource(
-            lambda_handler=list_badges_handler,
+            lambda_handler=self.list_badges_handler,
             http_method="GET",
             api_resource=badges_resource,
             request_parameters={
@@ -176,7 +202,7 @@ class Api(core.Construct):
         )
 
         self.integrate_lambda_and_resource(
-            lambda_handler=authenticate_platform,
+            lambda_handler=self.authenticate_platform_handler,
             http_method="POST",
             api_resource=auth_resource,
             request_model=ApiModel(
@@ -190,6 +216,66 @@ class Api(core.Construct):
                 MethodResponse(404, aws_apigateway.Model.ERROR_MODEL),
             ],
             validator=body_validator,
+        )
+
+        self.integrate_lambda_and_resource(
+            lambda_handler=self.create_account_handler,
+            http_method="POST",
+            api_resource=accounts_resource,
+            request_model=ApiModel(
+                "CreateAccountRequestModel",
+                schemas.create_account_request_schema,
+            ),
+            method_responses=[
+                MethodResponse(
+                    200,
+                    ApiModel(
+                        "CreateAccountResponseModel",
+                        schemas.create_account_response_schema,
+                    ).to_model(rest_api),
+                ),
+                MethodResponse(400, aws_apigateway.Model.ERROR_MODEL),
+                MethodResponse(403, aws_apigateway.Model.ERROR_MODEL),
+                MethodResponse(404, aws_apigateway.Model.ERROR_MODEL),
+            ],
+            validator=body_validator,
+        )
+
+        self.integrate_lambda_and_resource(
+            lambda_handler=self.list_accounts_handler,
+            http_method="GET",
+            api_resource=accounts_resource,
+            request_parameters={
+                "method.request.querystring.status": False,
+                "method.request.querystring.since": False,
+                "method.request.querystring.limit": False,
+            },
+            method_responses=[
+                MethodResponse(
+                    200,
+                    ApiModel(
+                        "ListAccountsResponseModel",
+                        schemas.list_accounts_response_schema,
+                    ).to_model(rest_api),
+                ),
+            ],
+            validator=params_validator,
+        )
+
+        self.integrate_lambda_and_resource(
+            lambda_handler=self.delete_account_handler,
+            http_method="DELETE",
+            api_resource=account_resource,
+            request_parameters={
+                "method.request.path.account": True,
+            },
+            method_responses=[
+                MethodResponse(200, aws_apigateway.Model.EMPTY_MODEL),
+                MethodResponse(400, aws_apigateway.Model.ERROR_MODEL),
+                MethodResponse(403, aws_apigateway.Model.ERROR_MODEL),
+                MethodResponse(404, aws_apigateway.Model.ERROR_MODEL),
+            ],
+            validator=params_validator,
         )
 
     def integrate_lambda_and_resource(
@@ -248,8 +334,8 @@ class Api(core.Construct):
             scope=self,
             id=method_id,
             entry=str(entry_path),
-            index=f"{method_name}.py",
-            handler=method_name,
+            index=f"src/handlers/{method_name}.py",
+            handler=f"{method_name}_handler",
             environment=environment,
             retry_attempts=0,
             **kwargs,
@@ -273,7 +359,7 @@ class Api(core.Construct):
         handler = aws_lambda_nodejs.NodejsFunction(
             scope=self,
             id=method_id,
-            entry=f"{str(entry_path)}/{method_name}.ts",
+            entry=f"{entry_path}/src/handlers/{method_name}.ts",
             handler=f"{method_name}_handler",
             bundling=aws_lambda_nodejs.BundlingOptions(
                 environment=environment,

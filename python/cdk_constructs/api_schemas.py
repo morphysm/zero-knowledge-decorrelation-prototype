@@ -8,6 +8,7 @@ from aws_cdk import aws_apigateway
 
 from python.lib.enums import Platform
 
+# PRIMITIVES
 address_schema = aws_apigateway.JsonSchema(
     schema=aws_apigateway.JsonSchemaVersion.DRAFT7,
     type=aws_apigateway.JsonSchemaType.STRING,
@@ -20,6 +21,14 @@ badge_name_schema = aws_apigateway.JsonSchema(
     type=aws_apigateway.JsonSchemaType.STRING,
     title="Badge Name",
     description="Name of a badge",
+)
+
+badge_names_schema = aws_apigateway.JsonSchema(
+    schema=aws_apigateway.JsonSchemaVersion.DRAFT7,
+    type=aws_apigateway.JsonSchemaType.ARRAY,
+    title="Badge Names",
+    description="List of Badge Names",
+    items=badge_name_schema,
 )
 
 platform_schema = aws_apigateway.JsonSchema(
@@ -55,7 +64,7 @@ auth_code_schema = aws_apigateway.JsonSchema(
     schema=aws_apigateway.JsonSchemaVersion.DRAFT7,
     type=aws_apigateway.JsonSchemaType.STRING,
     title="Authorization Code",
-    description="Authorization code returned by user for initiating an OAuth2 flow",
+    description="Authorization code returned by account for initiating an OAuth2 flow",
 )
 
 scopes_schema = aws_apigateway.JsonSchema(
@@ -66,6 +75,50 @@ scopes_schema = aws_apigateway.JsonSchema(
     ),
     title="Scopes",
     description="Collection of OAuth2 Scopes.",
+)
+
+account_id_schema = aws_apigateway.JsonSchema(
+    schema=aws_apigateway.JsonSchemaVersion.DRAFT7,
+    type=aws_apigateway.JsonSchemaType.STRING,
+    title="Account ID",
+    description="ID of a account on a given platform.",
+)
+
+metamask_id_schema = aws_apigateway.JsonSchema(
+    schema=aws_apigateway.JsonSchemaVersion.DRAFT7,
+    type=aws_apigateway.JsonSchemaType.STRING,
+    title="Metamask ID",
+    description="Metamask ID",
+)
+
+discord_server_id_schema = aws_apigateway.JsonSchema(
+    schema=aws_apigateway.JsonSchemaVersion.DRAFT7,
+    type=aws_apigateway.JsonSchemaType.STRING,
+    title="Discord Server ID",
+    description="ID of the Discord Server",
+)
+
+discord_role_id_schema = aws_apigateway.JsonSchema(
+    schema=aws_apigateway.JsonSchemaVersion.DRAFT7,
+    type=aws_apigateway.JsonSchemaType.STRING,
+    title="Discord Role ID",
+    description="ID of a Discord Role",
+)
+
+
+# DATA STRUCTURES
+account_schema = aws_apigateway.JsonSchema(
+    schema=aws_apigateway.JsonSchemaVersion.DRAFT7,
+    title="Zeko Account",
+    type=aws_apigateway.JsonSchemaType.OBJECT,
+    properties={
+        "account_id": account_id_schema,
+        "platform": platform_schema,
+        "metamask_id": metamask_id_schema,
+        "badges": badge_names_schema,
+        "server_id": discord_server_id_schema,
+        "role_id": discord_role_id_schema,
+    },
 )
 
 
@@ -85,6 +138,7 @@ badge_schema = aws_apigateway.JsonSchema(
 )
 
 
+# MINT HANDLER REQUESTS AND RESPONSES
 mint_badge_request_schema = aws_apigateway.JsonSchema(
     schema=aws_apigateway.JsonSchemaVersion.DRAFT7,
     title="Mint Badge Request",
@@ -112,6 +166,37 @@ list_badges_response_schema = aws_apigateway.JsonSchema(
     items=badge_schema,
 )
 
+# ACCOUNT HANDLER REQUESTS AND RESPONSES
+create_account_request_schema = aws_apigateway.JsonSchema(
+    schema=aws_apigateway.JsonSchemaVersion.DRAFT7,
+    title="Mint Badge Request",
+    type=aws_apigateway.JsonSchemaType.OBJECT,
+    properties={
+        "account_id": account_id_schema,
+        "platform": platform_schema,
+        "metamask_id": metamask_id_schema,
+        "server_id": discord_server_id_schema,
+        "role_id": discord_role_id_schema,
+    },
+    required=["account_id", "platform", "metamask_id"],
+)
+
+create_account_response_schema = aws_apigateway.JsonSchema(
+    schema=aws_apigateway.JsonSchemaVersion.DRAFT7,
+    title="Create Account Response",
+    type=aws_apigateway.JsonSchemaType.OBJECT,
+    properties={"body": account_schema},
+)
+
+list_accounts_response_schema = aws_apigateway.JsonSchema(
+    schema=aws_apigateway.JsonSchemaVersion.DRAFT7,
+    title="List Accounts Response",
+    type=aws_apigateway.JsonSchemaType.ARRAY,
+    items=account_schema,
+)
+
+
+# AUTHENTICATE PLATFORM REQUEST/RESPONSE
 authenticate_platform_request_schema = aws_apigateway.JsonSchema(
     schema=aws_apigateway.JsonSchemaVersion.DRAFT7,
     title="Authenticate Platform Request",
