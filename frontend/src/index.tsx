@@ -8,12 +8,12 @@ import { DAppProvider } from "@usedapp/core";
 import App from './App';
 
 import reportWebVitals from './reportWebVitals';
-import { Badges } from './components/Badges';
 import { Header } from './components/Header';
 import { Mint } from './components/Mint';
 import { Search } from './components/Search';
 import { About } from './components/About';
 import { Discord } from './components/Discord'
+
 interface IHeaderProps {
   // any props that come into the component
 }
@@ -25,19 +25,18 @@ const Foo: React.FC<IHeaderProps> = (props) => {
 }
 ReactDOM.render(
   <React.StrictMode>
-      <DAppProvider config={{}}>
+    <DAppProvider config={{}}>
+      <Router>
+        <Header></Header>
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/mint" element={<Mint />} />
+          <Route path="/mint/discord" element={<Discord />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/about" element={<About />} />
 
-    <Router>
-      <Header></Header>
-      <Routes>
-        <Route path="/" element={<App/>} />
-        <Route path="/mint" element={<Mint/>}/>
-        <Route path="/search" element={<Search/>}/>
-        <Route path="/about" element={<About/>}/>
-        <Route path="/discord" element={<Discord/>}/>
-
-      </Routes>
-    </Router >
+        </Routes>
+      </Router >
     </DAppProvider>
   </React.StrictMode>,
   document.getElementById('root')

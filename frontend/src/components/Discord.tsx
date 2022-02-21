@@ -1,6 +1,11 @@
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+
+import { useEffect, useState } from 'react';
+
+
 //here lies types for the api response...
 
-//after auth we get this data
 interface IDiscordAuthProps {
     // tokenType: string
     // accessToken: string
@@ -51,8 +56,50 @@ export interface User {
 
 
 
+
 const Discord: React.FunctionComponent<IDiscordAuthProps> = (props) => {
+
+    const API_ENDPOINT = 'https://discord.com/api/v8/oauth2/token';
+    const CLIENT_ID = '945061636400627783';
+    const CLIENT_SECRET = 'redacted - pm me for it :). I will make them as env variables of course i just cba to at the time'; //TODO: read from env var obvi.
+    //should probably read the testing env from a file but it's a hackathon so who cares. 
+    const REDIRECT_URI = 'http://localhost:3000/mint/discord';
+    const code = getQueryString().get('code');
+
+    const params = new URLSearchParams();
+    params.append('client_id', CLIENT_ID);
+    params.append('client_secret', CLIENT_SECRET);
+    params.append('grant_type', 'authorization_code');
+    params.append('code', String(code));
+    params.append('redirect_uri', REDIRECT_URI);
+
+    //this token will be used (frankly may not have to be in a useState hook i want to check) to make api requests.
+    const [bearerToken, setToken] = useState('');
+    //useEffect means when the component is ready/loaded - do this stuff.
+    useEffect(() => {
+        //async because we need to await the fetch response
+        const getData = async () => {
+            const response = await fetch(API_ENDPOINT, {
+                method: 'POST',
+                body: params,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+
+            const json = response.json();
+            setToken(JSON.stringify(json));
+        }
+        getData();
+    }, []);
+
     return null;
 }
+
+const getQueryString = (): URLSearchParams => {
+    const queryString = window.location.search;
+    return new URLSearchParams(queryString);
+}
+
 
 export { Discord }
