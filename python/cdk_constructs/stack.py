@@ -4,6 +4,7 @@ from typing import Any
 from aws_cdk import core
 
 from python.cdk_constructs.api import Api
+from python.cdk_constructs.dynamo import Dynamo
 
 
 class ZicoBadgesStack(core.Stack):
@@ -20,8 +21,9 @@ class ZicoBadgesStack(core.Stack):
             https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacks.html
 
         Currently contains:
-            API stack containing a full rest API with lambda
+            API construct containing a full rest API with lambda
                 handlers for all endpoints.
+            Dynamo construct with user and badge tables.
 
         args:
             scope: construct that is scope for this stack. All CDK
@@ -32,3 +34,4 @@ class ZicoBadgesStack(core.Stack):
         super().__init__(scope=scope, id=id, **kwargs)
 
         Api(scope=self, id=f"{id}Api")
+        Dynamo(scope=self, id=f"{id}Database")
