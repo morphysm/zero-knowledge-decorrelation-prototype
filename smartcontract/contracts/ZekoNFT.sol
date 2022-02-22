@@ -5,36 +5,27 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-// create IPFS function to issue the NFT 
-// ZK Badge, It doesn't display who you are on the frontend!
-// - ERC721 full interface (base, metadata, enumerable)
+// Bring your Discord Dao roles on chain via Zeko NFT Badges
 
-// Function required:
-// - BulkTransfer to whitelisted address (set a timeout!) (can only be called by the admin = me)
-// - Make the badge non transferable after BulkTransfer
-// - separaPerProgetto...
-
-// to add:
-// - Burnable NFTs
+// Functionality to add: 
+// Give admin permission to each dao
 
 contract ZekoNFT is ERC721URIStorage {
 
+    event RoleTokenAssigned (uint256 daoId, uint256 roleId, uint256 tokenId);
+
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
-
 
     // The contract deployer becomes the admin of the contract 
     address public admin;
 
     // Add a mapping of "claimers" 
-    // Add a mapping of "whitelisted addresses"  
     // (daoId => roleId => array of addresses) 
     mapping (uint => mapping (uint => address [])) public claimers;
-    mapping (uint => mapping (uint => address [])) public whiteList;
 
-    // Add a mapping that gets you from daoId => RoleId => array of NFT tokenIds that shows if 
-    // it's transferable or not
-    mapping (uint => mapping (uint => uint [])) public tokenRoleToId;
+    // Add a mapping that gets you from daoId => RoleId => array of NFT's tokenIds
+    mapping (uint => mapping (uint => uint [])) private _daoToRoleToId;
 
     // Add a mapping that gets you from NFT id to its trasnferability
     mapping (uint => bool) isNftTransferable;
@@ -59,37 +50,45 @@ contract ZekoNFT is ERC721URIStorage {
         claimers[_daoId][_roleId].push(msg.sender);
     }
 
-    // - Add address to the white list (serverId => roleId => address) (Admin permission) after internal verification
-    function addToWhitelist (address verifiedClaimer, uint _daoId, uint _roleId) public {
-        whiteList[_daoId][_roleId].push(verifiedClaimer);
-        require(msg.sender == admin);
+    
+    function mintNFT(uint _daoId, uint _roleId) public {
+        claimers[_daoId][_roleId].push(msg.sender);
     }
 
-    // - when called addresses inside the whitelist gets their NFT airdropped otherwise it gets burned
-    function blukAirdropForRole (uint _daoId, uint _roleId) public {
-
-        address [] memory addressesToTransfer = whiteList[_daoId][_roleId];
+    // admin requriments 
+    function blukAirdropForRole (uint _daoId, uint _roleId, address [] addressesToTransfer) public {
     
         uint [] memory nftMintedIds = tokenRoleToId[_daoId][_roleId];
 
         for (uint i = 0; i < nftMintedIds.length; i++) {
             _transfer(msg.sender, addressesToTransfer[i], nftMintedIds[i]);
             isNftTransferable[nftMintedIds[i]] = false;
+
+            emit RoleTokenAssigned(_daoId, _roleId, nftMintedIds[i]);
         }
 
         require(msg.sender == admin);
     }
 
+    // Make the badge non transferable after Airdrop
+    function _transfer(address from, address to, uint256 tokenId) override internal {
+        require(isNftTransferable[tokenId]=true);
+        super._transfer(from, to, tokenId); 
+    }
 
-   function _transfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) override internal {
+    function daoToRoleToId (uint256 _daoId, uint256 _roleId) public view returns (uint256) {
 
-    require(isNftTransferable[tokenId]=true);
-    super._transfer(from, to, tokenId); 
-}
+        return _daoToRoleToId[_daoId][_roleId ];
+    }
+
+    // you can only burn NFTs owned by the msg.sender
+    function burn(uint256 tokenId) public {
+
+        require(msg.sender == admin);
+        require(ownerOf(tokenId) == msg.sender); 
+        require(_isApprovedOrOwner(msg.sender, tokenId) || isAdmin(msg.sender));
+        _burn(tokenId);
+    } 
 }
 
     

@@ -3,7 +3,7 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
-const deployedContract = '0xD268d358461d328f95FB8EDB0fFa365E44c512eE'
+const deployedContract = '0xf923CB0A7dEbfe946F69Ed1F50b945c50cF41252'
 const hre = require("hardhat");
 
 async function main() {
