@@ -87,10 +87,14 @@ Code should be annotated using the type hints introduced in [PEP 484](https://ww
 To type check your code, run the following commands:
 
 ```
-mypy .
+mypy -p python
 ```
 
 The settings for MyPy are definined in the mypy.ini file in the root of the repo.
+
+We use mypy -p because Python is a package within our repo, and imports
+will be evaluated wrongly if we use defauly MyPy. See Python BDFL Guido van Rossum's
+answer [here](https://lifesaver.codes/answer/release-0-780-source-file-found-twice-under-different-module-names-error-8944).
 
 
 ### Linting
