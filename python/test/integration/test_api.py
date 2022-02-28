@@ -8,7 +8,7 @@ from python.lib.enums import Platform
 
 
 # TODO: Pull from CDK output file
-BASE_URL = "https://ck7q26rfh5.execute-api.us-east-1.amazonaws.com/prod/"
+BASE_URL = "https://jo236x3z18.execute-api.us-east-1.amazonaws.com/prod"
 
 
 class TestMintBadges:
@@ -80,3 +80,40 @@ class TestAuthenticateApi:
     def test_authenticate_platform_invalid_request() -> None:
         resp = requests.post(f"{BASE_URL}/auth")
         assert resp.status_code == 400, resp.content
+
+
+class TestCreateAccount:
+    @staticmethod
+    def test_create_account() -> None:
+        request_body = {
+            "account_id": "foo",
+            "platform": Platform.DISCORD.name,
+            "metamask_id": "bar",
+            "server_id": "baz",
+            "role_id": "qux",
+        }
+
+        resp = requests.post(f"{BASE_URL}/accounts", json=request_body)
+        assert resp.status_code == 200, resp.content
+
+
+class TestListAccounts:
+    @staticmethod
+    def test_list_accounts() -> None:
+        resp = requests.get(f"{BASE_URL}/accounts")
+        assert resp.status_code == 200, resp.content
+
+
+class TestDeleteAccount:
+    @staticmethod
+    @pytest.mark.skip(reason="Depends on create account")
+    def test_delete_account() -> None:
+        accountname = ...
+        resp = requests.delete(f"{BASE_URL}/accounts/{accountname}")
+        assert resp.status_code == 200, resp.content
+
+    @staticmethod
+    def test_delete_account_dne() -> None:
+        accountname = "zico"
+        resp = requests.delete(f"{BASE_URL}/accounts/{accountname}")
+        assert resp.status_code == 404, resp.content
