@@ -1,5 +1,6 @@
 aws-cdk.core==1.89.0
 aws_cdk.aws_apigateway==1.89.0
+aws_cdk.aws_iam==1.89.0
 aws_cdk.aws_lambda==1.89.0
 aws_cdk.aws_lambda_python==1.89.0
 aws_cdk.aws_lambda_nodejs==1.89.0
