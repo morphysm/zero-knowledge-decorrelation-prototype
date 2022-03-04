@@ -5,10 +5,10 @@ interface IFooterProps {
 }
 
 export const Footer: React.FC<IFooterProps> = (props) => (
-    <footer className="page-footer font-small bg-dark pt-4" style={{position: 'sticky', bottom: 0}}>
+    <footer className="page-footer font-small bg-dark pt-2" style={{position: 'sticky', bottom: 0}}>
         <div className="container-fluid text-center text-md-left">
             <div className="row">
-                <div className="col-md-6 mt-md-0 mt-3">
+                <div className="col-md-6 mt-md-0">
                     <h5 className="text-uppercase text-light">Zeko</h5>
                 </div>
                 <hr className="clearfix w-100 d-md-none pb-0" />

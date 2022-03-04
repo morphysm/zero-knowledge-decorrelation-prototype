@@ -6,10 +6,10 @@ export interface IBadgesProps {
 
 const Badges: React.FC<IBadgesProps> = ({ images }) => {
     return (
-        <div className='d-flex flex-column justify-content-center m-5 align-items-left bg-black'>
-            <div className='d-flex flex-row flex-wrap d-inline-block text-center align-top bg-light ' > {/*style={{width: '500px'}}*/}
+        <div className='d-flex flex-column justify-content-center m-5 align-items-left'>
+            <div className='d-flex flex-row flex-wrap d-inline-block text-center align-top ' >
                 {images.map((arr, i) =>
-                    <div key={`player-${i}`}>
+                    <div className='bg-light m-2' key={`player-${i}`}>
                         <img className='image' src={arr[0]}></img>
                         <span className='d-block'>{arr[1]}</span>
                     </div>
