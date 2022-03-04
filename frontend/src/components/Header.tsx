@@ -11,13 +11,13 @@ interface IHeaderProps {
 //https://www.codeply.com/p/P0KN7DNsEq
 const Header: React.FunctionComponent<IHeaderProps> = (props) => {
     return (
-        <Nav className="navbar navbar-expand-md navbar-dark bg-dark w-100">
+        <Nav className="navbar navbar-expand-md navbar-dark bg-dark w-100" style={{position: 'sticky', top: 0}}>
             <div className="container-fluid">
                 <div className="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
                     <ul className="navbar-nav me-auto">
                         <li className="nav-item active">
                             <LinkContainer to="/">
-                                <Navbar.Brand>ZEKO BADGES</Navbar.Brand>
+                                <Navbar.Brand>ZEKO</Navbar.Brand>
                             </LinkContainer>
                         </li>
                     </ul>
@@ -25,7 +25,10 @@ const Header: React.FunctionComponent<IHeaderProps> = (props) => {
                 <div className="mx-auto order-0 " >
                     {/* LinkContainer botched formatting, added padding of*/}
                     <LinkContainer className='p-4' to="/mint">
-                        <Navbar.Brand className="navbar-brand mx-auto" >Mint NFTs</Navbar.Brand>
+                        <Navbar.Brand className="navbar-brand mx-auto" >ZK Badges</Navbar.Brand>
+                    </LinkContainer>
+                    <LinkContainer className='p-4' to="/partners">
+                        <Navbar.Brand className="navbar-brand mx-auto">Partners</Navbar.Brand>
                     </LinkContainer>
                     <LinkContainer className='p-4' to="/search">
                         <Navbar.Brand className="navbar-brand mx-auto">Search</Navbar.Brand>

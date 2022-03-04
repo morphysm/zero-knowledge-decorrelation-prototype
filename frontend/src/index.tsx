@@ -14,6 +14,7 @@ import { Mint } from './components/Mint';
 import { Search } from './components/Search';
 import { About } from './components/About';
 import { Discord } from './components/Discord'
+import { Footer } from './components/Footer';
 interface IHeaderProps {
   // any props that come into the component
 }
@@ -37,6 +38,7 @@ ReactDOM.render(
         <Route path="/discord" element={<Discord/>}/>
 
       </Routes>
+      <Footer></Footer>
     </Router >
     </DAppProvider>
   </React.StrictMode>,
