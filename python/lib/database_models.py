@@ -2,7 +2,12 @@
 
 https://pynamodb.readthedocs.io/en/latest/tutorial.html#getting-started
 """
-from pynamodb.attributes import ListAttribute, UnicodeAttribute, UTCDateTimeAttribute
+from pynamodb.attributes import (
+    JSONAttribute,
+    ListAttribute,
+    UnicodeAttribute,
+    UTCDateTimeAttribute,
+)
 from pynamodb.models import Model
 
 
@@ -32,6 +37,21 @@ class BadgeModel(Model):
     name = UnicodeAttribute()
     platform = UnicodeAttribute()
     status = UnicodeAttribute()
+    created_datetime = UTCDateTimeAttribute(null=True, default=None)
+    description = UnicodeAttribute(null=True, default=None)
+    image_url = UnicodeAttribute(null=True, default=None)
+
+
+class DaoModel(Model):
+    """A DAO as represented in Dynamo DB."""
+
+    class Meta:
+        table_name = "Daos"
+
+    discord_server_id = UnicodeAttribute(hash_key=True)
+
+    dao_name = UnicodeAttribute()
+    badges = JSONAttribute()
     created_datetime = UTCDateTimeAttribute(null=True, default=None)
     description = UnicodeAttribute(null=True, default=None)
     image_url = UnicodeAttribute(null=True, default=None)
