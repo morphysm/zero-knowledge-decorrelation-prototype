@@ -8,7 +8,7 @@ from python.lib.enums import Platform
 
 
 # TODO: Pull from CDK output file
-BASE_URL = "https://aehctx9vki.execute-api.us-east-1.amazonaws.com/prod"
+BASE_URL = "https://91i8x6sq2f.execute-api.us-east-1.amazonaws.com/prod"
 
 
 class TestMintBadges:
@@ -125,7 +125,6 @@ class TestCreateDao:
         request_body = {
             "discord_server_id": "foo",
             "name": "bar",
-            "badges": ["Foo", "Bar"],
         }
 
         resp = requests.post(f"{BASE_URL}/daos", json=request_body)
@@ -148,7 +147,7 @@ class TestDeleteDao:
         assert resp.status_code == 200, resp.content
 
     @staticmethod
-    def test_delete_account_dne() -> None:
+    def test_delete_dao_dne() -> None:
         dao_server_id = "dao"
         resp = requests.delete(f"{BASE_URL}/daos/{dao_server_id}")
         assert resp.status_code == 404, resp.content
