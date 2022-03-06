@@ -117,3 +117,38 @@ class TestDeleteAccount:
         accountname = "zico"
         resp = requests.delete(f"{BASE_URL}/accounts/{accountname}")
         assert resp.status_code == 404, resp.content
+
+
+class TestCreateDao:
+    @staticmethod
+    def test_create_dao() -> None:
+        request_body = {
+            "discord_server_id": "foo",
+            "name": "bar",
+            "badges": ["Foo", "Bar"],
+        }
+
+        resp = requests.post(f"{BASE_URL}/daos", json=request_body)
+        assert resp.status_code == 200, resp.content
+
+
+class TestListDaos:
+    @staticmethod
+    def test_list_daos() -> None:
+        resp = requests.get(f"{BASE_URL}/daos")
+        assert resp.status_code == 200, resp.content
+
+
+class TestDeleteDao:
+    @staticmethod
+    @pytest.mark.skip(reason="Depends on create dao")
+    def test_delete_dao() -> None:
+        accountname = ...
+        resp = requests.delete(f"{BASE_URL}/daos/{accountname}")
+        assert resp.status_code == 200, resp.content
+
+    @staticmethod
+    def test_delete_account_dne() -> None:
+        dao_server_id = "dao"
+        resp = requests.delete(f"{BASE_URL}/daos/{dao_server_id}")
+        assert resp.status_code == 404, resp.content
