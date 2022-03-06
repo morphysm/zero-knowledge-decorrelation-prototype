@@ -9,7 +9,7 @@ from lib.database_models import AccountModel
 logger = logging.getLogger("create_account_handler")
 
 
-def create_user_handler(event: Dict, context: Any) -> Dict:
+def create_account_handler(event: Dict, context: Any) -> Dict:
     event_body = json.loads(event["body"])
 
     try:
@@ -26,4 +26,4 @@ def create_user_handler(event: Dict, context: Any) -> Dict:
         }
 
     account.save()
-    return {"statusCode": 200, "body": account.to_json()}
+    return {"statusCode": 200, "body": account.attribute_values}

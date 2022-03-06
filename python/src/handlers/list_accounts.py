@@ -11,4 +11,7 @@ def list_accounts_handler(event: Dict, context: Any) -> Dict:
     TODO: Implement filtering, pagination, etc.
     """
     accounts = AccountModel.scan()
-    return {"statusCode": 200, "body": json.dumps([a.to_json() for a in accounts])}
+    return {
+        "statusCode": 200,
+        "body": json.dumps([a.attribute_values for a in accounts]),
+    }
