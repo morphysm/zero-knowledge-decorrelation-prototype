@@ -50,8 +50,8 @@ class DaoModel(Model):
 
     discord_server_id = UnicodeAttribute(hash_key=True)
 
-    dao_name = UnicodeAttribute()
-    badges = JSONAttribute()
+    name = UnicodeAttribute()
+    badges = JSONAttribute(null=True, default=None)
     created_datetime = UTCDateTimeAttribute(null=True, default=None)
     description = UnicodeAttribute(null=True, default=None)
     image_url = UnicodeAttribute(null=True, default=None)
