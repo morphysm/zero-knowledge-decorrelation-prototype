@@ -108,18 +108,16 @@ class Api(core.Construct):
         accounts_resource = rest_api.root.add_resource("accounts")
         account_resource = accounts_resource.add_resource("{account}")
 
-        # Handler definitions
-        self.mint_badges_handler = self.create_nodejs_handler(
-            method_name="mint_badge",
-        )
-        self.list_badges_handler = self.create_nodejs_handler(
-            method_name="list_badges",
-        )
+        daos_resource = rest_api.root.add_resource("daos")
+        dao_resource = daos_resource.add_resource("{dao}")
 
+        # Handler definitions
+        # Auth
         self.authenticate_platform_handler = self.create_python_handler(
             method_name="authenticate_platform"
         )
 
+        # Accounts
         self.list_accounts_handler = self.create_python_handler(
             method_name="list_accounts"
         )
@@ -129,6 +127,18 @@ class Api(core.Construct):
         self.delete_account_handler = self.create_python_handler(
             method_name="delete_account"
         )
+        # Badges
+        self.mint_badges_handler = self.create_nodejs_handler(
+            method_name="mint_badge",
+        )
+        self.list_badges_handler = self.create_nodejs_handler(
+            method_name="list_badges",
+        )
+
+        # Daos
+        self.list_daos_handler = self.create_python_handler(method_name="list_daos")
+        self.create_dao_handler = self.create_python_handler(method_name="create_dao")
+        self.delete_dao_handler = self.create_python_handler(method_name="delete_dao")
 
         # Allow API handlers to read from DB
         # Pynamo ORN requires full access
@@ -158,49 +168,7 @@ class Api(core.Construct):
         )
 
         # Integrate handlers with API resources
-        self.integrate_lambda_and_resource(
-            lambda_handler=self.mint_badges_handler,
-            http_method="POST",
-            api_resource=badges_resource,
-            request_model=ApiModel(
-                "MintBadgeRequestModel", schemas.mint_badge_request_schema
-            ),
-            method_responses=[
-                MethodResponse(
-                    200,
-                    ApiModel(
-                        "MintBadgeResponseModel", schemas.mint_badge_response_schema
-                    ).to_model(rest_api),
-                ),
-                MethodResponse(400, aws_apigateway.Model.ERROR_MODEL),
-                MethodResponse(403, aws_apigateway.Model.ERROR_MODEL),
-                MethodResponse(404, aws_apigateway.Model.ERROR_MODEL),
-            ],
-            validator=body_validator,
-        )
-
-        self.integrate_lambda_and_resource(
-            lambda_handler=self.list_badges_handler,
-            http_method="GET",
-            api_resource=badges_resource,
-            request_parameters={
-                "method.request.querystring.platform": True,
-                "method.request.querystring.status": False,
-                "method.request.querystring.since": False,
-                "method.request.querystring.limit": False,
-            },
-            method_responses=[
-                MethodResponse(
-                    200,
-                    ApiModel(
-                        "ListBadgesResponseModel", schemas.list_badges_response_schema
-                    ).to_model(rest_api),
-                ),
-                MethodResponse(400, aws_apigateway.Model.ERROR_MODEL),
-            ],
-            validator=params_validator,
-        )
-
+        # Auth
         self.integrate_lambda_and_resource(
             lambda_handler=self.authenticate_platform_handler,
             http_method="POST",
@@ -218,6 +186,7 @@ class Api(core.Construct):
             validator=body_validator,
         )
 
+        # Accounts
         self.integrate_lambda_and_resource(
             lambda_handler=self.create_account_handler,
             http_method="POST",
@@ -268,6 +237,111 @@ class Api(core.Construct):
             api_resource=account_resource,
             request_parameters={
                 "method.request.path.account": True,
+            },
+            method_responses=[
+                MethodResponse(200, aws_apigateway.Model.EMPTY_MODEL),
+                MethodResponse(400, aws_apigateway.Model.ERROR_MODEL),
+                MethodResponse(403, aws_apigateway.Model.ERROR_MODEL),
+                MethodResponse(404, aws_apigateway.Model.ERROR_MODEL),
+            ],
+            validator=params_validator,
+        )
+
+        # Badges
+        self.integrate_lambda_and_resource(
+            lambda_handler=self.mint_badges_handler,
+            http_method="POST",
+            api_resource=badges_resource,
+            request_model=ApiModel(
+                "MintBadgeRequestModel", schemas.mint_badge_request_schema
+            ),
+            method_responses=[
+                MethodResponse(
+                    200,
+                    ApiModel(
+                        "MintBadgeResponseModel", schemas.mint_badge_response_schema
+                    ).to_model(rest_api),
+                ),
+                MethodResponse(400, aws_apigateway.Model.ERROR_MODEL),
+                MethodResponse(403, aws_apigateway.Model.ERROR_MODEL),
+                MethodResponse(404, aws_apigateway.Model.ERROR_MODEL),
+            ],
+            validator=body_validator,
+        )
+
+        self.integrate_lambda_and_resource(
+            lambda_handler=self.list_badges_handler,
+            http_method="GET",
+            api_resource=badges_resource,
+            request_parameters={
+                "method.request.querystring.platform": True,
+                "method.request.querystring.status": False,
+                "method.request.querystring.since": False,
+                "method.request.querystring.limit": False,
+            },
+            method_responses=[
+                MethodResponse(
+                    200,
+                    ApiModel(
+                        "ListBadgesResponseModel", schemas.list_badges_response_schema
+                    ).to_model(rest_api),
+                ),
+                MethodResponse(400, aws_apigateway.Model.ERROR_MODEL),
+            ],
+            validator=params_validator,
+        )
+
+        # Daos
+        self.integrate_lambda_and_resource(
+            lambda_handler=self.create_dao_handler,
+            http_method="POST",
+            api_resource=daos_resource,
+            request_model=ApiModel(
+                "CreateDaoRequestModel",
+                schemas.create_account_request_schema,
+            ),
+            method_responses=[
+                MethodResponse(
+                    200,
+                    ApiModel(
+                        "CreateDaoResponseModel",
+                        schemas.create_dao_response_schema,
+                    ).to_model(rest_api),
+                ),
+                MethodResponse(400, aws_apigateway.Model.ERROR_MODEL),
+                MethodResponse(403, aws_apigateway.Model.ERROR_MODEL),
+                MethodResponse(404, aws_apigateway.Model.ERROR_MODEL),
+            ],
+            validator=body_validator,
+        )
+
+        self.integrate_lambda_and_resource(
+            lambda_handler=self.list_daos_handler,
+            http_method="GET",
+            api_resource=daos_resource,
+            request_parameters={
+                "method.request.querystring.status": False,
+                "method.request.querystring.since": False,
+                "method.request.querystring.limit": False,
+            },
+            method_responses=[
+                MethodResponse(
+                    200,
+                    ApiModel(
+                        "ListDaosResponseModel",
+                        schemas.list_daos_response_schema,
+                    ).to_model(rest_api),
+                ),
+            ],
+            validator=params_validator,
+        )
+
+        self.integrate_lambda_and_resource(
+            lambda_handler=self.delete_dao_handler,
+            http_method="DELETE",
+            api_resource=dao_resource,
+            request_parameters={
+                "method.request.path.dao": True,
             },
             method_responses=[
                 MethodResponse(200, aws_apigateway.Model.EMPTY_MODEL),
