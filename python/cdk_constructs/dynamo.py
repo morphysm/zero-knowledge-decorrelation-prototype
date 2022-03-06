@@ -2,7 +2,7 @@
 
 from aws_cdk import aws_dynamodb, core
 
-from python.lib.database_models import AccountModel, BadgeModel
+from python.lib.database_models import AccountModel, BadgeModel, DaoModel
 
 
 class Dynamo(core.Construct):
@@ -28,7 +28,13 @@ class Dynamo(core.Construct):
             partition_key=aws_dynamodb.Attribute(
                 name="account_id", type=aws_dynamodb.AttributeType.STRING
             ),
-            sort_key=aws_dynamodb.Attribute(
-                name="platform", type=aws_dynamodb.AttributeType.STRING
+        )
+
+        self.daos_table = aws_dynamodb.Table(
+            scope=self,
+            id=DaoModel.Meta.table_name,
+            table_name=DaoModel.Meta.table_name,
+            partition_key=aws_dynamodb.Attribute(
+                name="discord_server_id", type=aws_dynamodb.AttributeType.STRING
             ),
         )

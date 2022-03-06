@@ -238,7 +238,6 @@ create_dao_request_schema = aws_apigateway.JsonSchema(
     properties={
         "discord_server_id": discord_server_id_schema,
         "dao_name": dao_name_schema,
-        "badges": badge_names_schema,
         "description": description_schema,
         "image_url": image_url_schema,
     },

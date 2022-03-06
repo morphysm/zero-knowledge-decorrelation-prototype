@@ -16,7 +16,8 @@ class AccountModel(Model):
         table_name = "Accounts"
 
     account_id = UnicodeAttribute(hash_key=True)
-    platform = UnicodeAttribute(range_key=True)
+
+    platform = UnicodeAttribute()
     badges: ListAttribute[str] = ListAttribute(default=list)
     metamask_id = UnicodeAttribute()
 

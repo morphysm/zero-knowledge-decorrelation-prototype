@@ -83,6 +83,7 @@ class Api(core.Construct):
         id: str,
         accounts_table: aws_dynamodb.Table,
         badges_table: aws_dynamodb.Table,
+        daos_table: aws_dynamodb.Table,
         **kwargs: Any,
     ) -> None:
         """Create the API Gateway defining an API.
@@ -148,6 +149,10 @@ class Api(core.Construct):
 
         badges_table.grant_full_access(self.mint_badges_handler)
         badges_table.grant_full_access(self.list_badges_handler)
+
+        daos_table.grant_full_access(self.list_daos_handler)
+        daos_table.grant_full_access(self.create_dao_handler)
+        daos_table.grant_full_access(self.delete_dao_handler)
 
         # Validators
         # see here: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-validation-set-up.html

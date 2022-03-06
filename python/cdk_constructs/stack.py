@@ -39,4 +39,5 @@ class ZicoBadgesStack(core.Stack):
             id=f"{id}Api",
             accounts_table=self.dynamo.accounts_table,
             badges_table=self.dynamo.badges_table,
+            daos_table=self.dynamo.daos_table,
         )
