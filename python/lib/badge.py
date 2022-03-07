@@ -11,8 +11,9 @@ from python.lib.enums import Platform
 class Badge:
     id: str
     name: str
-    address: str
     platform: Platform
+
+    address: Optional[str] = None
     image_url: Optional[str] = None
     created_datetime: Optional[datetime] = None
     description: Optional[str] = None
