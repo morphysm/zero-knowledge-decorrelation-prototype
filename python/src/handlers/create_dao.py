@@ -12,6 +12,8 @@ logger = logging.getLogger("create_dao_handler")
 def create_dao_handler(event: Dict, context: Any) -> Dict:
     event_body = json.loads(event["body"])
 
+    logger.info(f"Creating DAO. Event Body: {event_body}")
+
     try:
         dao = DaoModel(**event_body)
     except Exception as e:

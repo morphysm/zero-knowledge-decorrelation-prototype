@@ -5,7 +5,7 @@ from typing import Any, Dict
 from lib.database_models import AccountModel
 
 
-def list_accounts_handler(event: Dict, context: Any) -> Dict:
+def list_daos_handler(event: Dict, context: Any) -> Dict:
     """List accounts matching params.
 
     TODO: Implement filtering, pagination, etc.

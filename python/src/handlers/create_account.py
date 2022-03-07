@@ -12,6 +12,8 @@ logger = logging.getLogger("create_account_handler")
 def create_account_handler(event: Dict, context: Any) -> Dict:
     event_body = json.loads(event["body"])
 
+    logger.info(f"Creating account. Event Body: {event_body}")
+
     try:
         account = AccountModel(**event_body)
     except Exception as e:
