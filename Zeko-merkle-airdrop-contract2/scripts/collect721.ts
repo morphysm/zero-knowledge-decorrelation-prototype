@@ -41,7 +41,7 @@ async function main() {
     await tx.wait();
     console.log("Collected!")
 
-    let zekoNFT =  await hre.ethers.getContractAt("ZekoNFT", ERC721_ADDR)
+    let zekoNFT =  await hre.ethers.getContractAt("ZekoGenerativeNFT", ERC721_ADDR)
     let balance = await zekoNFT.balanceOf(collector.address)
     console.log(`Collector balance: ${balance.toString()}`)
 }

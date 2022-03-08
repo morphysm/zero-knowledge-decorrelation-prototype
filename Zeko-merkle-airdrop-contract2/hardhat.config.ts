@@ -9,7 +9,7 @@ export default {
 	version: "0.8.0",
 	settings: {
 		optimizer: {
-			enabled: true,
+			enabled: false,
 			runs: 88888
 		}
 	}
