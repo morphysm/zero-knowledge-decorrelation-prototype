@@ -16,56 +16,69 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Base64.sol";
 
+// NEED TO ADD AN INTERFACE TO CALL THE PRIVATE AIRDROP CONTRACT
+
+interface IAirdropContract {
+    function setInitialTokenId(uint256 _firstNFTID) external returns (uint256);
+}
+
 contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
     using Strings for uint256;
-    mapping(uint256 => Word) public wordsToTokenId;
+    mapping(uint256 => Word) public TokenIdToWord;
+    mapping(uint256 => uint256) public TransferCounterForTokenId;
+
     uint256 public stringLimit = 45;
+
     struct Word {
-        string name;
-        string description;
+        string daoName;
+        string role;
+        string tokenIdInCollection;
         string bgHue;
         string textHue;
-        string value;
     }
 
-    constructor() ERC721("ZekoNFT", "ZK") {
-    }
+    constructor() ERC721("ZekoNFT", "ZK") {}
 
-    function mint(string memory _userText, address _to) public payable onlyOwner {
-        uint256 supply = totalSupply();
-        bytes memory strBytes = bytes(_userText);
-        require(strBytes.length <= stringLimit, "String input exceeds limit.");
-        require(exists(_userText) != true, "String already exists!");
-
-        Word memory newWord = Word(
-            string(abi.encodePacked("NFT", uint256(supply + 1).toString())),
-            "This is our on-chain NFT",
-            randomNum(361, block.difficulty, supply).toString(),
-            randomNum(361, block.timestamp, supply).toString(),
-            _userText
+    function mintRoleToAirdrop(
+        string memory _daoName,
+        string memory _role,
+        uint256 _qty,
+        address _PrivateAirdropContract
+    ) public onlyOwner {
+        bytes memory strDaoBytes = bytes(_daoName);
+        bytes memory strRoleBytes = bytes(_role);
+        require(
+            strDaoBytes.length <= stringLimit,
+            "String input exceeds limit."
         );
+        require(
+            strRoleBytes.length <= stringLimit,
+            "String input exceeds limit."
+        );
+        IAirdropContract(_PrivateAirdropContract).setInitialTokenId(
+            totalSupply() + 1
+        );
+        for (uint256 i = 0; i < _qty; i++) {
+            uint256 supply = totalSupply();
+            Word memory newWord = Word(
+                _daoName,
+                _role,
+                string(
+                    abi.encodePacked(
+                        "#",
+                        uint256(i + 1).toString(),
+                        "/",
+                        uint256(_qty).toString()
+                    )
+                ),
+                randomNum(361, block.difficulty, supply).toString(),
+                randomNum(361, block.timestamp, supply).toString()
+            );
 
-        if (msg.sender != owner()) {
-            require(msg.value >= 0.005 ether);
+            TokenIdToWord[supply + 1] = newWord; //Add word to mapping @tokenId
+            TransferCounterForTokenId[supply + 1] == 0; // create TransferCounterForTokenId for NFT, in order to make it non transferable after the first transfer
+            _safeMint(_PrivateAirdropContract, supply + 1);
         }
-
-        wordsToTokenId[supply + 1] = newWord; //Add word to mapping @tokenId
-        _safeMint(_to, supply + 1);
-    }
-
-    function exists(string memory _text) public view returns (bool) {
-        bool result = false;
-        //totalSupply function starts at 1, as does out wordToTokenId mapping
-        for (uint256 i = 1; i <= totalSupply(); i++) {
-            string memory text = wordsToTokenId[i].value;
-            if (
-                keccak256(abi.encodePacked(text)) ==
-                keccak256(abi.encodePacked(_text))
-            ) {
-                result = true;
-            }
-        }
-        return result;
     }
 
     function randomNum(
@@ -82,7 +95,7 @@ contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
     }
 
     function buildImage(uint256 _tokenId) private view returns (string memory) {
-        Word memory currentWord = wordsToTokenId[_tokenId];
+        Word memory currentWord = TokenIdToWord[_tokenId];
         string memory random = randomNum(361, 3, 3).toString();
         return
             Base64.encode(
@@ -94,13 +107,18 @@ contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
                         ',50%,25%)"/>',
                         '<text font-size="18" y="10%" x="80%" fill="hsl(',
                         random,
-                        ',100%,80%)">Token: ',
-                        _tokenId.toString(),
+                        ',100%,80%)">Token Id In Collection',
+                        currentWord.tokenIdInCollection,
                         "</text>",
                         '<text font-size="18" y="50%" x="50%" text-anchor="middle" fill="hsl(',
                         random,
                         ',100%,80%)">',
-                        currentWord.value,
+                        currentWord.daoName,
+                        "</text>",
+                        '<text font-size="18" y="50%" x="50%" text-anchor="middle" fill="hsl(',
+                        random,
+                        ',100%,80%)">',
+                        currentWord.role,
                         "</text>",
                         "</svg>"
                     )
@@ -113,7 +131,7 @@ contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
         view
         returns (string memory)
     {
-        Word memory currentWord = wordsToTokenId[_tokenId];
+        Word memory currentWord = TokenIdToWord[_tokenId];
         return
             string(
                 abi.encodePacked(
@@ -121,10 +139,12 @@ contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
                     Base64.encode(
                         bytes(
                             abi.encodePacked(
-                                '{"name":"',
-                                currentWord.name,
-                                '", "description":"',
-                                currentWord.description,
+                                '{"Dao":"',
+                                currentWord.daoName,
+                                '", "Role":"',
+                                currentWord.role,
+                                '", "TokenIdInRoleCollection":"',
+                                currentWord.tokenIdInCollection,
                                 '", "image": "',
                                 "data:image/svg+xml;base64,",
                                 buildImage(_tokenId),
@@ -157,12 +177,17 @@ contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
         return buildMetadata(_tokenId);
     }
 
-    //only owner
-    function withdraw() public payable onlyOwner {
-        (bool success, ) = payable(msg.sender).call{
-            value: address(this).balance
-        }("");
-        require(success);
+    // This ovverriding makes the token non transferable after the first transfer
+    function _transfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override {
+        require(
+            TransferCounterForTokenId[tokenId] == 0,
+            "The token is no longer transferable"
+        );
+        super._transfer(from, to, tokenId);
+        TransferCounterForTokenId[tokenId] += 1;
     }
-
 }

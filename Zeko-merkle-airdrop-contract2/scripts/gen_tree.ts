@@ -3,7 +3,7 @@ import { generateMerkleTreeAndKeys, saveMerkleTreeAndSource } from "../utils/Tes
 let TREE_HEIGHT = 5;
 
 async function main() {
-    let merkleTreeAndSource = generateMerkleTreeAndKeys(2**TREE_HEIGHT)
+    let merkleTreeAndSource = generateMerkleTreeAndKeys(2 ** TREE_HEIGHT)
     saveMerkleTreeAndSource(merkleTreeAndSource)
 }
 

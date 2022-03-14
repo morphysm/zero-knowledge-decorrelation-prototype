@@ -1,7 +1,45 @@
 # ZicoBadges
- Badges for web3 users
 
- Part of EthDenver 2022 🙌
+Zero Knowledge Badges for web3 users
+
+Part of EthDenver 2022 🙌
+
+# Goal 
+
+DAOs’ activities are mostly based on Discord today. Discussion on proposals, strategy
+definitions, grant distributions and, more broadly, the coordination between participants
+and contributors happen via Discord.
+
+DAOs struggle a lot to bridge the gap between the off-chain nature of their activities on
+Discord and the distribution of on-chain rewards. For example, when it comes to distribute
+NFT airdrops or other types of rewards (meme contest or POAPs) or when it comes to
+distribute grant to individuals via ERC20 tokens the problem becomes obvious. The routine
+procedure is to collect address via Google Forms, Airtables or Typeforms that ask you for a
+combination of off-chain verification (it can range from what’s your discord username to
+more complex oAuth2 verification mechanism) and on-chain verification (again, ranging
+from simple questions such as What’s your Ethereum address? to more complex message
+signing verifications).
+This entire process is cumbersome to manage for Daos and, furthermore, represents a
+serious privacy threat for users as they are associating their off-chain profile to on-chain
+identity. Essentially, they are doing a Faustanian pact trading their privacy for rewards.
+The solution we are proposing is the issuance of ZK-based NFT badges that represent one’s role
+in Discord. With these badges users can claim an NFT that represent their Discord role
+without actually having to disclose the association between your Discord ID and your
+Ethereum Address.
+
+This solution can facilitate the coordination within Dao members while preserving the
+privacy of the single individual.
+Furthermore, a lot of potential applications can be built upon that once there’s an on-chain
+attestation of someone’s role in a DAO:
+• Improved governance mechanism such as weighting the voting power according to
+someone’s role
+• Automated distribution of grants based on someone’s role
+• Social media platform that relies on these badges as sybil-resistant authentication
+mechanism
+• On-chain resume built on these attestations
+
+This project is currently being built for Eth Denver 22 Virtual and will be delivered by the
+end of this March.
 
 # Setup
 

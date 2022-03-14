@@ -20,11 +20,11 @@ async function main() {
     let redeemIndex = 168;
     let key = merkleTreeAndSource.leafNullifiers[redeemIndex];
     let secret = merkleTreeAndSource.leafSecrets[redeemIndex];
-    let calldata = 
+    let calldata =
         await generateProofCallData(
-            merkleTreeAndSource.merkleTree, 
-            key, 
-            secret, 
+            merkleTreeAndSource.merkleTree,
+            key,
+            secret,
             redeemer.address,
             WASM_BUFF,
             ZKEY_BUFF);

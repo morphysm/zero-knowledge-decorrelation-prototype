@@ -28,7 +28,7 @@ async function main() {
         await mainFactory.deploy(
             zekoNFT.address,
             BigNumber.from(NUM_ERC721_PER_REDEMPTION),
-            plonk.address, 
+            plonk.address,
             toHex(merkleTree.root.val))) as PrivateAirdrop
     console.log(`PrivateAirdrop contract address: ${privateAirdrop.address}`)
 }
