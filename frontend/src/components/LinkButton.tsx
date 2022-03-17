@@ -13,8 +13,8 @@ const LinkButton: React.FC<ILinkButtonProps> = ({ to, children }) => {
     navigate(to);
   }
   return (
-      <Container className="d-flex align-items-center justify-content-center">
-        <Button className="px-4 border border-dark bg-dark b-dark" onClick={routeChange}>
+      <Container className='d-flex align-items-center justify-content-center mt-5'>
+        <Button className="px-4 border border-dark bg-dark" onClick={routeChange}>
           {children}
         </Button>
       </Container>

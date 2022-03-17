@@ -17,12 +17,7 @@ const App: React.FC<IAppProps> = (props) => {
   return (
 
     <div className='d-flex justify-content-center flex-column align-items-center' style={{backgroundColor: '#DCDCDC'}}>
-      <ConnectMM/>
       <LandingBody></LandingBody>
-      {/* <div>
-        <p className='mt-5'>Prove you’re trustworthy without ever saying who you are</p>
-      </div> */}
-      {/* <Badges redditImages={redditImages} discordImages={discordImages}></Badges> */}
     </div>
   )
 }
