@@ -4,13 +4,14 @@ import discord  # type: ignore
 import pytest
 
 from python.lib.discord_utils import (
+    get_all_users,
     get_badges_for_guild,
     get_discord_client,
 )
 
 pytestmark = [pytest.mark.asyncio]
 
-BOT_TOKEN = os.environ["BOT_TOKEN"]
+BOT_TOKEN = os.environ["DISCORD_TOKEN"]
 
 
 @pytest.fixture
@@ -29,5 +30,7 @@ class TestGetDiscordClient:
 class TestGetBadgesForGuild:
     @staticmethod
     async def test_get_badges_for_guild(client: discord.Client) -> None:
+        await get_all_users(client)
+        assert False
         badges = await get_badges_for_guild(client, "931828851565273108")
         assert len(badges) > 0

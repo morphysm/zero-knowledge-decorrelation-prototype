@@ -201,6 +201,13 @@ list_badges_response_schema = aws_apigateway.JsonSchema(
     items=badge_schema,
 )
 
+get_badge_response_schema = aws_apigateway.JsonSchema(
+    schema=aws_apigateway.JsonSchemaVersion.DRAFT7,
+    title="Get Badge Response",
+    type=aws_apigateway.JsonSchemaType.OBJECT,
+    properties={"body": badge_schema},
+)
+
 # ACCOUNT HANDLER REQUESTS AND RESPONSES
 create_account_request_schema = aws_apigateway.JsonSchema(
     schema=aws_apigateway.JsonSchemaVersion.DRAFT7,

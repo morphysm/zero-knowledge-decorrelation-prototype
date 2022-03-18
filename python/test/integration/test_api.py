@@ -8,7 +8,7 @@ from python.lib.enums import Platform
 
 
 # TODO: Pull from CDK output file
-BASE_URL = "https://91i8x6sq2f.execute-api.us-east-1.amazonaws.com/prod"
+BASE_URL = "https://4554ifoul2.execute-api.us-east-1.amazonaws.com/prod"
 
 
 class TestMintBadges:

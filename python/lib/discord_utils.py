@@ -72,6 +72,20 @@ def get_oauth_token(
     return OAuthToken(**create_oauth_token_resp.json())
 
 
+async def get_badges(client: discord.Client) -> List[Badge]:
+    auth_token = os.environ["DISCORD_TOKEN"]
+    client = get_discord_client()
+
+
+async def get_all_users(client: discord.Client) -> List:
+    async for guild in client.fetch_guilds(limit=150):
+        logger.info(guild)
+        for member in guild.members:
+            roles = member.roles
+            raise ValueError(member)
+        raise ValueError(guild)
+
+
 async def get_discord_client(
     auth_token: str,
 ) -> discord.Client:

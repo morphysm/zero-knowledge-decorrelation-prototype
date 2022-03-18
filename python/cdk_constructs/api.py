@@ -104,6 +104,8 @@ class Api(core.Construct):
 
         # Api Resources
         badges_resource = rest_api.root.add_resource("badges")
+        badge_resource = badges_resource.add_resource("{badge}")
+
         auth_resource = rest_api.root.add_resource("auth")
 
         accounts_resource = rest_api.root.add_resource("accounts")
@@ -135,6 +137,8 @@ class Api(core.Construct):
         self.list_badges_handler = self.create_nodejs_handler(
             method_name="list_badges",
         )
+
+        self.get_badge_handler = self.create_python_handler(method_name="get_badge")
 
         # Daos
         self.list_daos_handler = self.create_python_handler(method_name="list_daos")
@@ -292,6 +296,24 @@ class Api(core.Construct):
                     ).to_model(rest_api),
                 ),
                 MethodResponse(400, aws_apigateway.Model.ERROR_MODEL),
+            ],
+            validator=params_validator,
+        )
+
+        self.integrate_lambda_and_resource(
+            lambda_handler=self.list_badges_handler,
+            http_method="GET",
+            api_resource=badge_resource,
+            request_parameters={"method.request.path.badge": True},
+            method_responses=[
+                MethodResponse(
+                    200,
+                    ApiModel(
+                        "GetBadgeResponseModel", schemas.get_badge_response_schema
+                    ).to_model(rest_api),
+                ),
+                MethodResponse(400, aws_apigateway.Model.ERROR_MODEL),
+                MethodResponse(404, aws_apigateway.Model.ERROR_MODEL),
             ],
             validator=params_validator,
         )
