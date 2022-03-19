@@ -6,13 +6,17 @@ import logging
 import os
 from typing import List
 
+import discord  # type: ignore
 import requests
 
+from python.lib.badge import Badge
+from python.lib.enums import Platform
 from python.lib.oauth_utils import OAuthToken
 
 logger = logging.getLogger("lib.discord_utils")
 
 DISCORD_API_ENDPOINT = "https://discord.com/api/v8"
+DISCORD_BOT_TOKEN = "OTQ1MDYxNjM2NDAwNjI3Nzgz.YhKrPA.I3RChpAAm71iwBDF31CcsAOjGFA"
 
 
 def get_oauth_token(
@@ -66,3 +70,56 @@ def get_oauth_token(
     )
     create_oauth_token_resp.raise_for_status()
     return OAuthToken(**create_oauth_token_resp.json())
+
+
+async def get_badges(client: discord.Client) -> List[Badge]:
+    auth_token = os.environ["DISCORD_TOKEN"]
+    client = get_discord_client()
+
+
+async def get_all_users(client: discord.Client) -> List:
+    async for guild in client.fetch_guilds(limit=150):
+        logger.info(guild)
+        for member in guild.members:
+            roles = member.roles
+            raise ValueError(member)
+        raise ValueError(guild)
+
+
+async def get_discord_client(
+    auth_token: str,
+) -> discord.Client:
+    """Create and login a Discord bot client.
+
+    Note: the auth token MUST be for a bot. Using a user
+    token is a violation of discord's terms of service.
+
+    See:
+        *https://discordpy.readthedocs.io/en/stable/api.html#discord.Client.login
+        *https://support.discord.com/hc/en-us/articles/115002192352
+    """
+    client = discord.Client()
+    await client.login(auth_token)
+    return client
+
+
+async def get_badges_for_guild(
+    client: discord.Client,
+    guild_id: str,
+    limit: int = 100,
+) -> List[Badge]:
+    """Return all of the badges a DAO would want to mint."""
+    guild = await client.fetch_guild(guild_id)
+    roles = await guild.fetch_roles()
+
+    badges: List[Badge] = list()
+
+    for role in roles:
+        badges.append(
+            Badge(
+                id=role.id,
+                name=role.name,
+                platform=Platform.DISCORD,
+            )
+        )
+    return badges

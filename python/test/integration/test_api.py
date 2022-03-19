@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 from typing import Dict
 
@@ -9,7 +8,7 @@ from python.lib.enums import Platform
 
 
 # TODO: Pull from CDK output file
-BASE_URL = "https://ck7q26rfh5.execute-api.us-east-1.amazonaws.com/prod/"
+BASE_URL = "https://4554ifoul2.execute-api.us-east-1.amazonaws.com/prod"
 
 
 class TestMintBadges:
@@ -22,7 +21,7 @@ class TestMintBadges:
         In the future, will will read from the blockchain
         to assert that an NFT was actually minted.
         """
-        body = json.dumps({"address": "foo", "description": "foo"})
+        body = {"address": "foo", "description": "bar"}
         resp = requests.post(f"{BASE_URL}/badges", json=body)
         assert resp.status_code == 200, resp.content
 
@@ -69,13 +68,11 @@ class TestAuthenticateApi:
 
         Currently just verify an "ok" response is returned.
         """
-        body = json.dumps(
-            {
-                "platform": platform.name,
-                "authorization_code": "123",
-                "scopes": ["read"],
-            }
-        )
+        body = {
+            "platform": platform.name,
+            "authorization_code": "123",
+            "scopes": ["read"],
+        }
         resp = requests.post(f"{BASE_URL}/auth", json=body)
         assert resp.status_code == 200, resp.content
 
@@ -83,3 +80,74 @@ class TestAuthenticateApi:
     def test_authenticate_platform_invalid_request() -> None:
         resp = requests.post(f"{BASE_URL}/auth")
         assert resp.status_code == 400, resp.content
+
+
+class TestCreateAccount:
+    @staticmethod
+    def test_create_account() -> None:
+        request_body = {
+            "account_id": "foo",
+            "platform": Platform.DISCORD.name,
+            "metamask_id": "bar",
+            "server_id": "baz",
+            "role_id": "qux",
+        }
+
+        resp = requests.post(f"{BASE_URL}/accounts", json=request_body)
+        assert resp.status_code == 200, resp.content
+
+
+class TestListAccounts:
+    @staticmethod
+    def test_list_accounts() -> None:
+        resp = requests.get(f"{BASE_URL}/accounts")
+        assert resp.status_code == 200, resp.content
+
+
+class TestDeleteAccount:
+    @staticmethod
+    @pytest.mark.skip(reason="Depends on create account")
+    def test_delete_account() -> None:
+        accountname = ...
+        resp = requests.delete(f"{BASE_URL}/accounts/{accountname}")
+        assert resp.status_code == 200, resp.content
+
+    @staticmethod
+    def test_delete_account_dne() -> None:
+        accountname = "zico"
+        resp = requests.delete(f"{BASE_URL}/accounts/{accountname}")
+        assert resp.status_code == 404, resp.content
+
+
+class TestCreateDao:
+    @staticmethod
+    def test_create_dao() -> None:
+        request_body = {
+            "discord_server_id": "foo",
+            "name": "bar",
+        }
+
+        resp = requests.post(f"{BASE_URL}/daos", json=request_body)
+        assert resp.status_code == 200, resp.content
+
+
+class TestListDaos:
+    @staticmethod
+    def test_list_daos() -> None:
+        resp = requests.get(f"{BASE_URL}/daos")
+        assert resp.status_code == 200, resp.content
+
+
+class TestDeleteDao:
+    @staticmethod
+    @pytest.mark.skip(reason="Depends on create dao")
+    def test_delete_dao() -> None:
+        accountname = ...
+        resp = requests.delete(f"{BASE_URL}/daos/{accountname}")
+        assert resp.status_code == 200, resp.content
+
+    @staticmethod
+    def test_delete_dao_dne() -> None:
+        dao_server_id = "dao"
+        resp = requests.delete(f"{BASE_URL}/daos/{dao_server_id}")
+        assert resp.status_code == 404, resp.content

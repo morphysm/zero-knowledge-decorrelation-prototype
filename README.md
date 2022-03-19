@@ -105,6 +105,27 @@ Press Y and the deployment will proceed.
 
 If the deployment fails, log into the Coudformation console using your IAM user to debug.
 
+## Database
+
+For a database, we chose AWS's cloud-native NoSQL database, [DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html),
+
+NoSQL means that this database does not follow the rigid standards of SQL relational databases.
+Because our data is not complex and our access patterns are simple, we can take advantage of this
+added flexibility to more easily and quickly develop a production ready system.
+
+For instance,
+
+* No need to worry about database schema migrations.
+* We can store all badges in the same table with arbitrary schemas without
+altering the schema each time.
+* No deployment worries, since Amazon manages everything. Even compared to
+AWS RDS, the SQL service, the deployment is much easier.
+
+We use an Object Relationship Manager (ORM) called [PynamoDB](https://pynamodb.readthedocs.io/en/latest/indexes.html)
+for working with Dynamo rows in Python. This renders each row as a Python object and lets us work with
+them intuitively instead of making raw database commands.
+
+
 # Code Style
 
 ## Python
@@ -125,10 +146,14 @@ Code should be annotated using the type hints introduced in [PEP 484](https://ww
 To type check your code, run the following commands:
 
 ```
-mypy .
+mypy -p python
 ```
 
 The settings for MyPy are definined in the mypy.ini file in the root of the repo.
+
+We use mypy -p because Python is a package within our repo, and imports
+will be evaluated wrongly if we use defauly MyPy. See Python BDFL Guido van Rossum's
+answer [here](https://lifesaver.codes/answer/release-0-780-source-file-found-twice-under-different-module-names-error-8944).
 
 
 ### Linting
