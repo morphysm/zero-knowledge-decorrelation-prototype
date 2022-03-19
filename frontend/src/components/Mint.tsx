@@ -14,6 +14,7 @@ const Mint: React.FC<IMintProps> = (props) => {
             </div>
         </Container> 
     )
+
 }
 
 function openDisc() {

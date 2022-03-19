@@ -1,33 +1,22 @@
 import './Badges.css';
 
 export interface IBadgesProps {
-    discordImages: string[][]; // in array pos 0 is img pos 1 is description
-    redditImages: string[][];
+    images: string[][] //pos 0 is image, pos 1 is name. will probably be a more complex obj once I get api data.
 }
 
-const Badges: React.FC<IBadgesProps> = ({ discordImages, redditImages }) => {
+const Badges: React.FC<IBadgesProps> = ({ images }) => {
     return (
-        <div className='d-flex flex-column justify-content-center m-5 align-items-left bg-black'>
-            <Badge images={redditImages}></Badge>
-            <Badge images={discordImages}></Badge>
+        <div className='d-flex flex-column justify-content-center m-5 align-items-left'>
+            <div className='d-flex flex-row flex-wrap d-inline-block text-center align-top ' >
+                {images.map((arr, i) =>
+                    <div className='bg-light m-2' key={`player-${i}`}>
+                        <img className='image' src={arr[0]}></img>
+                        <span className='d-block'>{arr[1]}</span>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
 
-export interface IBadgeProps {
-    images: string[][];
-}
-
-const Badge: React.FC<IBadgeProps> = ({images}) => {
-    return (
-        <div className='d-flex flex-row flex-wrap d-inline-block text-center align-top bg-primary ' > {/*style={{width: '500px'}}*/}
-            {images.map((arr, i) =>
-                <div key={`player-${i}`}>
-                    <img className='image' src={arr[0]}></img>
-                    <span className='d-block'>{arr[1]}</span>
-                </div>
-            )}
-        </div>
-    )
-}
 export { Badges }

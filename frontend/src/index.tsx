@@ -13,16 +13,11 @@ import { Mint } from './components/Mint';
 import { Search } from './components/Search';
 import { About } from './components/About';
 import { Discord } from './components/Discord'
-
+import { Footer } from './components/Footer'
 interface IHeaderProps {
   // any props that come into the component
 }
 
-const Foo: React.FC<IHeaderProps> = (props) => {
-  return (
-    <p>foooooooo</p>
-  )
-}
 ReactDOM.render(
   <React.StrictMode>
     <DAppProvider config={{}}>
@@ -35,8 +30,9 @@ ReactDOM.render(
           <Route path="/search" element={<Search />} />
           <Route path="/about" element={<About />} />
 
-        </Routes>
-      </Router >
+      </Routes>
+      <Footer></Footer>
+    </Router >
     </DAppProvider>
   </React.StrictMode>,
   document.getElementById('root')

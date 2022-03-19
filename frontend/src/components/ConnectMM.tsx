@@ -11,6 +11,6 @@ export default function ConnectMM() {
     return account ? (
         <h1> {account} </h1>
     ) : (
-        <Button className='m-4 bg-dark border border-dark' onClick={activateBrowserWallet}>Connect to a wallet</Button>
+        <Button className='m-4 bg-dark border border-dark' onClick={activateBrowserWallet}>Connect Wallet</Button>
     );
 }
