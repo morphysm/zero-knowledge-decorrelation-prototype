@@ -7,10 +7,9 @@ import {toHex, pedersenHashConcat } from "zkp-merkle-airdrop-lib";
 
 
 // WHERE SHOULD THE INPUT COME FROM?
+// let inputFileName = "./test/temp/publicCommitments.txt" RETRIEVE IT FROM THE PUBLIC FOLDER STORED ON THE FRONTEND
 
- // let inputFileName = "./test/temp/publicCommitments.txt" RETRIEVE IT FROM THE PUBLIC FOLDER STORED ON THE FRONTEND
-
-async function main(inputFileName:string) : Promise<{key: string, secret: string}>  {
+export default function main(inputFileName:string) : {key: string, secret: string}  {
 
     let treeHeight = 5;
     let keyHex = toHex(randomBigInt(31)) 

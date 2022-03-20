@@ -16,31 +16,31 @@ import { providers} from 'ethers';
 //        let secretHex // RETRIEVE IT FROM THE STATE SET PREVIOUSLY
 
 
-async function main(WASM_PATH : string, ZKEY_PATH: string, commitmentsFileName: string, keyHex: string, secretHex: string) : Promise<{proof: string, keyHash: string}> {
+// export default function main(WASM_PATH : string, ZKEY_PATH: string, commitmentsFileName: string, keyHex: string, secretHex: string) : Promise<{proof: string, keyHash: string}> {
 
-    let WASM_BUFF = readFileSync(WASM_PATH);
-    let ZKEY_BUFF = readFileSync(ZKEY_PATH);
+//     let WASM_BUFF = readFileSync(WASM_PATH);
+//     let ZKEY_BUFF = readFileSync(ZKEY_PATH);
     
-    // IN ORDER TO CONNECT THE WALLET ON THE FRONTEND
-    // GET SIGNER
-    let provider = new providers.Web3Provider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
-    let signer = provider.getSigner();
-    let address = await signer.getAddress();
+//     // IN ORDER TO CONNECT THE WALLET ON THE FRONTEND
+//     // GET SIGNER
+//     let provider = new providers.Web3Provider(window.ethereum);
+//     await provider.send("eth_requestAccounts", []);
+//     let signer = provider.getSigner();
+//     let address = await signer.getAddress();
 
-    let key = BigInt(keyHex)
-    let secret = BigInt (secretHex)
+//     let key = BigInt(keyHex)
+//     let secret = BigInt (secretHex)
 
-    let mt = getMerkleTreeFromPublicListOfCommitments(commitmentsFileName, 5)
-    let newProof =
-        await generateProofCallData(
-            mt,
-            key,   
-            secret,
-            address,
-            WASM_BUFF,
-            ZKEY_BUFF);
-    console.log("Proof: ", newProof); 
-    let newKeyHash = toHex(pedersenHash(key));
-    return {proof: newProof, keyHash: newKeyHash} // SAVE IT IN THE STATE
-}
+//     let mt = getMerkleTreeFromPublicListOfCommitments(commitmentsFileName, 5)
+//     let newProof =
+//         await generateProofCallData(
+//             mt,
+//             key,   
+//             secret,
+//             address,
+//             WASM_BUFF,
+//             ZKEY_BUFF);
+//     console.log("Proof: ", newProof); 
+//     let newKeyHash = toHex(pedersenHash(key));
+//     return {proof: newProof, keyHash: newKeyHash} // SAVE IT IN THE STATE
+// }
