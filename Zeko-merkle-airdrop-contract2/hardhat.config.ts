@@ -19,7 +19,7 @@ export default {
   networks: {
     mumbai: {
       url: `${process.env.ALCHEMY_URL}`,
-      accounts: [`0x${process.env.MUMBAI_PRIVATE_KEY}`],
+      accounts: [`0x${process.env.MUMBAI_PRIVATE_KEY1}`, `0x${process.env.MUMBAI_PRIVATE_KEY2}` ], 
       gas: 9900000,
       gasPrice: 8000000000
     }

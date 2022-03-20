@@ -41,165 +41,69 @@ mechanism
 This project is currently being built for Eth Denver 22 Virtual and will be delivered by the
 end of this March.
 
-# Setup
+## Related Work and Credits
 
-## Env File
+Credit to A16Z (https://github.com/a16z/zkp-merkle-airdrop-contracts). This application modifies the purpose of the core A16Z repo allowing NFT (ERC721) private airdrops as well.
 
-Create a .env file in the root of the repo for environment variables. This is .gitignored,
-so it will not be applied to the repo by default.
+## Purpose
 
-It should contain the following variables to allow our Smart Contracts to reference PolkaDot:
+Distribute an NFT airdrop without having to collect users address beforehand. In the Zeko implementation users will just need to authenticate on the frontend with Discord oAuth2, choose the NFT badges that they want to claim and generate a commitment and get, in return, a note of their commitment containing their secret + nullifier that were used to generate the commitment. 
 
-```
-ALCHEMY_MUMBAI_URL=foo
-MUMBAI_PRIVATE_KEY=bar
-```
+After that, Zeko will assemble a merkle tree containing these commitments and deploy a Private Airdrop contract. Users will be able to claim token by providing the note. The Zero Knowledge characteristic of the contract allows users to demonstrate that their commitment is part of the merkle tree without revealing which commitment is associated to that note. 
 
-## Python Dependencies
+By doing that, users can claim a badge that represent their contribution to Dao based on their Discord activity without disclosing their on-chain identity.  
 
-To manage Python dependencies, we recommend creating a virtual environment name ".venv"
-in the root of the repository and installing all requirements there.
+Users' Discord ID will never be tied to the wallet address that owns the badge NFT.
 
-All of the requirements are detailed in `python/requirements.txt`. To install all
+## Setup
 
-To create the venv, activate, and install the project requirements you run the following commands on Unix:
-```
-python3 -m venv .venv
-source .venv/bin/activate
-pip3 install -r requirements.txt
-```
+- `npm i`
+- Circom setup in order to generate circuits: [Circom 2.0 install + snarkjs](https://docs.circom.io/getting-started/installation/)
 
-And these on Windows:
-```
-python3 -m venv .venv
-.venv\Scripts\activate.bat
-pip3 install -r requirements.txt
-```
+## Usage 
 
-Note: the name .venv is in the .gitignore file, so a virtual env of that name only will be ignored.
-If you wish to use a different name, make sure not to commit it to the repository.
+### collect users commitments
 
-See [here](https://docs.python.org/3/tutorial/venv.html) for more details.
+- The commitment is the hash of two random 31-byte values. The first is a "nullifier", the hash of which is disclosed when you withdraw, so that you cannot double-claim your NFT. The second is a secret which is never disclosed. 
 
-## AWS CDK
+How to generate random 31-byte values and therefore the commitment from https://github.com/a16z/zkp-merkle-airdrop-contracts/blob/722921f31ff32b332d7670486c0354f729d66bcb/utils/TestUtils.ts#L74
 
-We use the Amazon Web Services Cloud Development Kit to manage our cloud resources. All resources are defined
-as Python classes, and running a "deployment" causes the cloud versions of those resources to be updated
-to match the current definitions in this repository.
+- The user gets a note back after they create the commitment => similar to what happens with Tornado Cash
 
-To deploy with the CDK, you need to have an IAM (Identity and Access Management) user with the proper permissions.
-TODO: Figure out what these are.
+- Generate a random merkle tree of height n `ts-node ./scripts/gen_tree.ts` 
 
-Ask an admin to create an IAM users with API keys. Then, configure your
-[credentials and config files](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) with the keys
-under profile name {profile_name}.
+    or 
 
-To deploy, run these commands:
-```
-export AWS_PROFILE={profile_name}
-cdk deploy Badges --outputs-file cdk_deployment_outputs.json
-```
+- Generate a tree from a comma list of commitments `ts-node ./scripts/gen_tree_from_file.ts <input file name> <out put file name> <tree height>`
 
-It will ask you for your permission to deploy resources that modify IAM permissions.
-Press Y and the deployment will proceed.
+### circom circuits 
 
-If the deployment fails, log into the Coudformation console using your IAM user to debug.
+- Compile the circuit.circom file. Note: the input in the last line must match the height of the merkle tree. The number of leaves is the amount of commitments you are gonna collect from the users `circom circuits/circuit.circom --sym --wasm --r1cs -o ./build`
 
-## Database
+- generate zkey => `snarkjs plonk setup build/circuit.r1cs build/pot16_final.ptau build/circuit_final.zkey`
+- gen new sol => `snarkjs zkey export solidityverifier build/circuit_final.zkey contracts/compiled/MerkVerifier.sol`
 
-For a database, we chose AWS's cloud-native NoSQL database, [DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html),
+### deploy contracts
 
-NoSQL means that this database does not follow the rigid standards of SQL relational databases.
-Because our data is not complex and our access patterns are simple, we can take advantage of this
-added flexibility to more easily and quickly develop a production ready system.
+- `npx hardhat compile`
+- `npx hardhat node` to start a local hosted blockchain
+- `npx hardhat run scripts/deploy721.ts --network localhost` => Modify merkle tree source on line 15
 
-For instance,
+### collect NFT against the NFT airdrop contract
 
-* No need to worry about database schema migrations.
-* We can store all badges in the same table with arbitrary schemas without
-altering the schema each time.
-* No deployment worries, since Amazon manages everything. Even compared to
-AWS RDS, the SQL service, the deployment is much easier.
-
-We use an Object Relationship Manager (ORM) called [PynamoDB](https://pynamodb.readthedocs.io/en/latest/indexes.html)
-for working with Dynamo rows in Python. This renders each row as a Python object and lets us work with
-them intuitively instead of making raw database commands.
+- `npx hardhat run scripts/collect721.ts --network localhost` => Modify inputs on line 15,16,17 (ERC721_ADDR,; AIRDROP_ADDR; MT_KEYS_PATH) according to the output of the deployment script 
 
 
-# Code Style
+### Output if the NFT airdrop happened succesfully
 
-## Python
+Output => 
 
-### Documentation
-
-All functions and methods should have docstrings written according to the conventions
-outlined in [PEP 257](https://www.python.org/dev/peps/pep-0257/). File and module level
-docstrings are optional but nice.
-
-### Static Type Checking
-
-Python is a dynamic language, which adds flexibility but also makes code much more prone to type related bugs.
-We use the [MyPy static type checker](https://mypy.readthedocs.io/en/stable/) to ensure that all objects
-types are combatible.
-
-Code should be annotated using the type hints introduced in [PEP 484](https://www.python.org/dev/peps/pep-0484/).
-To type check your code, run the following commands:
-
-```
-mypy -p python
-```
-
-The settings for MyPy are definined in the mypy.ini file in the root of the repo.
-
-We use mypy -p because Python is a package within our repo, and imports
-will be evaluated wrongly if we use defauly MyPy. See Python BDFL Guido van Rossum's
-answer [here](https://lifesaver.codes/answer/release-0-780-source-file-found-twice-under-different-module-names-error-8944).
+`Proof:  0x210c82e47618b23129f14a002e5f45b403e4552b44dc76deb63c08ad97fa52082ef39b8097d96e6ed1edad0f237263bcc7f6407142f302c43453ad34dcbde2ea003b7f20290df436fdb273461b8dafc339310e83eb25209200604626176f623f2261d16c8241a23adf9160f781cad1e913570dd659c17c7fc00b2ee5a33f73a4010cfebfd56fbb603592de1a7630fed93aac855e244f0ad6a259a14a3920a0c610e2d17e8fb27e31b6e27a0a858691344fbeb8abb1d260c4e07f130f24736bb200c957e0eeeb4f1b13a8c6065a2b965b41d4cae14914987d7c4a3e55412b159b0b632e6773809bd00b0cefda0e890acbaf5691dc727e78463ec867629346a60d05a0320d3855adbf6b402a3b02a46f08fa325367c768fd6b1f384dd65b28e9762c2e1c7acc269ca09516221e93793b2941817b66370bc1bd1469b29a6dc401b32a864832b302c64c54bb041832283fafeaa9522aa5eede9716177f167708ae6f2fa229de0290ad79d89826096aae26190115a0d221e0557f75fe43d56035d171291bcdf3d7f58659ce51ea739f171906bbc81b4f5a8066d7773f489226308ca71b79554d11ab9f21723c92889d7cfc4a2c330134f2f24ccd2416324f67a617fc009521c9a5a13df60aecd4588b611449e0aaa123509f535bb5c4968ceaaa58b70852a5cde828176e117e40e6f2b9cc0727d8d07e70804180b11a3879179529bc2aa5552117e43c5673280836a7bd4258171e358c66295c83a3dbb03c5bf6b29f1fee3ffee887370a49e6b7909dc5d635bf32503fb5bfa824ea9b134c5a8873502f2f850f901279654d395ac8b5df1bc780757714e0a1b241c56ff5c5d7571cf52e726bc243234c3c88b231f640a6dd89bb61d194feb2edcfcaf3e3be861053c51b0d268cf20b1a0f82758cd9f38e55ff4924e38cb88851b0990cb04c86d617a41bc905533ef88740c7b2297f924d66fdad9666b767ed851eac196431dc72ce971694bbf7cdff46395ead3ca86911169258f88c0f20fd635319e2dc0589b2f6ec1011b02db8d4cd855c94b17d4c0ef88e305827e53e66172040cdd4acbe3f1d6b0bcbf6a000fcd4df63d55dec13f6c5317781f5f217ef1b821c2925d2958cc1ab
+Collected!
+Collector balance: 1`
 
 
-### Linting
+## To test the contract 
 
-We use the libraries [Black](https://black.readthedocs.io/en/stable/) and [Flake8](https://flake8.pycqa.org/en/latest/)
-to enforce code style.
-
-Black is a "code formatter" that will modify the code to standardize attributes such as string styling, line breaks,
-argument formatting, and parentheses. Named for Henry Ford's quip about the Model T coming in any color you like (as
-long as it's black), Black enforces a [single style](https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html#code-style)
-aiming for "consistency, generality, readability, and reducing git diffs."
-
-Flake8 is a style guide enforcement tool that logs code in violation of certain style rules. Unlike Black it only logs
-issues with code instead of modifying to resolve, but as such it can cover a wider range of violations.
-
-To lint your code, run the following commands:
-
-```
-black .
-flake8 .
-```
-
-This will first reformat the repo to be in accordance with Black's style, and then print to console all lines
-that violate Flake8's style guide.
-
-The settings for Flake8 are definined in the .flake8 file in the root of the repo.
-See [here](https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#flake8) for details on how the default settins have to be
-altered for compatibility with Black.
-
-### Testing
-
-Use [Pytest](https://docs.pytest.org/en/7.0.x/) for testing. Structure test cases to use [fixtures](https://docs.pytest.org/en/7.0.x/explanation/fixtures.html)
-to handle setup and teardown wherever possible.
-
-There are two suites of tests: unit and integration.
-
-To run tests, run the following command where suite is either "unit" or "integration":
-
-```
-pytest tests/{suite}
-```
-
-## Javascript
-
-Use Typescript if possible (files end with .ts)
-
-Good references:
-
-* [Google Style Guide](https://google.github.io/styleguide/tsguide.html)
+- Start your localhost `npx hardhat node`
+- Run the test `npx hardhat test ./smartContractTest/testMinting.js --network localhost`
