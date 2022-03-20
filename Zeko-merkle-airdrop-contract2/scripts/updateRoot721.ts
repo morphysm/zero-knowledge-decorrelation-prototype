@@ -1,6 +1,6 @@
 const hre = require("hardhat");
-import {getMerkleRoot, addNewCommitment} from "../utils/TestUtils";
-
+import {getMerkleRoot, addNewCommitment, randomBigInt} from "../utils/TestUtils";
+import {toHex, pedersenHashConcat } from "zkp-merkle-airdrop-lib";
 
 /**
  * when a new commitment comes it, update the public list of commitments and the merkle root stored inside the airdrop contract 
@@ -8,13 +8,19 @@ import {getMerkleRoot, addNewCommitment} from "../utils/TestUtils";
 
 async function main() {
 
-    let inputFileName = "./test/temp/emptyCommitments.txt"
+    let inputFileName = "./test/temp/publicCommitments.txt" // ADD IT IN THE PUBLIC FOLDER ON THE FRONTEND
     let treeHeight = 5;
-    let newCommitment = "0x1a382574148a46ea603d3471196820e6b57cc911f2d703745a72aab83ff3de5e"
-    
+    let keyHex = toHex(randomBigInt(31)) // SAVE IT AS STATE
+    let secretHex = toHex(randomBigInt(31)) // SAVE IT AS STATE
+
+    let key = BigInt(keyHex)
+    let secret = BigInt (secretHex)
+    let commitment = pedersenHashConcat(key, secret)
+    let hexCommitment = toHex(commitment)
     // update the public list of commitments and return the new Merkle Tree
-    let mt = addNewCommitment(inputFileName,newCommitment,treeHeight)
+    let mt = addNewCommitment(inputFileName,hexCommitment,treeHeight)
     let newRoot = getMerkleRoot(mt)
+    console.log(`new commitment generated ${hexCommitment} from key: ${keyHex} and secret ${secretHex}`)
 
     let AIRDROP_ADDR = "0x5948fb7e3510a194f955C80f1361837bf37B3fb8";
     let airdropContract = await hre.ethers.getContractAt("PrivateAirdrop", AIRDROP_ADDR)

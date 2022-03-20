@@ -25,8 +25,8 @@ async function main() {
     // let key = merkleTreeAndSource.leafNullifiers[redeemIndex];
     // let secret = merkleTreeAndSource.leafSecrets[redeemIndex];
 
-    let keyHex = "0x00a2db3bf3f1ce9de2d2ed66e62bbc1fe3a30f625d30b9484cd5d29e3424ab8c"
-    let secretHex = "0x0055c39aad23011d47dd026f2181fd7c6bbf936fbd3b4371d5b99ca82f6398de"
+    let keyHex = "0x00a6a6659fdc7297170dc96bbd55a09d3685422f4277d492e2be70bbd111055b"
+    let secretHex = "0x00f8445012454704c95b15c6849b9fb34230237733bb9a0e32676c7704637347"
 
     // TO BIG INT
     let key = BigInt(keyHex)
