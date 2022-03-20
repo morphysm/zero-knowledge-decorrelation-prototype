@@ -2,7 +2,7 @@
 
 ## Related Work and Credits
 
-Credit to A16Z (https://github.com/a16z/zkp-merkle-airdrop-contracts). This application modifies the purpose of the core A16Z repo allowing NFT (ERC721) airdrop as well.
+Credit to A16Z (https://github.com/a16z/zkp-merkle-airdrop-contracts). This application modifies the purpose of the core A16Z repo allowing NFT (ERC721) private airdrops as well.
 
 ## Purpose
 
@@ -61,3 +61,8 @@ Output =>
 Collected!
 Collector balance: 1`
 
+
+## To test the contract 
+
+- Start your localhost `npx hardhat node`
+- Run the test `npx hardhat test ./smartContractTest/testMinting.js --network localhost`

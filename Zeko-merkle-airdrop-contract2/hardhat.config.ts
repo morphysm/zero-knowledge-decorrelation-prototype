@@ -3,6 +3,8 @@ import "@typechain/hardhat";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
 import "hardhat-gas-reporter";
+require('dotenv').config();
+
 
 export default {
   solidity: {
@@ -13,6 +15,14 @@ export default {
 			runs: 88888
 		}
 	}
+  },
+  networks: {
+    mumbai: {
+      url: `${process.env.ALCHEMY_URL}`,
+      accounts: [`0x${process.env.MUMBAI_PRIVATE_KEY}`],
+      gas: 9900000,
+      gasPrice: 8000000000
+    }
   },
   mocha: {
     timeout: 200000

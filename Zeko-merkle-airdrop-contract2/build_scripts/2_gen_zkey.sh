@@ -1,1 +1,0 @@
-snarkjs plonk setup build/circuit.r1cs build/pot16_final.ptau build/circuit_final.zkey

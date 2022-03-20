@@ -101,7 +101,7 @@ contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
             Base64.encode(
                 bytes(
                     abi.encodePacked(
-                        '<svg width="500" height="500">',
+                        '<svg width="500" height="500" xmlns="http://www.w3.org/2000/svg">',
                         '<rect height="500" width="500" y="0" x="0" fill="hsl(',
                         currentWord.bgHue,
                         ',50%,25%)"/>',
@@ -112,12 +112,12 @@ contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
                         "</text>",
                         '<text font-size="18" y="50%" x="50%" text-anchor="middle" fill="hsl(',
                         random,
-                        ',100%,80%)">',
+                        ',100%,80%)"> daoName:',
                         currentWord.daoName,
                         "</text>",
                         '<text font-size="18" y="80%" x="50%" text-anchor="middle" fill="hsl(',
                         random,
-                        ',100%,80%)">',
+                        ',100%,80%)"> daoRole:',
                         currentWord.role,
                         "</text>",
                         "</svg>"

@@ -1,4 +1,3 @@
-import { BigNumber } from "ethers";
 import { readFileSync, writeFileSync } from "fs";
 import { exit } from "process";
 import { MerkleTree } from "zkp-merkle-airdrop-lib";
@@ -11,7 +10,6 @@ import { randomBigInt } from "../utils/TestUtils";
  *    - input file is a comma separated list of commitments
  *    - output file will be the format described in the library MerkleTree object: https://github.com/a16z/zkp-merkle-airdrop-lib/blob/main/src/MerkleTree.ts
  */
-
 
 let inputFileName = process.argv[2];
 let outputFileName = process.argv[3];

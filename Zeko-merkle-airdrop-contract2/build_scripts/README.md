@@ -1,1 +1,0 @@
-*This directory contains shell scripts for executing Circom / snarkjs compilation comands*
