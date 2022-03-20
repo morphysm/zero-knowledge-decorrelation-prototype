@@ -1,6 +1,6 @@
 # ZicoBadges
 
-Zero Knowledge Badges for web3 users
+Zero Knowledge-based Identity Badges for Discord users
 
 Part of EthDenver 2022 🙌
 
