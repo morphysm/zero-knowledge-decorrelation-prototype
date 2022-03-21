@@ -104,4 +104,8 @@ Again, the verification process performed by the MerkVerifier contract is able t
 - Start your localhost `npx hardhat node`
 - Run the test `npx hardhat test ./test/smartContractTest.js --network localhost` // TO BE FIXED
 
+## Demo
+
+[Youtube](https://www.youtube.com/watch?v=PnffMSrQDlY)
+
 
