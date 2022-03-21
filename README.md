@@ -87,9 +87,9 @@ Again, the verification process performed by the MerkVerifier contract is able t
 
 ## Check the contracts deployed on Mumbai (Polygon testned)
 
-- ZekoGenerativeNFT.sol
-- MerkVerifier.sol
-- PrivateAirdrop.sol
+- [ZekoGenerativeNFT.sol](https://mumbai.polygonscan.com/address/0xbA7B88DF383728FAe73F4aC6532795797202cc87#code)
+- [MerkVerifier.sol](https://mumbai.polygonscan.com/address/0x0B27cc41F37e62Bfea1f4E42897D56B5A18a3E70#code)
+- [PrivateAirdrop.sol]()
 
 ## Use-cases
 
@@ -104,6 +104,6 @@ Again, the verification process performed by the MerkVerifier contract is able t
 ## To test the contract 
 
 - Start your localhost `npx hardhat node`
-- Run the test `npx hardhat test ./test/smartContractTest.js --network localhost`
+- Run the test `npx hardhat test ./test/smartContractTest.js --network localhost` // TO BE FIXED
 
 

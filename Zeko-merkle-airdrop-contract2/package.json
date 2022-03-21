@@ -31,5 +31,8 @@
     "typechain": "^7.0.1",
     "typescript": "^4.4.4",
     "zkp-merkle-airdrop-lib": "file:zkp-merkle-airdrop-lib"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-etherscan": "^3.0.3"
   }
 }

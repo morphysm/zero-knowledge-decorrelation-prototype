@@ -2,8 +2,10 @@
 import "@typechain/hardhat";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-etherscan";
 import "hardhat-gas-reporter";
 require('dotenv').config();
+
 
 
 export default {
@@ -24,7 +26,10 @@ export default {
       gasPrice: 8000000000
     }
   },
+  etherscan: {
+    apiKey: process.env.POLYGONSCAN_API_KEY,
+ },
   mocha: {
-    timeout: 200000
+    timeout: 2000000
   }
 };
