@@ -83,8 +83,6 @@ The user calls the collectAirdrop passing the proof and the nullifierHash as inp
 Again, the verification process performed by the MerkVerifier contract is able to tell if the inputs passed by the users are associated to any of the commitments used to assemble the merkle tree without revealing which specific commitment is associated with the user that makes the call. 
 **The privacy of the user is protected**
 
-** ADD NFT IMAGE HERE **
-
 ## Check the contracts deployed on Mumbai (Polygon testned)
 
 - [ZekoGenerativeNFT.sol](https://mumbai.polygonscan.com/address/0xbA7B88DF383728FAe73F4aC6532795797202cc87#code)
