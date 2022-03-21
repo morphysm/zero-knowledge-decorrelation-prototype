@@ -11,10 +11,10 @@ async function main() {
     let WASM_PATH = "./build/circuit_js/circuit.wasm";
     let ZKEY_PATH = "./build/circuit_final.zkey"; 
     let commitmentsFileName = "./public/publicCommitments.txt" 
-    
     // TO ADD
-    let nullifierHex  = ""
-    let secretHex = ""
+
+    let nullifierHex  = "0x00879db2286f14b6be039318cdc8d5457e65dd4181b01c24bca734717852bb73"
+    let keyHex = "0x000d6248c042085574badf94be3571ca4d75eb9ad6ffaa1f6105477beb7730e5"
 
     let WASM_BUFF = readFileSync(WASM_PATH);
     let ZKEY_BUFF = readFileSync(ZKEY_PATH);
@@ -24,14 +24,14 @@ async function main() {
     let collectorAddress = collector.address
 
     let nullifier = BigInt(nullifierHex)
-    let secret = BigInt (secretHex)
+    let key = BigInt (keyHex)
 
     let mt = getMerkleTreeFromPublicListOfCommitments(commitmentsFileName, 5)
     let newProof =
         await generateProofCallData(
             mt,
             nullifier,   
-            secret,
+            key,
             collectorAddress,
             WASM_BUFF,
             ZKEY_BUFF);
@@ -39,7 +39,7 @@ async function main() {
     let newNullifierHash = toHex(pedersenHash(nullifier)); // hash of the nullifier => need to be passed to avoid double spending
 
     console.log("Proof: ", newProof) ; 
-    console.log("nullifierHash", newNullifierHash)
+    console.log("keyHash", newNullifierHash)
 }
 
 main()
