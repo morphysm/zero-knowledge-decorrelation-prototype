@@ -8,15 +8,15 @@ import {toHex, pedersenHashConcat } from "zkp-merkle-airdrop-lib";
 
 async function main() {
 
-    let inputFileName = "./public/publicCommitments.txt" // ADD IT IN THE PUBLIC FOLDER ON THE FRONTEND
+    let inputFileName = "./public/publicCommitments.txt"
     let treeHeight = 5;
 
     let keyHex = toHex(randomBigInt(31)) 
-    let secretHex = toHex(randomBigInt(31))
+    let nullifierHex = toHex(randomBigInt(31))
 
     let key = BigInt(keyHex)
-    let secret = BigInt (secretHex)
-    let commitment = pedersenHashConcat(key, secret)
+    let nullifier = BigInt (nullifierHex)
+    let commitment = pedersenHashConcat(key, nullifier)
     let hexCommitment = toHex(commitment)
 
     // update the public list of commitments
@@ -24,10 +24,10 @@ async function main() {
     // generate the merkletree
     let mt = getMerkleTreeFromPublicListOfCommitments(inputFileName, treeHeight)
     let newRoot = getMerkleRoot(mt)
-    console.log(`new commitment generated ${hexCommitment} from key: ${keyHex} and secret ${secretHex}`)
+    console.log(`new commitment generated ${hexCommitment} from key: ${keyHex} and nullifier ${nullifierHex}`)
 
     //TO ADD 
-    let AIRDROP_ADDR = "0xf4955374242F4FD04683f4BbEb45474389BC59A8";
+    let AIRDROP_ADDR = "";
     let airdropContract = await hre.ethers.getContractAt("PrivateAirdrop", AIRDROP_ADDR)
     await airdropContract.updateRoot(newRoot);
 

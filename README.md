@@ -1,45 +1,11 @@
-# ZicoBadges
+# Zero Knowledge Based NFT Airdrop
 
-Zero Knowledge-based Identity Badges for Discord users
+This library contains the tools (Zero Knowledge Proof circuits + smart contracts) needed to run a Zero Knowledge Based NFT Airdrop.
+DAOs or any other entity can collect commitments from their contributors via web2 platforms in a public way and deploy a private airdrop smart contract that allows these same contributors to use their wallet to redeem their airdrop.
 
-Part of EthDenver 2022 🙌
+By leveraging Zero Knowledge proof, there is no association between the web2 identity that made the initial commitment and the web3 wallet used to redeem the NFT based on that same commitment 
 
-# Goal 
-
-DAOs’ activities are mostly based on Discord today. Discussion on proposals, strategy
-definitions, grant distributions and, more broadly, the coordination between participants
-and contributors happen via Discord.
-
-DAOs struggle a lot to bridge the gap between the off-chain nature of their activities on
-Discord and the distribution of on-chain rewards. For example, when it comes to distribute
-NFT airdrops or other types of rewards (meme contest or POAPs) or when it comes to
-distribute grant to individuals via ERC20 tokens the problem becomes obvious. The routine
-procedure is to collect address via Google Forms, Airtables or Typeforms that ask you for a
-combination of off-chain verification (it can range from what’s your discord username to
-more complex oAuth2 verification mechanism) and on-chain verification (again, ranging
-from simple questions such as What’s your Ethereum address? to more complex message
-signing verifications).
-This entire process is cumbersome to manage for Daos and, furthermore, represents a
-serious privacy threat for users as they are associating their off-chain profile to on-chain
-identity. Essentially, they are doing a Faustanian pact trading their privacy for rewards.
-The solution we are proposing is the issuance of ZK-based NFT badges that represent one’s role
-in Discord. With these badges users can claim an NFT that represent their Discord role
-without actually having to disclose the association between your Discord ID and your
-Ethereum Address.
-
-This solution can facilitate the coordination within Dao members while preserving the
-privacy of the single individual.
-Furthermore, a lot of potential applications can be built upon that once there’s an on-chain
-attestation of someone’s role in a DAO:
-• Improved governance mechanism such as weighting the voting power according to
-someone’s role
-• Automated distribution of grants based on someone’s role
-• Social media platform that relies on these badges as sybil-resistant authentication
-mechanism
-• On-chain resume built on these attestations
-
-This project is currently being built for Eth Denver 22 Virtual and will be delivered by the
-end of this March.
+Project built during EthDenver 2022 🙌
 
 ## Related Work and Credits
 
@@ -47,63 +13,97 @@ Credit to A16Z (https://github.com/a16z/zkp-merkle-airdrop-contracts). This appl
 
 ## Purpose
 
-Distribute an NFT airdrop without having to collect users address beforehand. In the Zeko implementation users will just need to authenticate on the frontend with Discord oAuth2, choose the NFT badges that they want to claim and generate a commitment and get, in return, a note of their commitment containing their secret + nullifier that were used to generate the commitment. 
+Distribute an NFT airdrop without having to collect users address beforehand. Today is very common to see DAOs and other NFT projects asking for the public addresses of their contributors via Google Forms or Airtables in order to run aidrops. **This it is a privacy threat for users**.
 
-After that, Zeko will assemble a merkle tree containing these commitments and deploy a Private Airdrop contract. Users will be able to claim token by providing the note. The Zero Knowledge characteristic of the contract allows users to demonstrate that their commitment is part of the merkle tree without revealing which commitment is associated to that note. 
+# Usage
 
-By doing that, users can claim a badge that represent their contribution to Dao based on their Discord activity without disclosing their on-chain identity.  
+### Setup
 
-Users' Discord ID will never be tied to the wallet address that owns the badge NFT.
-
-## Setup
-
-- `npm i`
+- `npm i` to install all the support node packages
 - Circom setup in order to generate circuits: [Circom 2.0 install + snarkjs](https://docs.circom.io/getting-started/installation/)
+- [Hardhat configuration](https://www.chainshot.com/article/hardhat-guides-setup)
 
-## Usage 
-
-### collect users commitments
-
-- The commitment is the hash of two random 31-byte values. The first is a "nullifier", the hash of which is disclosed when you withdraw, so that you cannot double-claim your NFT. The second is a secret which is never disclosed. 
-
-How to generate random 31-byte values and therefore the commitment from https://github.com/a16z/zkp-merkle-airdrop-contracts/blob/722921f31ff32b332d7670486c0354f729d66bcb/utils/TestUtils.ts#L74
-
-- The user gets a note back after they create the commitment => similar to what happens with Tornado Cash
-
-- Generate a random merkle tree of height n `ts-node ./scripts/gen_tree.ts` 
-
-    or 
-
-- Generate a tree from a comma list of commitments `ts-node ./scripts/gen_tree_from_file.ts <input file name> <out put file name> <tree height>`
-
-### circom circuits 
+### Compile circom circuits and solidity verifier smart contract
 
 - Compile the circuit.circom file. Note: the input in the last line must match the height of the merkle tree. The number of leaves is the amount of commitments you are gonna collect from the users `circom circuits/circuit.circom --sym --wasm --r1cs -o ./build`
-
 - generate zkey => `snarkjs plonk setup build/circuit.r1cs build/pot16_final.ptau build/circuit_final.zkey`
-- gen new sol => `snarkjs zkey export solidityverifier build/circuit_final.zkey contracts/compiled/MerkVerifier.sol`
+- generate MerkVerifier.sol  => `snarkjs zkey export solidityverifier build/circuit_final.zkey contracts/compiled/MerkVerifier.sol`
 
-### deploy contracts
+### Deploy smart contracts
 
-- `npx hardhat compile`
-- `npx hardhat node` to start a local hosted blockchain
-- `npx hardhat run scripts/deploy721.ts --network localhost` => Modify merkle tree source on line 15
+- `npx hardhat run ./scripts/4_deployContracts.ts --network localhost`
 
-### collect NFT against the NFT airdrop contract
+By doing that we deploy 3 core contracts:
+1. ZekoGenerativeNFT.sol, an ERC721 generative NFT contract.  
+(it can be any already existing ERC721 standard compatible contract)
+2. PrivateAirdrop.sol, used to manage the airdrop.
+3. MerkVerifier.sol, contract automatically generated by circom as a result of the input circuit. It is used to run the zero knowledge proof verification on-chain. 
 
-- `npx hardhat run scripts/collect721.ts --network localhost` => Modify inputs on line 15,16,17 (ERC721_ADDR,; AIRDROP_ADDR; MT_KEYS_PATH) according to the output of the deployment script 
+### Mint NFTs
 
+- `npx hardhat run ./scripts/5_mint721.ts --network localhost`
 
-### Output if the NFT airdrop happened succesfully
+By doing that a set of NFTs is minted and transferred to the privateAirdrop contract. 
 
-Output => 
+An extra functionality added on ZekoGenerativeNFT.sol (function mintRoleToAirdrop) allows to mint a generative NFT that include a DaoName and a role as on-chain metadata. 
 
-`Proof:  0x210c82e47618b23129f14a002e5f45b403e4552b44dc76deb63c08ad97fa52082ef39b8097d96e6ed1edad0f237263bcc7f6407142f302c43453ad34dcbde2ea003b7f20290df436fdb273461b8dafc339310e83eb25209200604626176f623f2261d16c8241a23adf9160f781cad1e913570dd659c17c7fc00b2ee5a33f73a4010cfebfd56fbb603592de1a7630fed93aac855e244f0ad6a259a14a3920a0c610e2d17e8fb27e31b6e27a0a858691344fbeb8abb1d260c4e07f130f24736bb200c957e0eeeb4f1b13a8c6065a2b965b41d4cae14914987d7c4a3e55412b159b0b632e6773809bd00b0cefda0e890acbaf5691dc727e78463ec867629346a60d05a0320d3855adbf6b402a3b02a46f08fa325367c768fd6b1f384dd65b28e9762c2e1c7acc269ca09516221e93793b2941817b66370bc1bd1469b29a6dc401b32a864832b302c64c54bb041832283fafeaa9522aa5eede9716177f167708ae6f2fa229de0290ad79d89826096aae26190115a0d221e0557f75fe43d56035d171291bcdf3d7f58659ce51ea739f171906bbc81b4f5a8066d7773f489226308ca71b79554d11ab9f21723c92889d7cfc4a2c330134f2f24ccd2416324f67a617fc009521c9a5a13df60aecd4588b611449e0aaa123509f535bb5c4968ceaaa58b70852a5cde828176e117e40e6f2b9cc0727d8d07e70804180b11a3879179529bc2aa5552117e43c5673280836a7bd4258171e358c66295c83a3dbb03c5bf6b29f1fee3ffee887370a49e6b7909dc5d635bf32503fb5bfa824ea9b134c5a8873502f2f850f901279654d395ac8b5df1bc780757714e0a1b241c56ff5c5d7571cf52e726bc243234c3c88b231f640a6dd89bb61d194feb2edcfcaf3e3be861053c51b0d268cf20b1a0f82758cd9f38e55ff4924e38cb88851b0990cb04c86d617a41bc905533ef88740c7b2297f924d66fdad9666b767ed851eac196431dc72ce971694bbf7cdff46395ead3ca86911169258f88c0f20fd635319e2dc0589b2f6ec1011b02db8d4cd855c94b17d4c0ef88e305827e53e66172040cdd4acbe3f1d6b0bcbf6a000fcd4df63d55dec13f6c5317781f5f217ef1b821c2925d2958cc1ab
-Collected!
-Collector balance: 1`
+Note: this function is not strictly required to the execution of the private airdrop.
 
+### Collect Commitments
+
+- `npx hardhat run ./scripts/6_collectCommitments.ts --network localhost`
+
+This script simulates the collection of users' commitments by the entity which is gonna execute the airdrop. 
+
+A commitment is generated from the uses by hashing two private values (a secret and a nullifier). The commitments are collected by the airdrop issuer entity and assembled in a merkle tree. The root of the commitments merkle tree is then stored as state variable in the private airdrop contract. 
+
+The commitments are stored (and dynamically updated) into  ./public/publicCommitments.txt
+
+### Generate Zero Knowledge Proof Call Data 
+
+- `npx hardhat run ./scripts/7_GenerateProofCallData.ts --network localhost`
+
+This script simulates a user that, starting from:
+- his/her secret and private nullifier used to creates the commitment (private)
+- the public verification key (circuit_final.zkey) - (public)
+- the public zero knowledge circuit (circuit.wasm) - (public)
+
+is able to generate the proof and the nullifierHash needed to prove their eligibility for the airdrop.
+
+Note: this operation doesn't involve any on-chain transaction and can be privately by the user or in any browser facing app. 
+
+Note: the nullifier hash is generated to avoid the double spending starting from the same (valid) proof
+
+### Collect the airdrop 
+
+- `npx hardhat run ./scripts/8_collect721.ts --network localhost`
+
+The user calls the collectAirdrop passing the proof and the nullifierHash as inputs.
+
+Again, the verification process performed by the MerkVerifier contract is able to tell if the inputs passed by the users are associated to any of the commitments used to assemble the merkle tree without revealing which specific commitment is associated with the user that makes the call. 
+**The privacy of the user is protected**
+
+** ADD NFT IMAGE HERE **
+
+## Check the contracts deployed on Mumbai (Polygon testned)
+
+- ZekoGenerativeNFT.sol
+- MerkVerifier.sol
+- PrivateAirdrop.sol
+
+## Use-cases
+
+- Collect users' commitments via off-chain public channels and distribute airdrop preserving their privacy
+
+- Create identity-based NFT badges that bridge off-chain credentials to on-chain identity in a privacy preserving way(Zero Knowledge based badges created according to someone's role on Discord or Github contribution). This would further then unlock:
+
+    - Improved governance mechanism such as weighting the voting power according to these badges
+    - Automated distribution of grants based on badge ownership
+    - Use these badges as sybil-resistant authentication mechanism
 
 ## To test the contract 
 
 - Start your localhost `npx hardhat node`
-- Run the test `npx hardhat test ./smartContractTest/testMinting.js --network localhost`
+- Run the test `npx hardhat test ./test/smartContractTest.js --network localhost`
+
+
