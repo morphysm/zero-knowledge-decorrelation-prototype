@@ -102,7 +102,7 @@ Again, the verification process performed by the MerkVerifier contract is able t
 ## To test the contract 
 
 - Start your localhost `npx hardhat node`
-- Run the test `npx hardhat test ./test/smartContractTest.js --network localhost` // TO BE FIXED
+- Run the test `npx hardhat test ./test/smartContractTest.js --network localhost`
 
 ## Demo
 
