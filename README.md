@@ -1,4 +1,4 @@
-# Zero Knowledge Based NFT Airdrop
+# Zero Knowledge Proof NFT Airdrop
 
 This library contains the tools (Zero Knowledge Proof circuits + smart contracts) needed to run a Zero Knowledge Based NFT Airdrop.
 DAOs or any other entity can collect commitments from their contributors via web2 platforms in a public way and deploy a private airdrop smart contract that allows these same contributors to use their wallet to redeem their airdrop.
