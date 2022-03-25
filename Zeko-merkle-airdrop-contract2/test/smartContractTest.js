@@ -1,7 +1,7 @@
 import { assert, expect } from "chai";
 import { getMerkleTreeFromPublicListOfCommitments, getMerkleRoot, randomBigInt, addNewCommitment} from "../utils/TestUtils";
 import { BigNumber } from "@ethersproject/bignumber";
-import { toHex, pedersenHash, generateProofCallData } from "zkp-merkle-airdrop-lib";
+import { toHex, pedersenHashConcat, pedersenHash, generateProofCallData } from "zkp-merkle-airdrop-lib";
 import { readFileSync } from "fs";
 const hre = require("hardhat");
 
@@ -9,7 +9,6 @@ describe("Zeko Minting", function () {
 
   let zekoNFT;
   let privateAirdrop;
-
 
   beforeEach(async function () {
 
@@ -72,12 +71,12 @@ describe("Zeko Airdrop", function () {
   let zekoNFT;
   let privateAirdrop;
   let validProof;
-  let newNullifierHash;
+  let validNullifierHash
 
   before(async function () {
 
     // Contracts Deployment
-    let NUM_ERC721_PER_REDEMPTION = 1;
+    let NUM_ERC721_PER_REDEMPTION=1
     let inputFileName = "./public/publicCommitments.txt"
     let treeHeight = 5
 
@@ -86,9 +85,11 @@ describe("Zeko Airdrop", function () {
 
     const zekoNFTFactory = await hre.ethers.getContractFactory("ZekoGenerativeNFT")
     zekoNFT = await zekoNFTFactory.deploy()
+    console.log("Contract zekoNFT deployed @", zekoNFT.address)
 
     const plonkFactory = await hre.ethers.getContractFactory("PlonkVerifier")
     const plonk = await plonkFactory.deploy()
+    console.log("Contract plonkVerifier deployed @", plonk.address)
 
     const privateAirdropFactory = await hre.ethers.getContractFactory("PrivateAirdrop")
     privateAirdrop = await privateAirdropFactory.deploy(
@@ -96,67 +97,76 @@ describe("Zeko Airdrop", function () {
       BigNumber.from(NUM_ERC721_PER_REDEMPTION),
       plonk.address,
       merkleTreeRoot)
+    
+    console.log("Contract privateAirdrop deployed @", privateAirdrop.address)
+    // NFT MINTING
+    let daoName = "Zeko Badges"
+    let daoRole = "Hardcore contributor"
+    let quantity = "8";
+    await zekoNFT.mintRoleToAirdrop(daoName, daoRole, quantity, privateAirdrop.address);
 
-    // NFT Minting to the Airdrop contract address
-    const daoName = "Uniswap"
-    const daoRole = "core Developer"
-    const quantity = 7;
-    const tx = await zekoNFT.mintRoleToAirdrop(daoName, daoRole, quantity, privateAirdrop.address);
-    tx.wait();
+    console.log(`# ${quantity} NFTs succefully minted and trasferred to ${privateAirdrop.address}` )
+
   });
 
 
   it("should allow a user that provides a valid proof to collect an NFT from the airdrop contract", async function () {
 
-    let inputFileName = "./public/publicCommitments.txt" // ADD IT IN THE PUBLIC FOLDER ON THE FRONTEND
+    let inputFileName = "./public/publicCommitments.txt"
     let treeHeight = 5;
 
     let nullifierHex = toHex(randomBigInt(31)) 
-    let keyHex = toHex(randomBigInt(31))
+    let secretHex = toHex(randomBigInt(31))
 
     let nullifier = BigInt(nullifierHex)
-    let key = BigInt (keyHex)
-    let commitment = pedersenHash(nullifier, key)
+    let secret = BigInt (secretHex)
+    let commitment = pedersenHashConcat(nullifier, secret)
     let hexCommitment = toHex(commitment)
+
+    console.log(`My private values are nullifier: ${nullifierHex} and secret ${secretHex}`)
+
     // update the public list of commitments
     addNewCommitment(inputFileName,hexCommitment,treeHeight)
-    // NEED TO SAVE THE FILE IN THE MEANWHILE
     // generate the merkletree
     let mt = getMerkleTreeFromPublicListOfCommitments(inputFileName, treeHeight)
     let newRoot = getMerkleRoot(mt)
-    console.log(`new commitment generated ${hexCommitment} from nullifier: ${nullifierHex} and key ${keyHex}`)
+    console.log(`new commitment ${hexCommitment} added to the commitments merkle tree`)
 
-    //UPDATE THE ROOT on the private Airdropcontrct 
-    console.log(privateAirdrop.address)
-    let airdropContract = await hre.ethers.getContractAt("PrivateAirdrop", privateAirdrop.address)
-    await airdropContract.updateRoot(newRoot);
+    //update the root on Private Airdrop contract 
+    await privateAirdrop.updateRoot(newRoot);
+    console.log(`merkleRoot storage variable at @private Airdrop contract succesfully updated to ${newRoot} `)
 
-    console.log(`merkleRoot storage variable succesfully updated to ${newRoot} `)
-
+    // GENERATE PROOF CALL DATA
     let WASM_PATH = "./build/circuit_js/circuit.wasm";
-    let ZKEY_PATH = "./build/circuit_final.zkey";
-
+    let ZKEY_PATH = "./build/circuit_final.zkey"; 
+    // TO ADD
     let WASM_BUFF = readFileSync(WASM_PATH);
     let ZKEY_BUFF = readFileSync(ZKEY_PATH);
-
-    let signers = await hre.ethers.getSigners();
-    let collector = signers[2];
+    
+    let singers = await hre.ethers.getSigners();
+    let collector = singers[1]
+    let collectorAddress = collector.address
 
     validProof =
-      await generateProofCallData(
-        mt,
-        nullifier,  // nullifier 
-        key,
-        collector.address,
-        WASM_BUFF,
-        ZKEY_BUFF);
-    
-    newNullifierHash = toHex(pedersenHash(nullifier)) // hash of the nullifier => need to be passed to avoid double spending
+        await generateProofCallData(
+            mt,
+            nullifier,   
+            secret,
+            collectorAddress,
+            WASM_BUFF,
+            ZKEY_BUFF);
 
-    await privateAirdrop.connect(collector).collectAirdrop(validProof, newNullifierHash);
+    validNullifierHash = toHex(pedersenHash(nullifier)); // hash of the nullifier => need to be passed to avoid double spending
+
+    console.log("Proof: ", validProof) ; 
+    console.log("nullifierHash", validNullifierHash) 
+    
+    await privateAirdrop.connect(collector).collectAirdrop(validProof, validNullifierHash);
+
+    console.log(`Proof verified => NFT succesfully collected by ${collector.address}! without knowing which commitments corresponds to this verification!`)
+   
     let balance = await zekoNFT.balanceOf(collector.address)
     assert.equal(balance.toNumber(), 1);
-
 
   });
 
@@ -169,51 +179,23 @@ describe("Zeko Airdrop", function () {
   });
 
   it("should revert if a user provides a valid proof which has already been used", async function () {
-    // let WASM_PATH = "./build/circuit_js/circuit.wasm";
-    // let ZKEY_PATH = "./build/circuit_final.zkey";
-
-    // let WASM_BUFF = readFileSync(WASM_PATH);
-    // let ZKEY_BUFF = readFileSync(ZKEY_PATH);
-
-    // let MT_KEYS_PATH = "./test/temp/mt_keys_32.txt"
 
     let signers = await hre.ethers.getSigners();
     let collector = signers[2];
-
-    // let mt = getMerkleTreeFromPublicListOfCommitments(inputFileName, treeHeight)
-
-    // let merkleTreeAndSource = readMerkleTreeAndSourceFromFile(MT_KEYS_PATH);
-    // let redeemIndex = 3;
-    // let key = merkleTreeAndSource.leafNullifiers[redeemIndex];
-    // let secret = merkleTreeAndSource.leafSecrets[redeemIndex];
-
-    // let validProof =
-    //   await generateProofCallData(
-    //     merkleTreeAndSource.merkleTree,
-    //     key,  // nullifier 
-    //     secret,
-    //     collector.address,
-    //     WASM_BUFF,
-    //     ZKEY_BUFF);
-
-    // let keyHash = toHex(pedersenHashConcat(key)); // key of the nullifier => need to be passed to avoid double spending
-
-    await expect(privateAirdrop.connect(collector).collectAirdrop(validProof, newNullifierHash)).to.be.reverted
+    await expect(privateAirdrop.connect(collector).collectAirdrop(validProof, validNullifierHash)).to.be.reverted
   });
 
   it("should expect that the airdropped token is not transferable", async function () {
-
     let signers = await hre.ethers.getSigners();
     let collector = signers[2];
     let receiver = signers[4]
     await expect(zekoNFT.connect(collector).transferFrom(collector.address, receiver.address, 1)).to.be.reverted
   });
 
-  it("should have token ID 1 as nextTokenIdToBeAirdropped after the first airdrop happened", async function () {
+  it("should have token ID 2 as nextTokenIdToBeAirdropped after the first airdrop happened", async function () {
 
     let nextTokenIdToBeAirdroppedToString = await privateAirdrop.nextTokenIdToBeAirdropped()
     assert.equal(nextTokenIdToBeAirdroppedToString.toNumber(), 2);
-
   });
 
 });

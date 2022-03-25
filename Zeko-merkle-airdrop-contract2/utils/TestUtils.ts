@@ -123,7 +123,6 @@ export function addNewCommitment (filename: string, newcommitment: string, treeh
     console.log("list of public commitments succesfully updated")
     
     // Generate the merkle tree and return it
-
     return MerkleTree.createFromLeaves(commitmentsBigInt);
 }
 
