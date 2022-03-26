@@ -5,7 +5,9 @@ DAOs or any other entity can collect commitments from their contributors via web
 
 By leveraging Zero Knowledge proof, there is no association between the web2 identity that made the initial commitment and the web3 wallet used to redeem the NFT based on that same commitment 
 
-Project built during EthDenver 2022 🙌
+Project finalist at EthDenver 2022 🙌
+
+[Miro board to understand how it works](https://miro.com/app/board/uXjVOCOM9cg=/?invite_link_id=79946175165)
 
 ## Related Work and Credits
 
