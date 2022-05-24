@@ -4,3 +4,4 @@ artifacts
 cache
 local
 build
+coverage
