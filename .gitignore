@@ -1,0 +1,6 @@
+node_modules
+typechain
+artifacts
+cache
+local
+build
