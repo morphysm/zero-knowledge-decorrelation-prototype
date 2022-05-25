@@ -5,7 +5,8 @@ import {
   randomBigInt,
   getMerkleTreeFromPublicListOfCommitments,
 } from '../utils/TestUtils';
-import { toHex, pedersenHashConcat } from 'zkp-merkle-airdrop-lib';
+import { toHex } from 'zkp-merkle-airdrop-lib';
+import { pedersenHashConcat } from '../lib/Library';
 
 /**
  * when a new commitment comes it, update the public list of commitments and the merkle root stored inside the airdrop contract
@@ -20,8 +21,12 @@ async function main() {
 
   let nullifier = BigInt(nullifierHex);
   let secret = BigInt(secretHex);
-  let commitment = pedersenHashConcat(nullifier, secret);
+  // reward to be payed out, set by the server/project maintainer
+  let reward = BigInt(42);
+  let commitment = pedersenHashConcat([nullifier, secret, reward]);
   let hexCommitment = toHex(commitment);
+  console.log(commitment);
+  console.log(hexCommitment);
 
   // update the public list of commitments
   addNewCommitment(inputFileName, hexCommitment, treeHeight);
@@ -29,7 +34,9 @@ async function main() {
   let mt = getMerkleTreeFromPublicListOfCommitments(inputFileName, treeHeight);
   let newRoot = getMerkleRoot(mt);
   console.log(
-    `new commitment generated ${hexCommitment} from nullifier: ${nullifierHex} and secret ${secretHex}`
+    `new commitment generated ${hexCommitment} from nullifier: ${nullifierHex}, secret: ${secretHex} and reward ${toHex(
+      reward
+    )}`
   );
 
   let AIRDROP_ADDR = '0x3Aa5ebB10DC797CAC828524e59A333d0A371443c'; // TO MODIFTY

@@ -103,7 +103,6 @@ describe('Zeko Airdrop', () => {
   let validNullifierHash: string;
 
   beforeAll(async () => {
-    jest.setTimeout(60000);
     // Contracts Deployment
     let NUM_ERC721_PER_REDEMPTION = 1;
     let inputFileName = './public/publicCommitments.txt';

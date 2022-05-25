@@ -1,11 +1,8 @@
 // Collect against locally created merkle tree (only the first 4 commitments)
 import { readFileSync } from 'fs';
 import { getMerkleTreeFromPublicListOfCommitments } from '../utils/TestUtils';
-import {
-  generateProofCallData,
-  pedersenHash,
-  toHex,
-} from 'zkp-merkle-airdrop-lib';
+import { pedersenHash, toHex } from 'zkp-merkle-airdrop-lib';
+import { generateProofCallData } from '../lib/Library';
 
 /** Generate the proof call data. */
 // No on-chain interaction yet, everything happens off-chain
@@ -16,9 +13,11 @@ async function main() {
   let commitmentsFileName = './public/publicCommitments.txt';
 
   let nullifierHex =
-    '0x006f69eab082bae59c72bb9e5437aa99f05d38fa9f17966b36f4b0b1a437d721'; // TO MODIFTY
+    '0x00a787886e77aa2c6db3cc8918bab7ada3430c977a2448a54ffcb51d0c5c8438'; // TO MODIFTY
   let secretHex =
-    '0x003a15a2cf24feb16896bce4749190c159b6f055fa8050e69d59dee0ecb55475'; // TO MODIFTY
+    '0x00c8bf15a2df268086a0e2a15ea188320f9a26a1db6e33639421b4431dd30f68'; // TO MODIFTY
+  let rewardHex =
+    '0x000000000000000000000000000000000000000000000000000000000000002a'; // TO MODIFTY
 
   let WASM_BUFF = readFileSync(WASM_PATH);
   let ZKEY_BUFF = readFileSync(ZKEY_PATH);
@@ -29,6 +28,8 @@ async function main() {
 
   let nullifier = BigInt(nullifierHex);
   let secret = BigInt(secretHex);
+  let reward = BigInt(rewardHex);
+  console.log(reward);
 
   let mt = getMerkleTreeFromPublicListOfCommitments(commitmentsFileName, 5);
   let newProof = await generateProofCallData(
@@ -36,6 +37,7 @@ async function main() {
     nullifier,
     secret,
     collectorAddress,
+    reward,
     WASM_BUFF,
     ZKEY_BUFF
   );

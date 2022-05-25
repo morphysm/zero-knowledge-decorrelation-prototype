@@ -29,7 +29,7 @@ import type {
 export interface PrivateAirdropInterface extends utils.Interface {
   functions: {
     "amountPerRedemption()": FunctionFragment;
-    "collectAirdrop(bytes,bytes32)": FunctionFragment;
+    "collectAirdrop(bytes,bytes32,bytes32)": FunctionFragment;
     "nextTokenIdToBeAirdropped()": FunctionFragment;
     "nftToken()": FunctionFragment;
     "nullifierSpent(bytes32)": FunctionFragment;
@@ -64,7 +64,7 @@ export interface PrivateAirdropInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "collectAirdrop",
-    values: [BytesLike, BytesLike]
+    values: [BytesLike, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "nextTokenIdToBeAirdropped",
@@ -186,6 +186,7 @@ export interface PrivateAirdrop extends BaseContract {
     collectAirdrop(
       proof: BytesLike,
       nullifierHash: BytesLike,
+      reward: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -235,6 +236,7 @@ export interface PrivateAirdrop extends BaseContract {
   collectAirdrop(
     proof: BytesLike,
     nullifierHash: BytesLike,
+    reward: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -281,6 +283,7 @@ export interface PrivateAirdrop extends BaseContract {
     collectAirdrop(
       proof: BytesLike,
       nullifierHash: BytesLike,
+      reward: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -337,6 +340,7 @@ export interface PrivateAirdrop extends BaseContract {
     collectAirdrop(
       proof: BytesLike,
       nullifierHash: BytesLike,
+      reward: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -389,6 +393,7 @@ export interface PrivateAirdrop extends BaseContract {
     collectAirdrop(
       proof: BytesLike,
       nullifierHash: BytesLike,
+      reward: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

@@ -54,7 +54,7 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
     }
 
     /// @notice verifies the proof, collects the airdrop if valid, and prevents this proof from working again.
-    function collectAirdrop(bytes calldata proof, bytes32 nullifierHash)
+    function collectAirdrop(bytes calldata proof, bytes32 nullifierHash, bytes32 reward)
         public
     {
         require(
@@ -66,6 +66,7 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
         pubSignals[0] = uint256(root);
         pubSignals[1] = uint256(nullifierHash);
         pubSignals[2] = uint256(uint160(msg.sender));
+        pubSignals[3] = uint256(reward);
         require(
             verifier.verifyProof(proof, pubSignals),
             "Proof verification failed"
