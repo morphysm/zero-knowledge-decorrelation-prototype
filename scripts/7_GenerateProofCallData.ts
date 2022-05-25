@@ -13,9 +13,9 @@ async function main() {
   let commitmentsFileName = './public/publicCommitments.txt';
 
   let nullifierHex =
-    '0x00a787886e77aa2c6db3cc8918bab7ada3430c977a2448a54ffcb51d0c5c8438'; // TO MODIFTY
+    '0x00c09769b712aee13a08dfc20cb3eaa32235198c49335e80523e3499a52cb256'; // TO MODIFTY
   let secretHex =
-    '0x00c8bf15a2df268086a0e2a15ea188320f9a26a1db6e33639421b4431dd30f68'; // TO MODIFTY
+    '0x0000aed32ac784039cdf4f18ee349880f253967615bd87f84fb08fab0dbe333f'; // TO MODIFTY
   let rewardHex =
     '0x000000000000000000000000000000000000000000000000000000000000002a'; // TO MODIFTY
 

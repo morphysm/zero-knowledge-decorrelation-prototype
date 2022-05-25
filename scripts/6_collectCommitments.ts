@@ -6,7 +6,7 @@ import {
   getMerkleTreeFromPublicListOfCommitments,
 } from '../utils/TestUtils';
 import { toHex } from 'zkp-merkle-airdrop-lib';
-import { pedersenHashConcat } from '../lib/Library';
+import { pedersenHashSequential } from '../lib/Library';
 
 /**
  * when a new commitment comes it, update the public list of commitments and the merkle root stored inside the airdrop contract
@@ -23,7 +23,7 @@ async function main() {
   let secret = BigInt(secretHex);
   // reward to be payed out, set by the server/project maintainer
   let reward = BigInt(42);
-  let commitment = pedersenHashConcat([nullifier, secret, reward]);
+  let commitment = pedersenHashSequential([nullifier, secret, reward]);
   let hexCommitment = toHex(commitment);
   console.log(commitment);
   console.log(hexCommitment);
@@ -39,7 +39,7 @@ async function main() {
     )}`
   );
 
-  let AIRDROP_ADDR = '0x3Aa5ebB10DC797CAC828524e59A333d0A371443c'; // TO MODIFTY
+  let AIRDROP_ADDR = '0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690'; // TO MODIFTY
   let airdropContract = await hre.ethers.getContractAt(
     'PrivateAirdrop',
     AIRDROP_ADDR

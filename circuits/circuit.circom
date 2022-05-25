@@ -64,21 +64,35 @@ template CommitmentHasher() {
     signal output commitment;
     signal output nullifierHash;
 
-    component commitmentHasher = Pedersen(744);
+    component leafHasher = Pedersen(496); 
     component nullifierHasher = Pedersen(248);
     component nullifierBits = Num2Bits(248);
     component secretBits = Num2Bits(248);
+    
+    component commitmentHasher = Pedersen(500);
+    component leafBits = Num2Bits(252);
     component rewardBits = Num2Bits(248);
+
     nullifierBits.in <== nullifier;
     secretBits.in <== secret;
     rewardBits.in <== reward;
+
     for (var i = 0; i < 248; i++) {
         nullifierHasher.in[i] <== nullifierBits.out[i];
-        commitmentHasher.in[i] <== nullifierBits.out[i];
-        commitmentHasher.in[i + 248] <== secretBits.out[i];
-        commitmentHasher.in[i + 496] <== rewardBits.out[i];
+        leafHasher.in[i] <== nullifierBits.out[i];
+        leafHasher.in[i + 248] <== secretBits.out[i];
     }
-
+    
+    // hash reward that is added by airdropper
+    leafBits.in <== leafHasher.out[0];
+    for (var i = 0; i < 252; i++) {
+        commitmentHasher.in[i] <== leafBits.out[i];
+        
+    }
+    for (var i = 0; i < 248; i++) {
+        commitmentHasher.in[i + 252] <== rewardBits.out[i];  
+    }
+    
     commitment <== commitmentHasher.out[0];
     nullifierHash <== nullifierHasher.out[0];
 }
@@ -114,4 +128,4 @@ template Withdraw(levels) {
     recipientSquare <== recipient * recipient;
 }
 
-component main {public [root, nullifierHash, recipient]} = Withdraw(5); // This value  corresponds to width of tree (2^x)
+component main {public [root, nullifierHash, recipient, reward]} = Withdraw(5); // This value  corresponds to width of tree (2^x)

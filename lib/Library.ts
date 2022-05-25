@@ -38,6 +38,28 @@ export async function generateProofCallData(
   return solCallDataProof;
 }
 
+// export function pedersenHashSequential(values: BigInt[]): BigInt {
+//   return values.reduce((hash, value) => {
+//     const hashBuffer = toBufferLE(hash as any, 31);
+//     const valueBuffer = toBufferLE(value as any, 31);
+//     const combinedBuffer = Buffer.concat([hashBuffer, valueBuffer]);
+//     return pedersenHashBuff(combinedBuffer);
+//   });
+// }
+
+export function pedersenHashSequential(values: BigInt[]): BigInt {
+  const aBuffer = toBufferLE(values[0] as any, 31);
+  const bBuffer = toBufferLE(values[1] as any, 31);
+  const cBuffer = toBufferLE(values[2] as any, 31);
+
+  const abCombined = Buffer.concat([aBuffer, bBuffer]);
+  const abHash = pedersenHashBuff(abCombined);
+
+  const abHashBuffer = toBufferLE(abHash as any, 31);
+  const abHashCCombined = Buffer.concat([abHashBuffer, cBuffer]);
+  return pedersenHashBuff(abHashCCombined);
+}
+
 export function pedersenHashConcat(values: BigInt[]): BigInt {
   const buffers = values.map((value) => toBufferLE(value as any, 31));
   const combinedBuffer = Buffer.concat(buffers);
@@ -78,7 +100,7 @@ function generateCircuitInputJson(
   recieverAddr: BigInt
 ): CircuitInput {
   console.log(reward);
-  let commitment = pedersenHashConcat([nullifier, secret, reward]);
+  let commitment = pedersenHashSequential([nullifier, secret, reward]);
   console.log(commitment);
   console.log(toHex(commitment));
   let mp = mt.getMerkleProof(commitment);
