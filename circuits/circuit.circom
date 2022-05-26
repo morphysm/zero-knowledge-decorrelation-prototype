@@ -56,7 +56,7 @@ template MerkleTreeChecker(levels) {
     root === hashers[levels - 1].hash;
 }
 
-// computes Pedersen(nullifier + secret)
+// computes Pedersen(Pedersen(nullifier + secret) + rewardID)
 template CommitmentHasher() {
     signal input nullifier;
     signal input secret;
