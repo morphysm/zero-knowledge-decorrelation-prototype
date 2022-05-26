@@ -62,11 +62,11 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
             "Nullifier is not within the field"
         );
         require(!nullifierSpent[nullifierHash], "Airdrop already redeemed");
-        uint256[] memory pubSignals = new uint256[](3);
+        uint256[] memory pubSignals = new uint256[](4);
         pubSignals[0] = uint256(root);
         pubSignals[1] = uint256(nullifierHash);
-        pubSignals[2] = uint256(uint160(msg.sender));
-        pubSignals[3] = uint256(reward);
+        pubSignals[2] = uint256(reward);
+        pubSignals[3] = uint256(uint160(msg.sender));
         require(
             verifier.verifyProof(proof, pubSignals),
             "Proof verification failed"

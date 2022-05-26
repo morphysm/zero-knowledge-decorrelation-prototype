@@ -61,6 +61,7 @@ template CommitmentHasher() {
     signal input nullifier;
     signal input secret;
     signal input reward;
+    
     signal output commitment;
     signal output nullifierHash;
 
@@ -69,8 +70,8 @@ template CommitmentHasher() {
     component nullifierBits = Num2Bits(248);
     component secretBits = Num2Bits(248);
 
-    component commitmentHasher = Pedersen(501);
-    component leafBits = Num2Bits(253);
+    component commitmentHasher = Pedersen(504);
+    component leafBits = Num2Bits(256);
     component rewardBits = Num2Bits(248);
 
     nullifierBits.in <== nullifier;
@@ -85,12 +86,12 @@ template CommitmentHasher() {
     
     // hash reward that is added by airdropper
     leafBits.in <== leafHasher.out[0];
-    for (var i = 0; i < 253; i++) {
+    for (var i = 0; i < 256; i++) {
         commitmentHasher.in[i] <== leafBits.out[i];
         
     }
     for (var i = 0; i < 248; i++) {
-        commitmentHasher.in[i + 253] <== rewardBits.out[i];  
+        commitmentHasher.in[i + 256] <== rewardBits.out[i];  
     }
     
     commitment <== commitmentHasher.out[0];
@@ -101,8 +102,8 @@ template CommitmentHasher() {
 template Withdraw(levels) {
     signal input root; // public
     signal input nullifierHash; // public
-    signal input recipient; // public
     signal input reward; // public
+    signal input recipient; // public
 
     signal input nullifier; // private
     signal input secret; // private

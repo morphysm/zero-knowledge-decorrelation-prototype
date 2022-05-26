@@ -2,8 +2,8 @@
 const hre = require('hardhat');
 
 async function main() {
-  let ERC721_ADDR = '0x67d269191c92Caf3cD7723F116c85e6E9bf55933'; // TO MODIFTY
-  let AIRDROP_ADDR = '0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690'; // TO MODIFTY
+  let ERC721_ADDR = '0xc0F115A19107322cFBf1cDBC7ea011C19EbDB4F8'; // TO MODIFTY
+  let AIRDROP_ADDR = '0x34B40BA116d5Dec75548a9e9A8f15411461E8c70'; // TO MODIFTY
   let zekoNFT = await hre.ethers.getContractAt(
     'ZekoGenerativeNFT',
     ERC721_ADDR

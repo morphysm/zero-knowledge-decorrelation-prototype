@@ -13,9 +13,9 @@ async function main() {
   let commitmentsFileName = './public/publicCommitments.txt';
 
   let nullifierHex =
-    '0x00c09769b712aee13a08dfc20cb3eaa32235198c49335e80523e3499a52cb256'; // TO MODIFTY
+    '0x00202a03cea47b7918a36f12e6522c88f8fbcc9f74e07d529e9ce8f3a113ea87'; // TO MODIFTY
   let secretHex =
-    '0x0000aed32ac784039cdf4f18ee349880f253967615bd87f84fb08fab0dbe333f'; // TO MODIFTY
+    '0x00c46daf8a91c6b69e260765036de0ccf4b2e1cfe063ca630a6611f13adadee0'; // TO MODIFTY
   let rewardHex =
     '0x000000000000000000000000000000000000000000000000000000000000002a'; // TO MODIFTY
 
@@ -29,7 +29,6 @@ async function main() {
   let nullifier = BigInt(nullifierHex);
   let secret = BigInt(secretHex);
   let reward = BigInt(rewardHex);
-  console.log(reward);
 
   let mt = getMerkleTreeFromPublicListOfCommitments(commitmentsFileName, 5);
   let newProof = await generateProofCallData(
@@ -42,10 +41,10 @@ async function main() {
     ZKEY_BUFF
   );
 
-  let newNullifierHash = toHex(pedersenHash(nullifier)); // hash of the nullifier => need to be passed to avoid double spending
+  let nullifierHash = toHex(pedersenHash(nullifier)); // hash of the nullifier => need to be passed to avoid double spending
 
   console.log('Proof: ', newProof);
-  console.log('nullifier Hash', newNullifierHash);
+  console.log('Nullifier Hash: ', nullifierHash);
 }
 
 main()

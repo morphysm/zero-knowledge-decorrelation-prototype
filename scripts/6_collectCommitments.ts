@@ -23,10 +23,8 @@ async function main() {
   let secret = BigInt(secretHex);
   // reward to be payed out, set by the server/project maintainer
   let reward = BigInt(42);
-  let commitment = pedersenHashSequential([nullifier, secret, reward]);
+  let commitment = pedersenHashSequential(nullifier, secret, reward);
   let hexCommitment = toHex(commitment);
-  console.log(commitment);
-  console.log(hexCommitment);
 
   // update the public list of commitments
   addNewCommitment(inputFileName, hexCommitment, treeHeight);
@@ -39,7 +37,7 @@ async function main() {
     )}`
   );
 
-  let AIRDROP_ADDR = '0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690'; // TO MODIFTY
+  let AIRDROP_ADDR = '0x34B40BA116d5Dec75548a9e9A8f15411461E8c70'; // TO MODIFTY
   let airdropContract = await hre.ethers.getContractAt(
     'PrivateAirdrop',
     AIRDROP_ADDR

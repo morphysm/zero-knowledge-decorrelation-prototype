@@ -38,26 +38,22 @@ export async function generateProofCallData(
   return solCallDataProof;
 }
 
-// export function pedersenHashSequential(values: BigInt[]): BigInt {
-//   return values.reduce((hash, value) => {
-//     const hashBuffer = toBufferLE(hash as any, 31);
-//     const valueBuffer = toBufferLE(value as any, 31);
-//     const combinedBuffer = Buffer.concat([hashBuffer, valueBuffer]);
-//     return pedersenHashBuff(combinedBuffer);
-//   });
-// }
+export function pedersenHashSequential(
+  nullifier: BigInt,
+  secret: BigInt,
+  reward: BigInt
+): BigInt {
+  const nullifierBuffer = toBufferLE(nullifier as any, 31);
+  const secretBuffer = toBufferLE(secret as any, 31);
+  const rewardBuffer = toBufferLE(reward as any, 31);
 
-export function pedersenHashSequential(values: BigInt[]): BigInt {
-  const aBuffer = toBufferLE(values[0] as any, 31);
-  const bBuffer = toBufferLE(values[1] as any, 31);
-  const cBuffer = toBufferLE(values[2] as any, 31);
+  const nullSecBuffer = Buffer.concat([nullifierBuffer, secretBuffer]);
+  const nullSecHash = pedersenHashBuff(nullSecBuffer);
 
-  const abCombined = Buffer.concat([aBuffer, bBuffer]);
-  const abHash = pedersenHashBuff(abCombined);
+  const nullSecHashBuffer = toBufferLE(nullSecHash as any, 32);
 
-  const abHashBuffer = toBufferLE(abHash as any, 31);
-  const abHashCCombined = Buffer.concat([abHashBuffer, cBuffer]);
-  return pedersenHashBuff(abHashCCombined);
+  const commitmentBuffer = Buffer.concat([nullSecHashBuffer, rewardBuffer]);
+  return pedersenHashBuff(commitmentBuffer);
 }
 
 export function pedersenHashConcat(values: BigInt[]): BigInt {
@@ -99,10 +95,7 @@ function generateCircuitInputJson(
   reward: BigInt,
   recieverAddr: BigInt
 ): CircuitInput {
-  console.log(reward);
-  let commitment = pedersenHashSequential([nullifier, secret, reward]);
-  console.log(commitment);
-  console.log(toHex(commitment));
+  let commitment = pedersenHashSequential(nullifier, secret, reward);
   let mp = mt.getMerkleProof(commitment);
   let nullifierHash = pedersenHash(nullifier);
 
@@ -137,4 +130,12 @@ function unstringifyBigInts(o: any): any {
   } else {
     return o;
   }
+}
+
+function toBinaryString(buf: Buffer): string {
+  let result = [];
+  for (let b of buf) {
+    result.push(b.toString(2).padStart(8, '0'));
+  }
+  return result.join('');
 }
