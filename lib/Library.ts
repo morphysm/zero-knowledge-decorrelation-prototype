@@ -7,8 +7,8 @@ export async function generateProofCallData(
   merkleTree: MerkleTree,
   key: BigInt,
   secret: BigInt,
-  receiverAddr: string,
   reward: BigInt,
+  receiverAddr: string,
   circuitWasmBuffer: Buffer,
   zkeyBuffer: Buffer
 ): Promise<string> {
@@ -130,12 +130,4 @@ function unstringifyBigInts(o: any): any {
   } else {
     return o;
   }
-}
-
-function toBinaryString(buf: Buffer): string {
-  let result = [];
-  for (let b of buf) {
-    result.push(b.toString(2).padStart(8, '0'));
-  }
-  return result.join('');
 }

@@ -35,8 +35,8 @@ async function main() {
     mt,
     nullifier,
     secret,
-    collectorAddress,
     reward,
+    collectorAddress,
     WASM_BUFF,
     ZKEY_BUFF
   );
