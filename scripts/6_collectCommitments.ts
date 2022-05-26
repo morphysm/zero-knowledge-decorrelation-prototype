@@ -21,9 +21,9 @@ async function main() {
 
   let nullifier = BigInt(nullifierHex);
   let secret = BigInt(secretHex);
-  // reward to be payed out, set by the server/project maintainer
-  let reward = BigInt(42);
-  let commitment = pedersenHashSequential(nullifier, secret, reward);
+  // rewardID to be payed out, set by the server/project maintainer
+  let rewardID = BigInt(42);
+  let commitment = pedersenHashSequential(nullifier, secret, rewardID);
   let hexCommitment = toHex(commitment);
 
   // update the public list of commitments
@@ -32,8 +32,8 @@ async function main() {
   let mt = getMerkleTreeFromPublicListOfCommitments(inputFileName, treeHeight);
   let newRoot = getMerkleRoot(mt);
   console.log(
-    `new commitment generated ${hexCommitment} from nullifier: ${nullifierHex}, secret: ${secretHex} and reward ${toHex(
-      reward
+    `new commitment generated ${hexCommitment} from nullifier: ${nullifierHex}, secret: ${secretHex} and rewardID ${toHex(
+      rewardID
     )}`
   );
 

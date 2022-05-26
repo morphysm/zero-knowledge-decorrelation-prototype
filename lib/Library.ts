@@ -7,7 +7,7 @@ export async function generateProofCallData(
   merkleTree: MerkleTree,
   key: BigInt,
   secret: BigInt,
-  reward: BigInt,
+  rewardID: BigInt,
   receiverAddr: string,
   circuitWasmBuffer: Buffer,
   zkeyBuffer: Buffer
@@ -16,7 +16,7 @@ export async function generateProofCallData(
     merkleTree,
     key,
     secret,
-    reward,
+    rewardID,
     BigInt(receiverAddr)
   );
 
@@ -41,18 +41,18 @@ export async function generateProofCallData(
 export function pedersenHashSequential(
   nullifier: BigInt,
   secret: BigInt,
-  reward: BigInt
+  rewardID: BigInt
 ): BigInt {
   const nullifierBuffer = toBufferLE(nullifier as any, 31);
   const secretBuffer = toBufferLE(secret as any, 31);
-  const rewardBuffer = toBufferLE(reward as any, 31);
+  const rewardIDBuffer = toBufferLE(rewardID as any, 31);
 
   const nullSecBuffer = Buffer.concat([nullifierBuffer, secretBuffer]);
   const nullSecHash = pedersenHashBuff(nullSecBuffer);
 
   const nullSecHashBuffer = toBufferLE(nullSecHash as any, 32);
 
-  const commitmentBuffer = Buffer.concat([nullSecHashBuffer, rewardBuffer]);
+  const commitmentBuffer = Buffer.concat([nullSecHashBuffer, rewardIDBuffer]);
   return pedersenHashBuff(commitmentBuffer);
 }
 
@@ -82,7 +82,7 @@ interface CircuitInput {
   nullifierHash: BigInt;
   nullifier: BigInt;
   secret: BigInt;
-  reward: BigInt;
+  rewardID: BigInt;
   pathIndices: number[];
   pathElements: BigInt[];
   recipient: BigInt;
@@ -92,10 +92,10 @@ function generateCircuitInputJson(
   mt: MerkleTree,
   nullifier: BigInt,
   secret: BigInt,
-  reward: BigInt,
+  rewardID: BigInt,
   recieverAddr: BigInt
 ): CircuitInput {
-  let commitment = pedersenHashSequential(nullifier, secret, reward);
+  let commitment = pedersenHashSequential(nullifier, secret, rewardID);
   let mp = mt.getMerkleProof(commitment);
   let nullifierHash = pedersenHash(nullifier);
 
@@ -104,7 +104,7 @@ function generateCircuitInputJson(
     nullifierHash: nullifierHash,
     nullifier: nullifier,
     secret: secret,
-    reward: reward,
+    rewardID: rewardID,
     pathIndices: mp.indices,
     pathElements: mp.vals,
     recipient: recieverAddr,

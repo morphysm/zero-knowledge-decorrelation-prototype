@@ -78,12 +78,12 @@ describe('Famed Airdrop', () => {
 
     const nullifierHex = toHex(randomBigInt(31));
     const secretHex = toHex(randomBigInt(31));
-    const payoutHex = toHex(BigInt(100));
+    const rewardIDHex = toHex(BigInt(100));
 
     const nullifier = BigInt(nullifierHex);
     const secret = BigInt(secretHex);
-    const payout = BigInt(payoutHex);
-    const commitment = pedersenHashSequential(nullifier, secret, payout);
+    const rewardID = BigInt(rewardIDHex);
+    const commitment = pedersenHashSequential(nullifier, secret, rewardID);
     const hexCommitment = toHex(commitment);
 
     console.log(
@@ -123,7 +123,7 @@ describe('Famed Airdrop', () => {
       mt,
       nullifier,
       secret,
-      payout,
+      rewardID,
       collectorAddress,
       WASM_BUFF,
       ZKEY_BUFF
@@ -136,7 +136,7 @@ describe('Famed Airdrop', () => {
 
     await privateAirdrop
       .connect(collector)
-      .collectAirdrop(validProof, validNullifierHash, toHex(payout));
+      .collectAirdrop(validProof, validNullifierHash, toHex(rewardID));
 
     console.log(
       `Proof verified => NFT succesfully collected by ${collector.address}! without knowing which commitments corresponds to this verification!`

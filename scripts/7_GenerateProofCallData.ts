@@ -16,7 +16,7 @@ async function main() {
     '0x00202a03cea47b7918a36f12e6522c88f8fbcc9f74e07d529e9ce8f3a113ea87'; // TO MODIFTY
   let secretHex =
     '0x00c46daf8a91c6b69e260765036de0ccf4b2e1cfe063ca630a6611f13adadee0'; // TO MODIFTY
-  let rewardHex =
+  let rewardIDHex =
     '0x000000000000000000000000000000000000000000000000000000000000002a'; // TO MODIFTY
 
   let WASM_BUFF = readFileSync(WASM_PATH);
@@ -28,14 +28,14 @@ async function main() {
 
   let nullifier = BigInt(nullifierHex);
   let secret = BigInt(secretHex);
-  let reward = BigInt(rewardHex);
+  let rewardID = BigInt(rewardIDHex);
 
   let mt = getMerkleTreeFromPublicListOfCommitments(commitmentsFileName, 5);
   let newProof = await generateProofCallData(
     mt,
     nullifier,
     secret,
-    reward,
+    rewardID,
     collectorAddress,
     WASM_BUFF,
     ZKEY_BUFF

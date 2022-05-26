@@ -60,7 +60,7 @@ template MerkleTreeChecker(levels) {
 template CommitmentHasher() {
     signal input nullifier;
     signal input secret;
-    signal input reward;
+    signal input rewardID;
     
     signal output commitment;
     signal output nullifierHash;
@@ -72,11 +72,11 @@ template CommitmentHasher() {
 
     component commitmentHasher = Pedersen(504);
     component leafBits = Num2Bits(256);
-    component rewardBits = Num2Bits(248);
+    component rewardIDBits = Num2Bits(248);
 
     nullifierBits.in <== nullifier;
     secretBits.in <== secret;
-    rewardBits.in <== reward;
+    rewardIDBits.in <== rewardID;
 
     for (var i = 0; i < 248; i++) {
         nullifierHasher.in[i] <== nullifierBits.out[i];
@@ -84,14 +84,14 @@ template CommitmentHasher() {
         leafHasher.in[i + 248] <== secretBits.out[i];
     }
     
-    // hash reward that is added by airdropper
+    // hash rewardID that is added by airdropper
     leafBits.in <== leafHasher.out[0];
     for (var i = 0; i < 256; i++) {
         commitmentHasher.in[i] <== leafBits.out[i];
         
     }
     for (var i = 0; i < 248; i++) {
-        commitmentHasher.in[i + 256] <== rewardBits.out[i];  
+        commitmentHasher.in[i + 256] <== rewardIDBits.out[i];  
     }
     
     commitment <== commitmentHasher.out[0];
@@ -102,7 +102,7 @@ template CommitmentHasher() {
 template Withdraw(levels) {
     signal input root; // public
     signal input nullifierHash; // public
-    signal input reward; // public
+    signal input rewardID; // public
     signal input recipient; // public
 
     signal input nullifier; // private
@@ -113,7 +113,7 @@ template Withdraw(levels) {
     component hasher = CommitmentHasher();
     hasher.nullifier <== nullifier;
     hasher.secret <== secret;
-    hasher.reward <== reward;
+    hasher.rewardID <== rewardID;
     hasher.nullifierHash === nullifierHash;
 
     component tree = MerkleTreeChecker(levels);
@@ -129,4 +129,4 @@ template Withdraw(levels) {
     recipientSquare <== recipient * recipient;
 }
 
-component main {public [root, nullifierHash, recipient, reward]} = Withdraw(5); // This value  corresponds to width of tree (2^x)
+component main {public [root, nullifierHash, recipient, rewardID]} = Withdraw(5); // This value  corresponds to width of tree (2^x)

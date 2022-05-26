@@ -12,134 +12,134 @@ import type {
   PopulatedTransaction,
   Signer,
   utils,
-} from "ethers";
+} from 'ethers';
 import type {
   FunctionFragment,
   Result,
   EventFragment,
-} from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
+} from '@ethersproject/abi';
+import type { Listener, Provider } from '@ethersproject/providers';
 import type {
   TypedEventFilter,
   TypedEvent,
   TypedListener,
   OnEvent,
-} from "../../common";
+} from '../../common';
 
 export interface PrivateAirdropInterface extends utils.Interface {
   functions: {
-    "amountPerRedemption()": FunctionFragment;
-    "collectAirdrop(bytes,bytes32,bytes32)": FunctionFragment;
-    "nextTokenIdToBeAirdropped()": FunctionFragment;
-    "nftToken()": FunctionFragment;
-    "nullifierSpent(bytes32)": FunctionFragment;
-    "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
-    "owner()": FunctionFragment;
-    "renounceOwnership()": FunctionFragment;
-    "root()": FunctionFragment;
-    "setInitialTokenId(uint256)": FunctionFragment;
-    "transferOwnership(address)": FunctionFragment;
-    "updateRoot(bytes32)": FunctionFragment;
+    'amountPerRedemption()': FunctionFragment;
+    'collectAirdrop(bytes,bytes32,bytes32)': FunctionFragment;
+    'nextTokenIdToBeAirdropped()': FunctionFragment;
+    'nftToken()': FunctionFragment;
+    'nullifierSpent(bytes32)': FunctionFragment;
+    'onERC721Received(address,address,uint256,bytes)': FunctionFragment;
+    'owner()': FunctionFragment;
+    'renounceOwnership()': FunctionFragment;
+    'root()': FunctionFragment;
+    'setInitialTokenId(uint256)': FunctionFragment;
+    'transferOwnership(address)': FunctionFragment;
+    'updateRoot(bytes32)': FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
-      | "amountPerRedemption"
-      | "collectAirdrop"
-      | "nextTokenIdToBeAirdropped"
-      | "nftToken"
-      | "nullifierSpent"
-      | "onERC721Received"
-      | "owner"
-      | "renounceOwnership"
-      | "root"
-      | "setInitialTokenId"
-      | "transferOwnership"
-      | "updateRoot"
+      | 'amountPerRedemption'
+      | 'collectAirdrop'
+      | 'nextTokenIdToBeAirdropped'
+      | 'nftToken'
+      | 'nullifierSpent'
+      | 'onERC721Received'
+      | 'owner'
+      | 'renounceOwnership'
+      | 'root'
+      | 'setInitialTokenId'
+      | 'transferOwnership'
+      | 'updateRoot'
   ): FunctionFragment;
 
   encodeFunctionData(
-    functionFragment: "amountPerRedemption",
+    functionFragment: 'amountPerRedemption',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "collectAirdrop",
+    functionFragment: 'collectAirdrop',
     values: [BytesLike, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "nextTokenIdToBeAirdropped",
+    functionFragment: 'nextTokenIdToBeAirdropped',
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "nftToken", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'nftToken', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "nullifierSpent",
+    functionFragment: 'nullifierSpent',
     values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "onERC721Received",
+    functionFragment: 'onERC721Received',
     values: [string, string, BigNumberish, BytesLike]
   ): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'owner', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "renounceOwnership",
+    functionFragment: 'renounceOwnership',
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "root", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'root', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "setInitialTokenId",
+    functionFragment: 'setInitialTokenId',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "transferOwnership",
+    functionFragment: 'transferOwnership',
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "updateRoot",
+    functionFragment: 'updateRoot',
     values: [BytesLike]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "amountPerRedemption",
+    functionFragment: 'amountPerRedemption',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "collectAirdrop",
+    functionFragment: 'collectAirdrop',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "nextTokenIdToBeAirdropped",
+    functionFragment: 'nextTokenIdToBeAirdropped',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "nftToken", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'nftToken', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "nullifierSpent",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "onERC721Received",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "renounceOwnership",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "root", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "setInitialTokenId",
+    functionFragment: 'nullifierSpent',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "transferOwnership",
+    functionFragment: 'onERC721Received',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "updateRoot", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'owner', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'renounceOwnership',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'root', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'setInitialTokenId',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: 'transferOwnership',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'updateRoot', data: BytesLike): Result;
 
   events: {
-    "OwnershipTransferred(address,address)": EventFragment;
+    'OwnershipTransferred(address,address)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'OwnershipTransferred'): EventFragment;
 }
 
 export interface OwnershipTransferredEventObject {
@@ -186,7 +186,7 @@ export interface PrivateAirdrop extends BaseContract {
     collectAirdrop(
       proof: BytesLike,
       nullifierHash: BytesLike,
-      reward: BytesLike,
+      rewardID: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -236,7 +236,7 @@ export interface PrivateAirdrop extends BaseContract {
   collectAirdrop(
     proof: BytesLike,
     nullifierHash: BytesLike,
-    reward: BytesLike,
+    rewardID: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -283,7 +283,7 @@ export interface PrivateAirdrop extends BaseContract {
     collectAirdrop(
       proof: BytesLike,
       nullifierHash: BytesLike,
-      reward: BytesLike,
+      rewardID: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -324,7 +324,7 @@ export interface PrivateAirdrop extends BaseContract {
   };
 
   filters: {
-    "OwnershipTransferred(address,address)"(
+    'OwnershipTransferred(address,address)'(
       previousOwner?: string | null,
       newOwner?: string | null
     ): OwnershipTransferredEventFilter;
@@ -340,7 +340,7 @@ export interface PrivateAirdrop extends BaseContract {
     collectAirdrop(
       proof: BytesLike,
       nullifierHash: BytesLike,
-      reward: BytesLike,
+      rewardID: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -393,7 +393,7 @@ export interface PrivateAirdrop extends BaseContract {
     collectAirdrop(
       proof: BytesLike,
       nullifierHash: BytesLike,
-      reward: BytesLike,
+      rewardID: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
