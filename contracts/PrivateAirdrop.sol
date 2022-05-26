@@ -54,7 +54,7 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
     }
 
     /// @notice verifies the proof, collects the airdrop if valid, and prevents this proof from working again.
-    function collectAirdrop(bytes calldata proof, bytes32 nullifierHash, bytes32 reward)
+    function collectAirdrop(bytes calldata proof, bytes32 nullifierHash, bytes32 rewardId)
         public
     {
         require(
@@ -65,7 +65,7 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
         uint256[] memory pubSignals = new uint256[](4);
         pubSignals[0] = uint256(root);
         pubSignals[1] = uint256(nullifierHash);
-        pubSignals[2] = uint256(reward);
+        pubSignals[2] = uint256(rewardId);
         pubSignals[3] = uint256(uint160(msg.sender));
         require(
             verifier.verifyProof(proof, pubSignals),
@@ -75,7 +75,7 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
         nftToken.transferFrom(
             address(this),
             msg.sender,
-            nextTokenIdToBeAirdropped
+            pubSignals[2]
         );
         nextTokenIdToBeAirdropped++;
     }
