@@ -5,7 +5,8 @@ import { Contract } from '@ethersproject/contracts';
 import { expect as cExpect } from 'chai';
 
 import {
-  pedersenHashSequential,
+  pedersenHashPreliminary,
+  pedersenHashFinal,
   generateProofCallData,
 } from './../lib/Library';
 import {
@@ -83,7 +84,8 @@ describe('Famed Airdrop', () => {
     const nullifier = BigInt(nullifierHex);
     const secret = BigInt(secretHex);
     const rewardID = BigInt(rewardIDHex);
-    const commitment = pedersenHashSequential(nullifier, secret, rewardID);
+    const preCommitment = pedersenHashPreliminary(nullifier, secret);
+    const commitment = pedersenHashFinal(preCommitment, rewardID);
     const hexCommitment = toHex(commitment);
 
     console.log(

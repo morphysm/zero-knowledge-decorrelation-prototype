@@ -1,6 +1,6 @@
 const snarkjs = require('snarkjs');
 const circomlibjs = require('circomlibjs');
-import { MerkleTree, pedersenHash, toHex } from 'zkp-merkle-airdrop-lib';
+import { MerkleTree, pedersenHash } from 'zkp-merkle-airdrop-lib';
 const wc = require('./witness_calculator.js');
 
 export async function generateProofCallData(
@@ -38,22 +38,23 @@ export async function generateProofCallData(
   return solCallDataProof;
 }
 
-export function pedersenHashSequential(
+export function pedersenHashPreliminary(
   nullifier: BigInt,
-  secret: BigInt,
-  rewardID: BigInt
+  secret: BigInt
 ): BigInt {
   const nullifierBuffer = toBufferLE(nullifier as any, 31);
   const secretBuffer = toBufferLE(secret as any, 31);
+
+  const preliminaryBuffer = Buffer.concat([nullifierBuffer, secretBuffer]);
+  return pedersenHashBuff(preliminaryBuffer);
+}
+
+export function pedersenHashFinal(preCommitment: BigInt, rewardID: BigInt) {
+  const nullSecHashBuffer = toBufferLE(preCommitment as any, 32);
   const rewardIDBuffer = toBufferLE(rewardID as any, 31);
 
-  const nullSecBuffer = Buffer.concat([nullifierBuffer, secretBuffer]);
-  const nullSecHash = pedersenHashBuff(nullSecBuffer);
-
-  const nullSecHashBuffer = toBufferLE(nullSecHash as any, 32);
-
-  const commitmentBuffer = Buffer.concat([nullSecHashBuffer, rewardIDBuffer]);
-  return pedersenHashBuff(commitmentBuffer);
+  const finalBuffer = Buffer.concat([nullSecHashBuffer, rewardIDBuffer]);
+  return pedersenHashBuff(finalBuffer);
 }
 
 export function pedersenHashConcat(values: BigInt[]): BigInt {
@@ -95,7 +96,8 @@ function generateCircuitInputJson(
   rewardID: BigInt,
   recieverAddr: BigInt
 ): CircuitInput {
-  let commitment = pedersenHashSequential(nullifier, secret, rewardID);
+  const preCommitment = pedersenHashPreliminary(nullifier, secret);
+  const commitment = pedersenHashFinal(preCommitment, rewardID);
   let mp = mt.getMerkleProof(commitment);
   let nullifierHash = pedersenHash(nullifier);
 

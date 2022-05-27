@@ -6,7 +6,7 @@ import {
   getMerkleTreeFromPublicListOfCommitments,
 } from '../utils/TestUtils';
 import { toHex } from 'zkp-merkle-airdrop-lib';
-import { pedersenHashSequential } from '../lib/Library';
+import { pedersenHashPreliminary, pedersenHashFinal } from '../lib/Library';
 
 /**
  * when a new commitment comes it, update the public list of commitments and the merkle root stored inside the airdrop contract
@@ -23,7 +23,8 @@ async function main() {
   let secret = BigInt(secretHex);
   // rewardID to be payed out, set by the server/project maintainer
   let rewardID = BigInt(42);
-  let commitment = pedersenHashSequential(nullifier, secret, rewardID);
+  const preCommitment = pedersenHashPreliminary(nullifier, secret);
+  const commitment = pedersenHashFinal(preCommitment, rewardID);
   let hexCommitment = toHex(commitment);
 
   // update the public list of commitments
