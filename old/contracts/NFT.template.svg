@@ -1,0 +1,6 @@
+<svg width="500" height="500">
+    <rect height="500" width="500" y="0" x="0" fill="hsl(20,50%,25%)"/>
+    <text font-size="18" y="10%" x="80%" text-anchor="middle" fill="hsl(111,100%,80%)">33</text>
+    <text font-size="18" y="50%" x="50%" text-anchor="middle" fill="hsl(190,100%,80%)">ZeKo</text>
+    <text font-size="18" y="80%" x="50%" text-anchor="middle" fill="hsl(210,100%,80%)">ADMIN</text>
+</svg>

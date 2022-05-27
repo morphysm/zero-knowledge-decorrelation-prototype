@@ -2,9 +2,9 @@
 pragma circom 2.0.0;
 
 // Massively borrowed from tornado cash: https://github.com/tornadocash/tornado-core/tree/master/circuits
-include "../node_modules/circomlib/circuits/bitify.circom";
-include "../node_modules/circomlib/circuits/mimcsponge.circom";
-include "../node_modules/circomlib/circuits/pedersen.circom";
+include "./node_modules/circomlib/circuits/bitify.circom";
+include "./node_modules/circomlib/circuits/mimcsponge.circom";
+include "./node_modules/circomlib/circuits/pedersen.circom";
 
 // Computes MiMC([left, right])
 template HashLeftRight() {

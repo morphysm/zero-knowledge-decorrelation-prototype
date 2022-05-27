@@ -1,0 +1,14 @@
+{
+  "name": "famed-airdrop-prototype-circuits",
+  "version": "0.0.1",
+  "description": "",
+  "main": "\"\"",
+  "scripts": {
+    "test": "\"\""
+  },
+  "author": "Kilian Kälsin @morphysm.com",
+  "license": "ISC",
+  "dependencies": {
+    "circomlib": "^2.0.3"
+  }
+}
