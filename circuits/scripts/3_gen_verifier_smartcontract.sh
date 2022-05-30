@@ -1,1 +1,1 @@
-snarkjs zkey export solidityverifier ./../build/circuit_final.zkey ./../../contracts/contracts/compiled/MerkVerifier.sol
+snarkjs zkey export solidityverifier ./../build/circuit_final.zkey ./../build/contracts/MerkVerifier.sol

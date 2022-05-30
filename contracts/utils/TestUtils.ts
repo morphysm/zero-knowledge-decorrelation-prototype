@@ -70,7 +70,6 @@ export function readMerkleTreeAndSourceFromFile(
   const leafNullifiers: BigInt[] = [];
   const leafSecrets: BigInt[] = [];
   const leaves: BigInt[] = [];
-  console.log("sdasd", process.cwd());
   const contents = readFileSync(filename, "utf8");
   const lines = contents.split("\n");
   for (let i = 1; i < lines.length; i++) {

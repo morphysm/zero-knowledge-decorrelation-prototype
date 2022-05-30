@@ -12,6 +12,7 @@ var MerkleTree = /** @class */ (function () {
      * For a set of leaves recursively computes hashes of adjacent nodes upwards until reaching a root.
      * Note: Significantly slower than `MerkleTree.createFromStorageString` as it rehashes the whole tree.
      */
+    // THAT THE CLASS I NEED TO USE 
     MerkleTree.createFromLeaves = function (leaves) {
         var leafNodes = leaves.map(function (leaf) { return new TreeNode(leaf); });
         var rootNode = MerkleTree.hashChildrenAndLinkToParent(leafNodes)[0];

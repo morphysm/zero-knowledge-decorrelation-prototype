@@ -75,7 +75,6 @@ export function toHex(number: BigInt, length = 32) {
 }
 
 // Non-exported
-
 interface CircuitInput {
   root: BigInt;
   nullifierHash: BigInt;
@@ -144,4 +143,14 @@ function toBufferLE(bi: BigInt, width: number): Buffer {
   );
   buffer.reverse();
   return buffer;
+}
+
+function toBigIntLE(buff: Buffer) {
+  const reversed = Buffer.from(buff);
+  reversed.reverse();
+  const hex = reversed.toString('hex');
+  if (hex.length === 0) {
+    return BigInt(0);
+  }
+  return BigInt(`0x${hex}`);
 }

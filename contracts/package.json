@@ -43,6 +43,7 @@
     "typescript": "^4.7.2"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.6.0"
+    "@openzeppelin/contracts": "^4.6.0",
+    "circuits": "file:../circuits"
   }
 }

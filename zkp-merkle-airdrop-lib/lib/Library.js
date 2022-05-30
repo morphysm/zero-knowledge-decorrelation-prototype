@@ -36,20 +36,20 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toHex = exports.pedersenHashConcat = exports.pedersenHash = exports.mimcSponge = exports.generateProofCallData = void 0;
+exports.toHex = exports.pedersenHashFinal = exports.pedersenHashPreliminary = exports.pedersenHash = exports.mimcSponge = exports.generateProofCallData = void 0;
 /**
  * Library which abstracts away much of the details required to interact with the private airdrop contract.
  */
-var snarkjs = require("snarkjs");
+var snarkjs = require('snarkjs');
 var circomlibjs = require('circomlibjs');
-var wc = require("./witness_calculator.js");
-function generateProofCallData(merkleTree, key, secret, receiverAddr, circuitWasmBuffer, zkeyBuffer) {
+var wc = require('./witness_calculator.js');
+function generateProofCallData(merkleTree, key, secret, rewardID, receiverAddr, circuitWasmBuffer, zkeyBuffer) {
     return __awaiter(this, void 0, void 0, function () {
         var inputs, witnessCalculator, witnessBuffer, _a, proof, publicSignals, proofProcessed, pubProcessed, allSolCallData, solCallDataProof;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
-                    inputs = generateCircuitInputJson(merkleTree, key, secret, BigInt(receiverAddr));
+                    inputs = generateCircuitInputJson(merkleTree, key, secret, rewardID, BigInt(receiverAddr));
                     return [4 /*yield*/, wc(circuitWasmBuffer)];
                 case 1:
                     witnessCalculator = _b.sent();
@@ -79,21 +79,29 @@ function pedersenHash(nullifier) {
     return pedersenHashBuff(toBufferLE(nullifier, 31));
 }
 exports.pedersenHash = pedersenHash;
-function pedersenHashConcat(nullifier, secret) {
-    var nullBuff = toBufferLE(nullifier, 31);
-    var secBuff = toBufferLE(secret, 31);
-    var combinedBuffer = Buffer.concat([nullBuff, secBuff]);
-    return pedersenHashBuff(combinedBuffer);
+function pedersenHashPreliminary(nullifier, secret) {
+    var nullifierBuffer = toBufferLE(nullifier, 31);
+    var secretBuffer = toBufferLE(secret, 31);
+    var preliminaryBuffer = Buffer.concat([nullifierBuffer, secretBuffer]);
+    return pedersenHashBuff(preliminaryBuffer);
 }
-exports.pedersenHashConcat = pedersenHashConcat;
+exports.pedersenHashPreliminary = pedersenHashPreliminary;
+function pedersenHashFinal(preCommitment, rewardID) {
+    var nullSecHashBuffer = toBufferLE(preCommitment, 32);
+    var rewardIDBuffer = toBufferLE(rewardID, 31);
+    var finalBuffer = Buffer.concat([nullSecHashBuffer, rewardIDBuffer]);
+    return pedersenHashBuff(finalBuffer);
+}
+exports.pedersenHashFinal = pedersenHashFinal;
 function toHex(number, length) {
     if (length === void 0) { length = 32; }
     var str = number.toString(16);
     return '0x' + str.padStart(length * 2, '0');
 }
 exports.toHex = toHex;
-function generateCircuitInputJson(mt, nullifier, secret, recieverAddr) {
-    var commitment = pedersenHashConcat(nullifier, secret);
+function generateCircuitInputJson(mt, nullifier, secret, rewardID, recieverAddr) {
+    var preCommitment = pedersenHashPreliminary(nullifier, secret);
+    var commitment = pedersenHashFinal(preCommitment, rewardID);
     var mp = mt.getMerkleProof(commitment);
     var nullifierHash = pedersenHash(nullifier);
     var inputObj = {
@@ -101,9 +109,10 @@ function generateCircuitInputJson(mt, nullifier, secret, recieverAddr) {
         nullifierHash: nullifierHash,
         nullifier: nullifier,
         secret: secret,
+        rewardID: rewardID,
         pathIndices: mp.indices,
         pathElements: mp.vals,
-        recipient: recieverAddr
+        recipient: recieverAddr,
     };
     return inputObj;
 }
@@ -113,16 +122,16 @@ function pedersenHashBuff(buff) {
 }
 // Lifted from ffutils: https://github.com/iden3/ffjavascript/blob/master/src/utils_bigint.js
 function unstringifyBigInts(o) {
-    if ((typeof (o) == "string") && (/^[0-9]+$/.test(o))) {
+    if (typeof o == 'string' && /^[0-9]+$/.test(o)) {
         return BigInt(o);
     }
-    else if ((typeof (o) == "string") && (/^0x[0-9a-fA-F]+$/.test(o))) {
+    else if (typeof o == 'string' && /^0x[0-9a-fA-F]+$/.test(o)) {
         return BigInt(o);
     }
     else if (Array.isArray(o)) {
         return o.map(unstringifyBigInts);
     }
-    else if (typeof o == "object") {
+    else if (typeof o == 'object') {
         var res_1 = {};
         var keys = Object.keys(o);
         keys.forEach(function (k) {
@@ -139,4 +148,13 @@ function toBufferLE(bi, width) {
     var buffer = Buffer.from(hex.padStart(width * 2, '0').slice(0, width * 2), 'hex');
     buffer.reverse();
     return buffer;
+}
+function toBigIntLE(buff) {
+    var reversed = Buffer.from(buff);
+    reversed.reverse();
+    var hex = reversed.toString('hex');
+    if (hex.length === 0) {
+        return BigInt(0);
+    }
+    return BigInt("0x".concat(hex));
 }
