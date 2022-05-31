@@ -73,7 +73,8 @@ export async function generateProofCallData(
 
 export async function mimcSponge(l: BigInt, r: BigInt): Promise<BigInt> {
   const mimcSponge = await getMimcSponge();
-  return toBigIntLE(mimcSponge.multiHash([l, r]));
+  const hash = mimcSponge.multiHash([l, r]);
+  return BigInt('0x' + mimcSponge.F.toString(hash, 16));
 }
 
 export async function pedersenHash(nullifier: BigInt): Promise<BigInt> {
@@ -147,7 +148,9 @@ async function pedersenHashBuff(buff: Buffer): Promise<BigInt> {
   const pedersen = await getPedersen();
   const point = pedersen.hash(buff);
   const babyjub = await getBabyjub();
-  return toBigIntLE(babyjub.unpackPoint(point)[0]);
+  // TODO can we improve this?
+  const hash = babyjub.unpackPoint(point)[0];
+  return BigInt('0x' + babyjub.F.toString(hash, 16));
 }
 
 // Lifted from ffutils: https://github.com/iden3/ffjavascript/blob/master/src/utils_bigint.js

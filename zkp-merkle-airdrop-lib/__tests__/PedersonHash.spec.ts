@@ -1,4 +1,6 @@
-import { pedersenHash } from '../src/Library';
+import { pedersenHash, toHex } from '../src/Library';
+const circomlibjs = require('circomlibjs');
+const circomlibjsOld = require('circomlibjs-old');
 
 describe('Pederson Hash', () => {
   test('should be calculated correctly', async () => {

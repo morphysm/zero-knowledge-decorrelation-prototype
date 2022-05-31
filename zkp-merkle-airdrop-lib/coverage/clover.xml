@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1653999783246" clover="3.2.0">
-  <project timestamp="1653999783246" name="All files">
-    <metrics statements="226" coveredstatements="33" conditionals="39" coveredconditionals="2" methods="32" coveredmethods="6" elements="297" coveredelements="41" complexity="0" loc="226" ncloc="226" packages="1" files="2" classes="2"/>
+<coverage generated="1654007103264" clover="3.2.0">
+  <project timestamp="1654007103264" name="All files">
+    <metrics statements="228" coveredstatements="29" conditionals="39" coveredconditionals="2" methods="32" coveredmethods="5" elements="299" coveredelements="36" complexity="0" loc="228" ncloc="228" packages="1" files="2" classes="2"/>
     <file name="Library.ts" path="/Users/kiliankaslin/Documents/morphysm/famed-airdrop-prototype/zkp-merkle-airdrop-lib/src/Library.ts">
-      <metrics statements="77" coveredstatements="32" conditionals="17" coveredconditionals="2" methods="15" coveredmethods="6"/>
+      <metrics statements="79" coveredstatements="28" conditionals="17" coveredconditionals="2" methods="15" coveredmethods="5"/>
       <line num="4" count="1" type="stmt"/>
       <line num="5" count="1" type="stmt"/>
       <line num="6" count="1" type="stmt"/>
@@ -33,54 +33,56 @@
       <line num="74" count="1" type="stmt"/>
       <line num="75" count="0" type="stmt"/>
       <line num="76" count="0" type="stmt"/>
-      <line num="79" count="1" type="stmt"/>
+      <line num="77" count="0" type="stmt"/>
       <line num="80" count="1" type="stmt"/>
-      <line num="83" count="1" type="stmt"/>
-      <line num="87" count="0" type="stmt"/>
+      <line num="81" count="1" type="stmt"/>
+      <line num="84" count="1" type="stmt"/>
       <line num="88" count="0" type="stmt"/>
-      <line num="90" count="0" type="stmt"/>
+      <line num="89" count="0" type="stmt"/>
       <line num="91" count="0" type="stmt"/>
-      <line num="94" count="1" type="stmt"/>
-      <line num="98" count="0" type="stmt"/>
+      <line num="92" count="0" type="stmt"/>
+      <line num="95" count="1" type="stmt"/>
       <line num="99" count="0" type="stmt"/>
-      <line num="101" count="0" type="stmt"/>
+      <line num="100" count="0" type="stmt"/>
       <line num="102" count="0" type="stmt"/>
-      <line num="105" count="1" type="cond" truecount="0" falsecount="1"/>
-      <line num="106" count="0" type="stmt"/>
+      <line num="103" count="0" type="stmt"/>
+      <line num="106" count="1" type="cond" truecount="0" falsecount="1"/>
       <line num="107" count="0" type="stmt"/>
-      <line num="128" count="0" type="stmt"/>
+      <line num="108" count="0" type="stmt"/>
       <line num="129" count="0" type="stmt"/>
       <line num="130" count="0" type="stmt"/>
       <line num="131" count="0" type="stmt"/>
-      <line num="133" count="0" type="stmt"/>
-      <line num="143" count="0" type="stmt"/>
-      <line num="147" count="1" type="stmt"/>
+      <line num="132" count="0" type="stmt"/>
+      <line num="134" count="0" type="stmt"/>
+      <line num="144" count="0" type="stmt"/>
       <line num="148" count="1" type="stmt"/>
       <line num="149" count="1" type="stmt"/>
       <line num="150" count="1" type="stmt"/>
-      <line num="155" count="0" type="cond" truecount="0" falsecount="4"/>
-      <line num="156" count="0" type="stmt"/>
-      <line num="157" count="0" type="cond" truecount="0" falsecount="4"/>
-      <line num="158" count="0" type="stmt"/>
-      <line num="159" count="0" type="cond" truecount="0" falsecount="2"/>
-      <line num="160" count="0" type="stmt"/>
-      <line num="161" count="0" type="cond" truecount="0" falsecount="2"/>
-      <line num="162" count="0" type="stmt"/>
+      <line num="152" count="1" type="stmt"/>
+      <line num="153" count="1" type="stmt"/>
+      <line num="158" count="0" type="cond" truecount="0" falsecount="4"/>
+      <line num="159" count="0" type="stmt"/>
+      <line num="160" count="0" type="cond" truecount="0" falsecount="4"/>
+      <line num="161" count="0" type="stmt"/>
+      <line num="162" count="0" type="cond" truecount="0" falsecount="2"/>
       <line num="163" count="0" type="stmt"/>
-      <line num="164" count="0" type="stmt"/>
+      <line num="164" count="0" type="cond" truecount="0" falsecount="2"/>
       <line num="165" count="0" type="stmt"/>
+      <line num="166" count="0" type="stmt"/>
       <line num="167" count="0" type="stmt"/>
-      <line num="169" count="0" type="stmt"/>
-      <line num="174" count="1" type="stmt"/>
-      <line num="175" count="1" type="stmt"/>
-      <line num="179" count="1" type="stmt"/>
-      <line num="180" count="1" type="stmt"/>
-      <line num="184" count="1" type="stmt"/>
-      <line num="185" count="1" type="stmt"/>
-      <line num="186" count="1" type="stmt"/>
-      <line num="187" count="1" type="cond" truecount="0" falsecount="1"/>
+      <line num="168" count="0" type="stmt"/>
+      <line num="170" count="0" type="stmt"/>
+      <line num="172" count="0" type="stmt"/>
+      <line num="177" count="1" type="stmt"/>
+      <line num="178" count="1" type="stmt"/>
+      <line num="182" count="1" type="stmt"/>
+      <line num="183" count="1" type="stmt"/>
+      <line num="187" count="0" type="stmt"/>
       <line num="188" count="0" type="stmt"/>
-      <line num="190" count="1" type="stmt"/>
+      <line num="189" count="0" type="stmt"/>
+      <line num="190" count="0" type="cond" truecount="0" falsecount="1"/>
+      <line num="191" count="0" type="stmt"/>
+      <line num="193" count="0" type="stmt"/>
     </file>
     <file name="witness_calculator.js" path="/Users/kiliankaslin/Documents/morphysm/famed-airdrop-prototype/zkp-merkle-airdrop-lib/src/witness_calculator.js">
       <metrics statements="149" coveredstatements="1" conditionals="22" coveredconditionals="0" methods="17" coveredmethods="0"/>

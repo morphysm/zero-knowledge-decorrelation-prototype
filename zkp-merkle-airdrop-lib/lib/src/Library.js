@@ -6,6 +6,12 @@ exports.toHex = exports.pedersenHashFinal = exports.pedersenHashPreliminary = ex
  */
 const snarkjs = require('snarkjs');
 const circomlibjs = require('circomlibjs');
+// TODO remove workaround for unpacking issue
+// When upacking the point with the new library, the return type is a Uint8Array.
+// It is currently unclear to me how to transform this correctly to BigInt.
+// Maybe the return value encoded in the Uint8Array also got changed,
+// however i doubt that since then the circuit library would also have changed.
+const circomlibjsOld = require('circomlibjs-old');
 const wc = require('./witness_calculator.js');
 let mimcSpongeInstance;
 const getMimcSponge = async () => {
@@ -43,8 +49,7 @@ async function generateProofCallData(merkleTree, key, secret, rewardID, receiver
 exports.generateProofCallData = generateProofCallData;
 async function mimcSponge(l, r) {
     const mimcSponge = await getMimcSponge();
-    const hash = mimcSponge.multiHash([l, r]);
-    return BigInt('0x' + mimcSponge.F.toString(hash, 16));
+    return toBigIntLE(mimcSponge.multiHash([l, r]));
 }
 exports.mimcSponge = mimcSponge;
 async function pedersenHash(nullifier) {
@@ -90,10 +95,9 @@ async function generateCircuitInputJson(mt, nullifier, secret, rewardID, recieve
 async function pedersenHashBuff(buff) {
     const pedersen = await getPedersen();
     const point = pedersen.hash(buff);
-    const babyjub = await getBabyjub();
-    // TODO can we improve this?
-    const hash = babyjub.unpackPoint(point)[0];
-    return BigInt('0x' + babyjub.F.toString(hash, 16));
+    // TODO as described above
+    const hash = circomlibjsOld.babyjub.unpackPoint(point)[0];
+    return hash;
 }
 // Lifted from ffutils: https://github.com/iden3/ffjavascript/blob/master/src/utils_bigint.js
 function unstringifyBigInts(o) {

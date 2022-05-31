@@ -3,12 +3,6 @@ import { readFileSync } from 'fs';
 const hre = require('hardhat');
 import { Contract } from '@ethersproject/contracts';
 import { expect as cExpect } from 'chai';
-
-// import {
-//   pedersenHashPreliminary,
-//   pedersenHashFinal,
-//   generateProofCallData,
-// } from './../lib/Library';
 import {
   getMerkleTreeFromPublicListOfCommitments,
   getMerkleRoot,
