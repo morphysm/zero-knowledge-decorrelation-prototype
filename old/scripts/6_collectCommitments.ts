@@ -28,9 +28,12 @@ async function main() {
   let hexCommitment = toHex(commitment);
 
   // update the public list of commitments
-  addNewCommitment(inputFileName, hexCommitment, treeHeight);
+  await addNewCommitment(inputFileName, hexCommitment, treeHeight);
   // generate the merkletree
-  let mt = getMerkleTreeFromPublicListOfCommitments(inputFileName, treeHeight);
+  let mt = await getMerkleTreeFromPublicListOfCommitments(
+    inputFileName,
+    treeHeight
+  );
   let newRoot = getMerkleRoot(mt);
   console.log(
     `new commitment generated ${hexCommitment} from nullifier: ${nullifierHex}, secret: ${secretHex} and rewardID ${toHex(

@@ -7,6 +7,33 @@ const wc = require('./witness_calculator.js');
 
 import { MerkleTree } from './MerkleTree';
 
+let mimcSpongeInstance: any;
+const getMimcSponge = async (): Promise<any> => {
+  if (mimcSpongeInstance === undefined) {
+    mimcSpongeInstance = await circomlibjs.buildMimcSponge();
+  }
+
+  return mimcSpongeInstance;
+};
+
+let pedersonInstance: any;
+const getPederson = async (): Promise<any> => {
+  if (pedersonInstance === undefined) {
+    pedersonInstance = await circomlibjs.buildPedersenHash();
+  }
+
+  return pedersonInstance;
+};
+
+let babyjubInstance: any;
+const getBabyjub = async (): Promise<any> => {
+  if (babyjubInstance === undefined) {
+    babyjubInstance = await circomlibjs.buildBabyjub();
+  }
+
+  return babyjubInstance;
+};
+
 export async function generateProofCallData(
   merkleTree: MerkleTree,
   key: BigInt,
@@ -16,13 +43,15 @@ export async function generateProofCallData(
   circuitWasmBuffer: Buffer,
   zkeyBuffer: Buffer
 ): Promise<string> {
-  const inputs = generateCircuitInputJson(
+  const inputs = await generateCircuitInputJson(
     merkleTree,
     key,
     secret,
     rewardID,
     BigInt(receiverAddr)
   );
+
+  console.log(inputs);
 
   const witnessCalculator = await wc(circuitWasmBuffer);
   const witnessBuffer = await witnessCalculator.calculateWTNSBin(inputs, 0);
@@ -42,31 +71,35 @@ export async function generateProofCallData(
   return solCallDataProof;
 }
 
-export function mimcSponge(l: BigInt, r: BigInt): BigInt {
-  return circomlibjs.mimcsponge.multiHash([l, r]);
+export async function mimcSponge(l: BigInt, r: BigInt): Promise<BigInt> {
+  const mimcSponge = await getMimcSponge();
+  return toBigIntLE(mimcSponge.multiHash([l, r]));
 }
 
-export function pedersenHash(nullifier: BigInt): BigInt {
-  return pedersenHashBuff(toBufferLE(nullifier as any, 31));
+export async function pedersenHash(nullifier: BigInt): Promise<BigInt> {
+  return await pedersenHashBuff(toBufferLE(nullifier as any, 31));
 }
 
-export function pedersenHashPreliminary(
+export async function pedersenHashPreliminary(
   nullifier: BigInt,
   secret: BigInt
-): BigInt {
+): Promise<BigInt> {
   const nullifierBuffer = toBufferLE(nullifier as any, 31);
   const secretBuffer = toBufferLE(secret as any, 31);
 
   const preliminaryBuffer = Buffer.concat([nullifierBuffer, secretBuffer]);
-  return pedersenHashBuff(preliminaryBuffer);
+  return await pedersenHashBuff(preliminaryBuffer);
 }
 
-export function pedersenHashFinal(preCommitment: BigInt, rewardID: BigInt) {
+export async function pedersenHashFinal(
+  preCommitment: BigInt,
+  rewardID: BigInt
+): Promise<BigInt> {
   const nullSecHashBuffer = toBufferLE(preCommitment as any, 32);
   const rewardIDBuffer = toBufferLE(rewardID as any, 31);
 
   const finalBuffer = Buffer.concat([nullSecHashBuffer, rewardIDBuffer]);
-  return pedersenHashBuff(finalBuffer);
+  return await pedersenHashBuff(finalBuffer);
 }
 
 export function toHex(number: BigInt, length = 32) {
@@ -85,17 +118,17 @@ interface CircuitInput {
   recipient: BigInt;
 }
 
-function generateCircuitInputJson(
+async function generateCircuitInputJson(
   mt: MerkleTree,
   nullifier: BigInt,
   secret: BigInt,
   rewardID: BigInt,
   recieverAddr: BigInt
-): CircuitInput {
-  const preCommitment = pedersenHashPreliminary(nullifier, secret);
-  const commitment = pedersenHashFinal(preCommitment, rewardID);
-  const mp = mt.getMerkleProof(commitment);
-  const nullifierHash = pedersenHash(nullifier);
+): Promise<CircuitInput> {
+  const preCommitment = await pedersenHashPreliminary(nullifier, secret);
+  const commitment = await pedersenHashFinal(preCommitment, rewardID);
+  const mp = await mt.getMerkleProof(commitment);
+  const nullifierHash = await pedersenHash(nullifier);
 
   const inputObj = {
     root: mt.root.val,
@@ -110,9 +143,11 @@ function generateCircuitInputJson(
   return inputObj;
 }
 
-function pedersenHashBuff(buff: Buffer): BigInt {
-  const point = circomlibjs.pedersenHash.hash(buff);
-  return circomlibjs.babyjub.unpackPoint(point)[0];
+async function pedersenHashBuff(buff: Buffer): Promise<BigInt> {
+  const pederson = await getPederson();
+  const point = pederson.hash(buff);
+  const babyjub = await getBabyjub();
+  return toBigIntLE(babyjub.unpackPoint(point)[0]);
 }
 
 // Lifted from ffutils: https://github.com/iden3/ffjavascript/blob/master/src/utils_bigint.js

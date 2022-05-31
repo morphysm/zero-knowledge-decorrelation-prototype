@@ -2,7 +2,7 @@ import * as crypto from "crypto";
 import { readFileSync, writeFileSync } from "fs";
 import {
   MerkleTree,
-  pedersenHashConcat,
+  pedersenHashPreliminary,
   toHex,
 } from "../../zkp-merkle-airdrop-lib";
 import { exit } from "process";
@@ -17,18 +17,22 @@ export interface MerkleTreeAndSource {
 /**
  * Generates a Merkle Tree from random leaves of size @param numLeaves.
  */
-export function generateMerkleTreeAndKeys(
+export async function generateMerkleTreeAndKeys(
   numLeaves: number
-): MerkleTreeAndSource {
+): Promise<MerkleTreeAndSource> {
   const leafNullifiers: BigInt[] = [];
   const leafSecrets: BigInt[] = [];
   const leaves: BigInt[] = [];
   for (let i = 0; i < numLeaves; i++) {
     leafNullifiers.push(randomBigInt(31));
     leafSecrets.push(randomBigInt(31));
-    leaves.push(pedersenHashConcat(leafNullifiers[i], leafSecrets[i]));
+    const leaf = await pedersenHashPreliminary(
+      leafNullifiers[i],
+      leafSecrets[i]
+    );
+    leaves.push(leaf);
   }
-  const merkleTree = MerkleTree.createFromLeaves(leaves);
+  const merkleTree = await MerkleTree.createFromLeaves(leaves);
   return { merkleTree, leafNullifiers, leafSecrets };
 }
 
@@ -64,9 +68,9 @@ export function saveMerkleTree(mt: MerkleTree, filePrefix: string = "") {
   writeFileSync(`${filePrefix}mt_${mt.leaves.length}.csv`, storage);
 }
 
-export function readMerkleTreeAndSourceFromFile(
+export async function readMerkleTreeAndSourceFromFile(
   filename: string
-): MerkleTreeAndSource {
+): Promise<MerkleTreeAndSource> {
   const leafNullifiers: BigInt[] = [];
   const leafSecrets: BigInt[] = [];
   const leaves: BigInt[] = [];
@@ -84,7 +88,7 @@ export function readMerkleTreeAndSourceFromFile(
     leafSecrets.push(BigInt(secret));
     leaves.push(BigInt(commitment));
   }
-  const merkleTree = MerkleTree.createFromLeaves(leaves);
+  const merkleTree = await MerkleTree.createFromLeaves(leaves);
   return { merkleTree, leafNullifiers, leafSecrets };
 }
 
@@ -108,11 +112,11 @@ export function getMerkleRoot(mt: MerkleTree): string {
   return toHex(root);
 }
 
-export function addNewCommitment(
+export async function addNewCommitment(
   filename: string,
   newcommitment: string,
   treeheight: number
-): MerkleTree {
+): Promise<MerkleTree> {
   const input: string = readFileSync(filename).toString();
   // replace and empty leaf with the newCommitment leaf
   const commitments = input.trim().split(",");
@@ -152,13 +156,13 @@ export function addNewCommitment(
   console.log("list of public commitments succesfully updated");
 
   // Generate the merkle tree and return it
-  return MerkleTree.createFromLeaves(commitmentsBigInt);
+  return await MerkleTree.createFromLeaves(commitmentsBigInt);
 }
 
-export function getMerkleTreeFromPublicListOfCommitments(
+export async function getMerkleTreeFromPublicListOfCommitments(
   filename: string,
   treeheight: number
-): MerkleTree {
+): Promise<MerkleTree> {
   const input: string = readFileSync(filename).toString();
   // replace and empty leaf with the newCommitment leaf
   const commitments = input.trim().split(",");
@@ -187,7 +191,7 @@ export function getMerkleTreeFromPublicListOfCommitments(
 
   // Generate the merkle tree and return it
 
-  return MerkleTree.createFromLeaves(commitmentsBigInt);
+  return await MerkleTree.createFromLeaves(commitmentsBigInt);
 }
 
 // '<svg width="500" height="500" xmlns="http://www.w3.org/2000/svg">',

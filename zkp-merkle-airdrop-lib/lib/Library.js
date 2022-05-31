@@ -1,110 +1,80 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.toHex = exports.pedersenHashFinal = exports.pedersenHashPreliminary = exports.pedersenHash = exports.mimcSponge = exports.generateProofCallData = void 0;
 /**
  * Library which abstracts away much of the details required to interact with the private airdrop contract.
  */
-var snarkjs = require('snarkjs');
-var circomlibjs = require('circomlibjs');
-var wc = require('./witness_calculator.js');
-function generateProofCallData(merkleTree, key, secret, rewardID, receiverAddr, circuitWasmBuffer, zkeyBuffer) {
-    return __awaiter(this, void 0, void 0, function () {
-        var inputs, witnessCalculator, witnessBuffer, _a, proof, publicSignals, proofProcessed, pubProcessed, allSolCallData, solCallDataProof;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0:
-                    inputs = generateCircuitInputJson(merkleTree, key, secret, rewardID, BigInt(receiverAddr));
-                    return [4 /*yield*/, wc(circuitWasmBuffer)];
-                case 1:
-                    witnessCalculator = _b.sent();
-                    return [4 /*yield*/, witnessCalculator.calculateWTNSBin(inputs, 0)];
-                case 2:
-                    witnessBuffer = _b.sent();
-                    return [4 /*yield*/, snarkjs.plonk.prove(zkeyBuffer, witnessBuffer)];
-                case 3:
-                    _a = _b.sent(), proof = _a.proof, publicSignals = _a.publicSignals;
-                    proofProcessed = unstringifyBigInts(proof);
-                    pubProcessed = unstringifyBigInts(publicSignals);
-                    return [4 /*yield*/, snarkjs.plonk.exportSolidityCallData(proofProcessed, pubProcessed)];
-                case 4:
-                    allSolCallData = _b.sent();
-                    solCallDataProof = allSolCallData.split(',')[0];
-                    return [2 /*return*/, solCallDataProof];
-            }
-        });
-    });
+const snarkjs = require('snarkjs');
+const circomlibjs = require('circomlibjs');
+const wc = require('./witness_calculator.js');
+let mimcSpongeInstance;
+const getMimcSponge = async () => {
+    if (mimcSpongeInstance === undefined) {
+        mimcSpongeInstance = await circomlibjs.buildMimcSponge();
+    }
+    return mimcSpongeInstance;
+};
+let pedersonInstance;
+const getPederson = async () => {
+    if (pedersonInstance === undefined) {
+        pedersonInstance = await circomlibjs.buildPedersenHash();
+    }
+    return pedersonInstance;
+};
+let babyjubInstance;
+const getBabyjub = async () => {
+    if (babyjubInstance === undefined) {
+        babyjubInstance = await circomlibjs.buildBabyjub();
+    }
+    return babyjubInstance;
+};
+async function generateProofCallData(merkleTree, key, secret, rewardID, receiverAddr, circuitWasmBuffer, zkeyBuffer) {
+    const inputs = await generateCircuitInputJson(merkleTree, key, secret, rewardID, BigInt(receiverAddr));
+    console.log(inputs);
+    const witnessCalculator = await wc(circuitWasmBuffer);
+    const witnessBuffer = await witnessCalculator.calculateWTNSBin(inputs, 0);
+    const { proof, publicSignals } = await snarkjs.plonk.prove(zkeyBuffer, witnessBuffer);
+    const proofProcessed = unstringifyBigInts(proof);
+    const pubProcessed = unstringifyBigInts(publicSignals);
+    const allSolCallData = await snarkjs.plonk.exportSolidityCallData(proofProcessed, pubProcessed);
+    const solCallDataProof = allSolCallData.split(',')[0];
+    return solCallDataProof;
 }
 exports.generateProofCallData = generateProofCallData;
-function mimcSponge(l, r) {
-    return circomlibjs.mimcsponge.multiHash([l, r]);
+async function mimcSponge(l, r) {
+    const mimcSponge = await getMimcSponge();
+    return toBigIntLE(mimcSponge.multiHash([l, r]));
 }
 exports.mimcSponge = mimcSponge;
-function pedersenHash(nullifier) {
-    return pedersenHashBuff(toBufferLE(nullifier, 31));
+async function pedersenHash(nullifier) {
+    return await pedersenHashBuff(toBufferLE(nullifier, 31));
 }
 exports.pedersenHash = pedersenHash;
-function pedersenHashPreliminary(nullifier, secret) {
-    var nullifierBuffer = toBufferLE(nullifier, 31);
-    var secretBuffer = toBufferLE(secret, 31);
-    var preliminaryBuffer = Buffer.concat([nullifierBuffer, secretBuffer]);
-    return pedersenHashBuff(preliminaryBuffer);
+async function pedersenHashPreliminary(nullifier, secret) {
+    const nullifierBuffer = toBufferLE(nullifier, 31);
+    const secretBuffer = toBufferLE(secret, 31);
+    const preliminaryBuffer = Buffer.concat([nullifierBuffer, secretBuffer]);
+    return await pedersenHashBuff(preliminaryBuffer);
 }
 exports.pedersenHashPreliminary = pedersenHashPreliminary;
-function pedersenHashFinal(preCommitment, rewardID) {
-    var nullSecHashBuffer = toBufferLE(preCommitment, 32);
-    var rewardIDBuffer = toBufferLE(rewardID, 31);
-    var finalBuffer = Buffer.concat([nullSecHashBuffer, rewardIDBuffer]);
-    return pedersenHashBuff(finalBuffer);
+async function pedersenHashFinal(preCommitment, rewardID) {
+    const nullSecHashBuffer = toBufferLE(preCommitment, 32);
+    const rewardIDBuffer = toBufferLE(rewardID, 31);
+    const finalBuffer = Buffer.concat([nullSecHashBuffer, rewardIDBuffer]);
+    return await pedersenHashBuff(finalBuffer);
 }
 exports.pedersenHashFinal = pedersenHashFinal;
-function toHex(number, length) {
-    if (length === void 0) { length = 32; }
-    var str = number.toString(16);
+function toHex(number, length = 32) {
+    const str = number.toString(16);
     return '0x' + str.padStart(length * 2, '0');
 }
 exports.toHex = toHex;
-function generateCircuitInputJson(mt, nullifier, secret, rewardID, recieverAddr) {
-    var preCommitment = pedersenHashPreliminary(nullifier, secret);
-    var commitment = pedersenHashFinal(preCommitment, rewardID);
-    var mp = mt.getMerkleProof(commitment);
-    var nullifierHash = pedersenHash(nullifier);
-    var inputObj = {
+async function generateCircuitInputJson(mt, nullifier, secret, rewardID, recieverAddr) {
+    const preCommitment = await pedersenHashPreliminary(nullifier, secret);
+    const commitment = await pedersenHashFinal(preCommitment, rewardID);
+    const mp = await mt.getMerkleProof(commitment);
+    const nullifierHash = await pedersenHash(nullifier);
+    const inputObj = {
         root: mt.root.val,
         nullifierHash: nullifierHash,
         nullifier: nullifier,
@@ -116,9 +86,11 @@ function generateCircuitInputJson(mt, nullifier, secret, rewardID, recieverAddr)
     };
     return inputObj;
 }
-function pedersenHashBuff(buff) {
-    var point = circomlibjs.pedersenHash.hash(buff);
-    return circomlibjs.babyjub.unpackPoint(point)[0];
+async function pedersenHashBuff(buff) {
+    const pederson = await getPederson();
+    const point = pederson.hash(buff);
+    const babyjub = await getBabyjub();
+    return toBigIntLE(babyjub.unpackPoint(point)[0]);
 }
 // Lifted from ffutils: https://github.com/iden3/ffjavascript/blob/master/src/utils_bigint.js
 function unstringifyBigInts(o) {
@@ -132,29 +104,29 @@ function unstringifyBigInts(o) {
         return o.map(unstringifyBigInts);
     }
     else if (typeof o == 'object') {
-        var res_1 = {};
-        var keys = Object.keys(o);
-        keys.forEach(function (k) {
-            res_1[k] = unstringifyBigInts(o[k]);
+        const res = {};
+        const keys = Object.keys(o);
+        keys.forEach((k) => {
+            res[k] = unstringifyBigInts(o[k]);
         });
-        return res_1;
+        return res;
     }
     else {
         return o;
     }
 }
 function toBufferLE(bi, width) {
-    var hex = bi.toString(16);
-    var buffer = Buffer.from(hex.padStart(width * 2, '0').slice(0, width * 2), 'hex');
+    const hex = bi.toString(16);
+    const buffer = Buffer.from(hex.padStart(width * 2, '0').slice(0, width * 2), 'hex');
     buffer.reverse();
     return buffer;
 }
 function toBigIntLE(buff) {
-    var reversed = Buffer.from(buff);
+    const reversed = Buffer.from(buff);
     reversed.reverse();
-    var hex = reversed.toString('hex');
+    const hex = reversed.toString('hex');
     if (hex.length === 0) {
         return BigInt(0);
     }
-    return BigInt("0x".concat(hex));
+    return BigInt(`0x${hex}`);
 }

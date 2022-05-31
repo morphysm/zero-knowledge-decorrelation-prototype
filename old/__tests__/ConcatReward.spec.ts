@@ -4,11 +4,11 @@ const hre = require('hardhat');
 import { Contract } from '@ethersproject/contracts';
 import { expect as cExpect } from 'chai';
 
-import {
-  pedersenHashPreliminary,
-  pedersenHashFinal,
-  generateProofCallData,
-} from './../lib/Library';
+// import {
+//   pedersenHashPreliminary,
+//   pedersenHashFinal,
+//   generateProofCallData,
+// } from './../lib/Library';
 import {
   getMerkleTreeFromPublicListOfCommitments,
   getMerkleRoot,
@@ -16,7 +16,13 @@ import {
   addNewCommitment,
 } from '../utils/TestUtils';
 import { BigNumber } from '@ethersproject/bignumber';
-import { toHex, pedersenHash } from 'zkp-merkle-airdrop-lib';
+import {
+  toHex,
+  pedersenHash,
+  pedersenHashPreliminary,
+  pedersenHashFinal,
+  generateProofCallData,
+} from './../../zkp-merkle-airdrop-lib';
 
 describe('Famed Airdrop', () => {
   let zekoNFT: Contract;
@@ -30,11 +36,13 @@ describe('Famed Airdrop', () => {
     const inputFileName = './public/publicCommitments.txt';
     const treeHeight = 5;
 
-    const mt = getMerkleTreeFromPublicListOfCommitments(
+    const mt = await getMerkleTreeFromPublicListOfCommitments(
       inputFileName,
       treeHeight
     );
     const merkconstreeRoot = getMerkleRoot(mt);
+
+    console.log('merkconstreeRoot', merkconstreeRoot);
 
     const zekoNFTFactory = await hre.ethers.getContractFactory(
       'ZekoGenerativeNFT'
@@ -84,8 +92,8 @@ describe('Famed Airdrop', () => {
     const nullifier = BigInt(nullifierHex);
     const secret = BigInt(secretHex);
     const rewardID = BigInt(rewardIDHex);
-    const preCommitment = pedersenHashPreliminary(nullifier, secret);
-    const commitment = pedersenHashFinal(preCommitment, rewardID);
+    const preCommitment = await pedersenHashPreliminary(nullifier, secret);
+    const commitment = await pedersenHashFinal(preCommitment, rewardID);
     const hexCommitment = toHex(commitment);
 
     console.log(
@@ -93,9 +101,9 @@ describe('Famed Airdrop', () => {
     );
 
     // update the public list of commitments
-    addNewCommitment(inputFileName, hexCommitment, treeHeight);
+    await addNewCommitment(inputFileName, hexCommitment, treeHeight);
     // generate the merkconstree
-    const mt = getMerkleTreeFromPublicListOfCommitments(
+    const mt = await getMerkleTreeFromPublicListOfCommitments(
       inputFileName,
       treeHeight
     );
@@ -131,7 +139,8 @@ describe('Famed Airdrop', () => {
       ZKEY_BUFF
     );
 
-    validNullifierHash = toHex(pedersenHash(nullifier)); // hash of the nullifier => need to be passed to avoid double spending
+    const nullifierHash = await pedersenHash(nullifier);
+    validNullifierHash = toHex(nullifierHash); // hash of the nullifier => need to be passed to avoid double spending
 
     console.log('Proof: ', validProof);
     console.log('nullifierHash', validNullifierHash);

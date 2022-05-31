@@ -1,6 +1,10 @@
 import * as crypto from 'crypto';
 import { readFileSync, writeFileSync } from 'fs';
-import { MerkleTree, pedersenHashConcat, toHex } from 'zkp-merkle-airdrop-lib';
+import {
+  MerkleTree,
+  pedersenHashPreliminary,
+  toHex,
+} from '../../zkp-merkle-airdrop-lib';
 import { exit } from 'process';
 
 /** MerkleTree and inputs used to derive. */
@@ -13,18 +17,22 @@ export interface MerkleTreeAndSource {
 /**
  * Generates a Merkle Tree from random leaves of size @param numLeaves.
  */
-export function generateMerkleTreeAndKeys(
+export async function generateMerkleTreeAndKeys(
   numLeaves: number
-): MerkleTreeAndSource {
-  let leafNullifiers: BigInt[] = [];
-  let leafSecrets: BigInt[] = [];
-  let leaves: BigInt[] = [];
+): Promise<MerkleTreeAndSource> {
+  const leafNullifiers: BigInt[] = [];
+  const leafSecrets: BigInt[] = [];
+  const leaves: BigInt[] = [];
   for (let i = 0; i < numLeaves; i++) {
     leafNullifiers.push(randomBigInt(31));
     leafSecrets.push(randomBigInt(31));
-    leaves.push(pedersenHashConcat(leafNullifiers[i], leafSecrets[i]));
+    const leaf = await pedersenHashPreliminary(
+      leafNullifiers[i],
+      leafSecrets[i]
+    );
+    leaves.push(leaf);
   }
-  let merkleTree = MerkleTree.createFromLeaves(leaves);
+  const merkleTree = await MerkleTree.createFromLeaves(leaves);
   return { merkleTree, leafNullifiers, leafSecrets };
 }
 
@@ -56,32 +64,31 @@ export function saveMerkleTreeAndSource(
 // THIS IS THE FUNCTION THAT I NEED !
 
 export function saveMerkleTree(mt: MerkleTree, filePrefix: string = '') {
-  let storage = mt.getStorageString();
+  const storage = mt.getStorageString();
   writeFileSync(`${filePrefix}mt_${mt.leaves.length}.csv`, storage);
 }
 
-export function readMerkleTreeAndSourceFromFile(
+export async function readMerkleTreeAndSourceFromFile(
   filename: string
-): MerkleTreeAndSource {
-  let leafNullifiers: BigInt[] = [];
-  let leafSecrets: BigInt[] = [];
-  let leaves: BigInt[] = [];
-  console.log('sdasd', process.cwd());
-  let contents = readFileSync(filename, 'utf8');
-  let lines = contents.split('\n');
+): Promise<MerkleTreeAndSource> {
+  const leafNullifiers: BigInt[] = [];
+  const leafSecrets: BigInt[] = [];
+  const leaves: BigInt[] = [];
+  const contents = readFileSync(filename, 'utf8');
+  const lines = contents.split('\n');
   for (let i = 1; i < lines.length; i++) {
-    let line = lines[i];
-    let tokens = line.split(',');
+    const line = lines[i];
+    const tokens = line.split(',');
     if (tokens.length < 3) continue;
 
-    let key = tokens[0];
-    let secret = tokens[1];
-    let commitment = tokens[2].split('\n')[0];
+    const key = tokens[0];
+    const secret = tokens[1];
+    const commitment = tokens[2].split('\n')[0];
     leafNullifiers.push(BigInt(key));
     leafSecrets.push(BigInt(secret));
     leaves.push(BigInt(commitment));
   }
-  let merkleTree = MerkleTree.createFromLeaves(leaves);
+  const merkleTree = await MerkleTree.createFromLeaves(leaves);
   return { merkleTree, leafNullifiers, leafSecrets };
 }
 
@@ -100,21 +107,21 @@ export function toBigIntLE(buff: Buffer) {
 }
 
 export function getMerkleRoot(mt: MerkleTree): string {
-  let root = mt.root.val;
+  const root = mt.root.val;
 
   return toHex(root);
 }
 
-export function addNewCommitment(
+export async function addNewCommitment(
   filename: string,
   newcommitment: string,
   treeheight: number
-): MerkleTree {
-  let input: string = readFileSync(filename).toString();
+): Promise<MerkleTree> {
+  const input: string = readFileSync(filename).toString();
   // replace and empty leaf with the newCommitment leaf
-  let commitments = input.trim().split(',');
+  const commitments = input.trim().split(',');
 
-  let indexToReplace = commitments.indexOf(
+  const indexToReplace = commitments.indexOf(
     '0x0000000000000000000000000000000000000000000000000000000000000000'
   );
   commitments[indexToReplace] = newcommitment;
@@ -134,7 +141,7 @@ export function addNewCommitment(
     );
   }
 
-  let commitmentsBigInt: BigInt[] = commitments.map((commitment) =>
+  const commitmentsBigInt: BigInt[] = commitments.map((commitment) =>
     BigInt(commitment)
   );
   for (let i = commitments.length; i < 2 ** treeheight; i++) {
@@ -143,22 +150,22 @@ export function addNewCommitment(
 
   // UPDATE THE Commitment Public FILE
 
-  let newCommitments = commitments.toString();
+  const newCommitments = commitments.toString();
 
   writeFileSync(filename, newCommitments);
   console.log('list of public commitments succesfully updated');
 
   // Generate the merkle tree and return it
-  return MerkleTree.createFromLeaves(commitmentsBigInt);
+  return await MerkleTree.createFromLeaves(commitmentsBigInt);
 }
 
-export function getMerkleTreeFromPublicListOfCommitments(
+export async function getMerkleTreeFromPublicListOfCommitments(
   filename: string,
   treeheight: number
-): MerkleTree {
-  let input: string = readFileSync(filename).toString();
+): Promise<MerkleTree> {
+  const input: string = readFileSync(filename).toString();
   // replace and empty leaf with the newCommitment leaf
-  let commitments = input.trim().split(',');
+  const commitments = input.trim().split(',');
 
   if (commitments.length > 2 ** treeheight) {
     console.error(
@@ -175,7 +182,7 @@ export function getMerkleTreeFromPublicListOfCommitments(
     );
   }
 
-  let commitmentsBigInt: BigInt[] = commitments.map((commitment) =>
+  const commitmentsBigInt: BigInt[] = commitments.map((commitment) =>
     BigInt(commitment)
   );
   for (let i = commitments.length; i < 2 ** treeheight; i++) {
@@ -184,7 +191,7 @@ export function getMerkleTreeFromPublicListOfCommitments(
 
   // Generate the merkle tree and return it
 
-  return MerkleTree.createFromLeaves(commitmentsBigInt);
+  return await MerkleTree.createFromLeaves(commitmentsBigInt);
 }
 
 // '<svg width="500" height="500" xmlns="http://www.w3.org/2000/svg">',

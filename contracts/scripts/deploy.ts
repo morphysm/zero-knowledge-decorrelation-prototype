@@ -27,7 +27,7 @@ async function main() {
   const inputFileName = "./../public/publicCommitments.txt";
   const treeHeight = 5;
 
-  const mt = getMerkleTreeFromPublicListOfCommitments(
+  const mt = await getMerkleTreeFromPublicListOfCommitments(
     inputFileName,
     treeHeight
   );
