@@ -16,13 +16,13 @@ const getMimcSponge = async (): Promise<any> => {
   return mimcSpongeInstance;
 };
 
-let pedersonInstance: any;
-const getPederson = async (): Promise<any> => {
-  if (pedersonInstance === undefined) {
-    pedersonInstance = await circomlibjs.buildPedersenHash();
+let pedersenInstance: any;
+const getPedersen = async (): Promise<any> => {
+  if (pedersenInstance === undefined) {
+    pedersenInstance = await circomlibjs.buildPedersenHash();
   }
 
-  return pedersonInstance;
+  return pedersenInstance;
 };
 
 let babyjubInstance: any;
@@ -144,8 +144,8 @@ async function generateCircuitInputJson(
 }
 
 async function pedersenHashBuff(buff: Buffer): Promise<BigInt> {
-  const pederson = await getPederson();
-  const point = pederson.hash(buff);
+  const pedersen = await getPedersen();
+  const point = pedersen.hash(buff);
   const babyjub = await getBabyjub();
   return toBigIntLE(babyjub.unpackPoint(point)[0]);
 }

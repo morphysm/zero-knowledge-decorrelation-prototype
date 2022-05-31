@@ -14,12 +14,12 @@ const getMimcSponge = async () => {
     }
     return mimcSpongeInstance;
 };
-let pedersonInstance;
-const getPederson = async () => {
-    if (pedersonInstance === undefined) {
-        pedersonInstance = await circomlibjs.buildPedersenHash();
+let pedersenInstance;
+const getPedersen = async () => {
+    if (pedersenInstance === undefined) {
+        pedersenInstance = await circomlibjs.buildPedersenHash();
     }
-    return pedersonInstance;
+    return pedersenInstance;
 };
 let babyjubInstance;
 const getBabyjub = async () => {
@@ -87,8 +87,8 @@ async function generateCircuitInputJson(mt, nullifier, secret, rewardID, recieve
     return inputObj;
 }
 async function pedersenHashBuff(buff) {
-    const pederson = await getPederson();
-    const point = pederson.hash(buff);
+    const pedersen = await getPedersen();
+    const point = pedersen.hash(buff);
     const babyjub = await getBabyjub();
     return toBigIntLE(babyjub.unpackPoint(point)[0]);
 }

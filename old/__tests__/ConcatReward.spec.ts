@@ -85,8 +85,10 @@ describe('Famed Airdrop', () => {
     const inputFileName = './public/publicCommitments.txt';
     const treeHeight = 5;
 
-    const nullifierHex = toHex(randomBigInt(31));
-    const secretHex = toHex(randomBigInt(31));
+    const nullifierHex =
+      '0x00a88cb7c2ab7f014b7b9cca92d42b7fe9416d4a1d9872267aefc2e8a6388c66';
+    const secretHex =
+      '0x00fb4a7280d470f619c59a341c65e874acc1f0b890815e07f41531f878e9ba08';
     const rewardIDHex = toHex(BigInt(100));
 
     const nullifier = BigInt(nullifierHex);
