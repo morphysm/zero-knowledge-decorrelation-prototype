@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "circomlibjs": "^0.1.2",
-    "circomlibjs-old": "npm:circomlibjs@^0.0.8",
     "snarkjs": "^0.4.19"
   }
 }
