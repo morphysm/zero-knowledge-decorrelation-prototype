@@ -18,7 +18,12 @@ func NewHandler() HTTPHandler {
 	return &airdropHandler{}
 }
 
+type PreCommitResponse struct {
+	Reward string `json:"reward"`
+}
+
 // PostPreCommitment returns a json with the final commit
 func (healthHandler *airdropHandler) PostPreCommitment(c echo.Context) error {
-	return c.NoContent(http.StatusOK)
+	response := PreCommitResponse{Reward: "42"}
+	return c.JSON(http.StatusOK, response)
 }

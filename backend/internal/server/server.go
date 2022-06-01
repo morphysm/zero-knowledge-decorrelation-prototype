@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/famed-airdrop-prototype/backend/internal/airdrop"
 	"github.com/famed-airdrop-prototype/backend/internal/config"
@@ -26,6 +27,9 @@ func NewBackendServer(cfg *config.Config) (*echo.Echo, error) {
 	// 	middleware.Logger(),
 	// )
 
+	e.Use(
+		middleware.Logger(),
+	)
 
 	// Airdrop endpoints exposed for airdrop I/O
 	airdropGroup := e.Group("/airdrop")

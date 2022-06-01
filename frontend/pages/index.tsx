@@ -1,9 +1,10 @@
 import type { NextPage } from 'next';
 import { useState } from 'react';
-import Head from 'next/head';
-import Image from 'next/image';
-import styles from '../styles/Home.module.css';
+
 import { pedersenHashPreliminary, toHex } from 'zkp-merkle-airdrop-lib';
+import { postPreCommitment } from '../services/airdropService';
+
+import styles from '../styles/Home.module.css';
 
 const Home: NextPage = () => {
   const [nullifier, setNullifier] = useState(
@@ -13,6 +14,7 @@ const Home: NextPage = () => {
     '0x00c46daf8a91c6b69e260765036de0ccf4b2e1cfe063ca630a6611f13adadee0'
   );
   const [preCommitment, setPreCommitment] = useState('');
+  const [reward, setReward] = useState('');
 
   const handleClick = async () => {
     try {
@@ -21,7 +23,15 @@ const Home: NextPage = () => {
         BigInt(secret)
       );
       setPreCommitment(toHex(preCommitment));
-      console.log();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleSendPreCommitmentClick = async () => {
+    try {
+      const reward = await postPreCommitment(preCommitment);
+      setReward(reward);
     } catch (err) {
       console.log(err);
     }
@@ -55,6 +65,8 @@ const Home: NextPage = () => {
         />
       </form>
       <button onClick={handleClick}>Generate Precommitment</button>
+      <button onClick={handleSendPreCommitmentClick}>Send Precommitment</button>
+      <p>Reward: {reward}</p>
     </div>
   );
 };
