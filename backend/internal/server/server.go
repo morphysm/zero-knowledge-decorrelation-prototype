@@ -1,12 +1,14 @@
 package server
 
 import (
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/famed-airdrop-prototype/backend/internal/airdrop"
 	"github.com/famed-airdrop-prototype/backend/internal/config"
 	"github.com/famed-airdrop-prototype/backend/internal/health"
+	"github.com/famed-airdrop-prototype/backend/internal/login"
 )
 
 // NewServer returns an echo server with default configuration
@@ -17,6 +19,8 @@ func newServer() *echo.Echo {
 // NewBackendServer instantiates new application Echo server.
 func NewBackendServer(cfg *config.Config) (*echo.Echo, error) {
 	e := newServer()
+
+	e.Validator = &CustomValidator{validator: validator.New()}
 
 	// Middleware
 	// e.Use(
@@ -31,6 +35,15 @@ func NewBackendServer(cfg *config.Config) (*echo.Echo, error) {
 		middleware.Logger(),
 	)
 
+	e.HTTPErrorHandler = e.DefaultHTTPErrorHandler
+
+	// Login endpoints exposed for login with GitHub
+	loginGroup := e.Group("/login")
+	{
+		LoginRoutes(
+			loginGroup, login.NewHandler(cfg.Github.ClientID, cfg.Github.ClientSecret),
+		)
+	}
 	// Airdrop endpoints exposed for airdrop I/O
 	airdropGroup := e.Group("/airdrop")
 	{

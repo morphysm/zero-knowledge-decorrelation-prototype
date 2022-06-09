@@ -103,7 +103,7 @@ export async function pedersenHashFinal(
   return await pedersenHashBuff(finalBuffer);
 }
 
-export function toHex(number: BigInt, length = 32) {
+export function toHex(number: BigInt, length = 32): string {
   const str: string = number.toString(16);
   return '0x' + str.padStart(length * 2, '0');
 }

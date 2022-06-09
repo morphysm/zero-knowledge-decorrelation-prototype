@@ -1,3 +1,4 @@
 circuits/build
 circuits/node_modules
 .vscode
+node-backend/node_modules
