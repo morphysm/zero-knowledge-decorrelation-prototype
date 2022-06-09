@@ -7,6 +7,7 @@ import (
 
 	"github.com/famed-airdrop-prototype/backend/internal/airdrop"
 	"github.com/famed-airdrop-prototype/backend/internal/config"
+	"github.com/famed-airdrop-prototype/backend/internal/github"
 	"github.com/famed-airdrop-prototype/backend/internal/health"
 	"github.com/famed-airdrop-prototype/backend/internal/login"
 )
@@ -35,13 +36,14 @@ func NewBackendServer(cfg *config.Config) (*echo.Echo, error) {
 		middleware.Logger(),
 	)
 
-	e.HTTPErrorHandler = e.DefaultHTTPErrorHandler
+	// New GitHub client; handels requests to GitHub
+	githubClient := github.NewClient(cfg.Github.ClientID, cfg.Github.ClientSecret)
 
 	// Login endpoints exposed for login with GitHub
 	loginGroup := e.Group("/login")
 	{
 		LoginRoutes(
-			loginGroup, login.NewHandler(cfg.Github.ClientID, cfg.Github.ClientSecret),
+			loginGroup, login.NewHandler(githubClient),
 		)
 	}
 	// Airdrop endpoints exposed for airdrop I/O

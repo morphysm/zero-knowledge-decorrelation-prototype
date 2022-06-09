@@ -16,6 +16,7 @@ func LoginRoutes(g *echo.Group, handler login.HTTPHandler) {
 
 // AirdropRoutes defines endpoints exposed to serve airdrop requests.
 func AirdropRoutes(g *echo.Group, handler airdrop.HTTPHandler) {
+	g.GET("/rewards", handler.GetRewards)
 	g.POST("/precommit", handler.PostPreCommitment)
 }
 
