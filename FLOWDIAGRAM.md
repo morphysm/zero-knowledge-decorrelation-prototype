@@ -1,3 +1,3 @@
 # Commitment
 
-![Sequence diagram](https://user-images.githubusercontent.com/11260050/173053405-89fb71c0-c9a6-4364-9b0f-233a511fdf62.png)
+![Sequence diagram(1)](https://user-images.githubusercontent.com/11260050/173054166-aee4c20e-0078-4369-92d6-598e9f96e67b.png)
