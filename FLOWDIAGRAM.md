@@ -6,5 +6,6 @@
 
 # Claim
 
-![Sequence Diagram Claim](https://user-images.githubusercontent.com/11260050/173059736-1e8c06b5-96ad-404f-a385-dca5b52f0782.png)
+![Sequence Diagram Claim(1)](https://user-images.githubusercontent.com/11260050/173060685-25cc924a-0a96-4bf8-9801-4aae5d06a599.png)
+
 
