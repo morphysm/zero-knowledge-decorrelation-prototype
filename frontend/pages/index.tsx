@@ -1,8 +1,9 @@
 import type { NextPage } from 'next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 
 import { pedersenHashPreliminary, toHex } from 'zkp-merkle-airdrop-lib';
-import { postPreCommitment } from '../services/airdropService';
+import { getRewards, postPreCommitment } from '../services/airdropService';
 
 import styles from '../styles/Home.module.css';
 
@@ -14,7 +15,22 @@ const Home: NextPage = () => {
     '0x00c46daf8a91c6b69e260765036de0ccf4b2e1cfe063ca630a6611f13adadee0'
   );
   const [preCommitment, setPreCommitment] = useState('');
+  const [user, setUser] = useState('');
   const [reward, setReward] = useState('');
+  // TODO improve this
+  const router = useRouter();
+  const [accessToken, setAccessToken] = useState('');
+
+  useEffect(() => {
+    if (router.query.accessToken) {
+      const uri = window.location.toString();
+      if (uri.indexOf('?') > 0) {
+        const clean_uri = uri.substring(0, uri.indexOf('?'));
+        window.history.replaceState({}, document.title, clean_uri);
+      }
+      setAccessToken(router.query.accessToken as string);
+    }
+  }, [router]);
 
   const handleClick = async () => {
     try {
@@ -23,6 +39,15 @@ const Home: NextPage = () => {
         BigInt(secret)
       );
       setPreCommitment(toHex(preCommitment));
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleGetRewardsClick = async () => {
+    try {
+      const reward = await getRewards();
+      setUser(reward.user);
     } catch (err) {
       console.log(err);
     }
@@ -37,8 +62,21 @@ const Home: NextPage = () => {
     }
   };
 
+  const handleLogin = async () => {
+    window.open('http://localhost:8080/login', '_self');
+  };
+
+  const handleLogout = async () => {
+    setAccessToken('');
+  };
+
   return (
     <div className='App'>
+      {!accessToken ? (
+        <button onClick={handleLogin}>Login with GitHub</button>
+      ) : (
+        <button onClick={handleLogout}>Log Out</button>
+      )}
       <form>
         <label htmlFor='nullifier'>Nullifier</label>
         <input
@@ -66,6 +104,8 @@ const Home: NextPage = () => {
       </form>
       <button onClick={handleClick}>Generate Precommitment</button>
       <button onClick={handleSendPreCommitmentClick}>Send Precommitment</button>
+      <button onClick={handleGetRewardsClick}>Load Rewards</button>
+      <p>User: {user}</p>
       <p>Reward: {reward}</p>
     </div>
   );

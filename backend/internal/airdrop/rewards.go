@@ -7,11 +7,12 @@ import (
 )
 
 type rewardRequest struct {
-	AccessToken string `json:"accessToken" validate:"true"`
+	AccessToken string `header:"Authorization" validate:"required"`
 }
 
 // TODO fill this response with data
 type rewardResponse struct {
+	User string `json:"user"`
 	Rewards []Reward `json:"rewards"`
 }
 
@@ -39,5 +40,6 @@ func (a *airdropHandler) GetRewards(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, user)
+	rewardResponse := rewardResponse{User: user}
+	return c.JSON(http.StatusOK, rewardResponse)
 }

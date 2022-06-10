@@ -24,16 +24,14 @@ func NewBackendServer(cfg *config.Config) (*echo.Echo, error) {
 	e.Validator = &CustomValidator{validator: validator.New()}
 
 	// Middleware
-	// e.Use(
-	// 	middleware.CORSWithConfig(middleware.CORSConfig{
-	// 		AllowOrigins: []string{"https://www.famed.morphysm.com", "https://famed.morphysm.com"},
-	// 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
-	// 	}),
-	// 	middleware.Logger(),
-	// )
-
+	// TODO set correct frontend URLS
 	e.Use(
+		middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins: []string{"*"},
+			AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		}),
 		middleware.Logger(),
+		middleware.Recover(),
 	)
 
 	// New GitHub client; handels requests to GitHub
@@ -50,7 +48,7 @@ func NewBackendServer(cfg *config.Config) (*echo.Echo, error) {
 	airdropGroup := e.Group("/airdrop")
 	{
 		AirdropRoutes(
-			airdropGroup, airdrop.NewHandler(),
+			airdropGroup, airdrop.NewHandler(githubClient),
 		)
 	}
 	// Health endpoints exposed for heartbeat

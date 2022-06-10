@@ -2,6 +2,7 @@ package login
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/famed-airdrop-prototype/backend/internal/github"
@@ -23,10 +24,6 @@ func NewHandler(client github.Client) HTTPHandler {
 	return &loginHandler{client: client}
 }
 
-type LoginResponse struct {
-	AccessToken string `json:"accessToken"`
-}
-
 // PostPreCommitment returns a json with the final commit
 func (lH *loginHandler) Login(c echo.Context) error {
     // Create the dynamic redirect URL for login
@@ -42,8 +39,8 @@ func (lH *loginHandler) Callback(c echo.Context) error {
 	}
 
     accessToken := lH.client.GetAccessToken(code)
-    // githubData := getGithubData(githubAccessToken)
 
-	response := LoginResponse{AccessToken: accessToken}
-    return c.JSON(http.StatusOK, response)
+	//TODO: find a better solution to forward the access token, or use cookies instead
+	redirectURL := fmt.Sprintf("http://localhost:3000?accessToken=%s",accessToken)
+    return c.Redirect(http.StatusMovedPermanently, redirectURL)
 }
