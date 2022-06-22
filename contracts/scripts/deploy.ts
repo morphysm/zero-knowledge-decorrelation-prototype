@@ -24,7 +24,7 @@ async function main() {
 
   // We get the contract to deploy
   const NUM_ERC721_PER_REDEMPTION = 1;
-  const inputFileName = "./../public/publicCommitments.txt";
+  const inputFileName = "../backend/public/publicCommitments.txt";
   const treeHeight = 5;
 
   const mt = await getMerkleTreeFromPublicListOfCommitments(

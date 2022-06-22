@@ -4,7 +4,7 @@ import {
   MerkleTree,
   pedersenHashPreliminary,
   toHex,
-} from '../../zkp-merkle-airdrop-lib';
+} from '../../zkp-merkle-airdrop-lib/lib';
 import { exit } from 'process';
 
 /** MerkleTree and inputs used to derive. */

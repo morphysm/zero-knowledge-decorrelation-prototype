@@ -1,5 +1,5 @@
 import { writeFileSync } from "fs";
-import addressFile from "../../public/contracts.json";
+import addressFile from "../deployments/addresses.json";
 
 interface Addresses {
   nft: string;
@@ -20,7 +20,7 @@ export function putContractAddresses(
   addressFile.local.plonkVerifier = plonkVerifier;
   addressFile.local.privateAidrop = privateAidrop;
   writeFileSync(
-    "./../public/contracts.json",
+    "./deployments/addresses.json",
     JSON.stringify(addressFile, null, 2)
   );
 }

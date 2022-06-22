@@ -26,7 +26,7 @@ func NewHandler(client github.Client) HTTPHandler {
 
 // PostPreCommitment returns a json with the final commit
 func (lH *loginHandler) Login(c echo.Context) error {
-    // Create the dynamic redirect URL for login
+    // TODO Create the dynamic redirect URL for login
     redirectURL := lH.client.GetRedirectURL("http://localhost:8080/login/callback")
 
 	return c.Redirect(http.StatusMovedPermanently, redirectURL)
@@ -41,6 +41,6 @@ func (lH *loginHandler) Callback(c echo.Context) error {
     accessToken := lH.client.GetAccessToken(code)
 
 	//TODO: find a better solution to forward the access token, or use cookies instead
-	redirectURL := fmt.Sprintf("http://localhost:3000?accessToken=%s",accessToken)
+	redirectURL := fmt.Sprintf("http://localhost:3000/auth/login?accessToken=%s",accessToken)
     return c.Redirect(http.StatusMovedPermanently, redirectURL)
 }

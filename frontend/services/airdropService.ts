@@ -3,16 +3,8 @@
 const baseURL: string = 'http://127.0.0.1:8080';
 
 interface RewardResponse {
-  user: string;
+  user: User;
   rewards: Reward[];
-}
-
-interface Reward {
-  // TODO can we determine if a reward was paid out?
-  paid: boolean;
-  id: string;
-  // Value could be monetary value or NFT, to be defined
-  value: string;
 }
 
 export const getRewards = async (
@@ -20,11 +12,11 @@ export const getRewards = async (
 ): Promise<RewardResponse> => {
   const requestOptions: RequestInit = {
     method: 'GET',
-    headers: new Headers({
-      'Content-Type': 'application/json',
-      Test: 'Test',
-      Authorization: 'Bearer ' + accessToken,
-    }),
+    // credentials: 'include',
+    mode: 'cors',
+    headers: {
+      authorization: 'Bearer ' + accessToken,
+    },
   };
   try {
     const response = await fetch(`${baseURL}/airdrop/rewards`, requestOptions);
@@ -42,12 +34,17 @@ interface CommitmentResponse {
 }
 
 export const postPreCommitment = async (
+  accessToken: string,
+  rewardId: string,
   preCommitment: string
 ): Promise<string> => {
   const requestOptions: RequestInit = {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ preCommitment }),
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: 'Bearer ' + accessToken,
+    },
+    body: JSON.stringify({ rewardId, preCommitment }),
   };
   try {
     const response = await fetch(

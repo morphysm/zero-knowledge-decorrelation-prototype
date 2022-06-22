@@ -1,7 +1,9 @@
 package airdrop
 
 import (
+	"github.com/famed-airdrop-prototype/backend/internal/ethereum"
 	"github.com/famed-airdrop-prototype/backend/internal/github"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -12,10 +14,11 @@ type HTTPHandler interface {
 
 // airdropHandler represents the handler for the airdrop endpoints.
 type airdropHandler struct{
-	client github.Client
+	gitHubClient github.Client
+	ethClient ethereum.Client
 }
 
 // NewHandler returns a pointer to the airdrop handler.
-func NewHandler(client github.Client) HTTPHandler {
-	return &airdropHandler{client: client}
+func NewHandler(gitHubClient github.Client, ethClient ethereum.Client) HTTPHandler {
+	return &airdropHandler{gitHubClient: gitHubClient, ethClient: ethClient}
 }

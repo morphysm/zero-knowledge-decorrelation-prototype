@@ -2,8 +2,8 @@ package github
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -13,7 +13,7 @@ import (
 type Client interface {
 	GetAccessToken(code string) string
 	GetRedirectURL(callbackUrl string) string
-	GetUser(accessToken string) (string, error)
+	GetUser(ctx context.Context, accessToken string) (User, error)
 }
 
 // githubClient represents a GitHub client.
@@ -85,34 +85,3 @@ func (c *client) GetAccessToken(code string) string {
     // details are relatively unnecessary for us)
     return ghresp.AccessToken
 }
-
-// TODO rework this to be cogruent with fame-github-backend
-func (c *client) GetUser(accessToken string) (string, error) {
-    // Get request to a set URL
-    req, reqerr := http.NewRequest(
-        "GET",
-        "https://api.github.com/user",
-        nil,
-    )
-    if reqerr != nil {
-        return "", errors.New("API Request creation failed")
-    }
-
-    // Set the Authorization header before sending the request
-    // Authorization: token XXXXXXXXXXXXXXXXXXXXXXXXXXX
-    authorizationHeaderValue := fmt.Sprintf("token %s", accessToken)
-    req.Header.Set("Authorization", authorizationHeaderValue)
-
-    // Make the request
-    resp, resperr := http.DefaultClient.Do(req)
-    if resperr != nil {
-		return "", errors.New("request failed")
-    }
-
-    // Read the response as a byte slice
-    respbody, _ := ioutil.ReadAll(resp.Body)
-
-    // Convert byte slice to string and return
-    return string(respbody), nil
-}
-
