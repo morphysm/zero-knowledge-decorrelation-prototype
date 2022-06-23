@@ -25,7 +25,7 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
     uint256 public amountPerRedemption;
     IPlonkVerifier verifier;
     bytes32 public root;
-    uint256 public nextTokenIdToBeAirdropped;
+    uint256 public worldBaseTokenId;
 
     mapping(bytes32 => bool) public nullifierSpent;
 
@@ -75,17 +75,16 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
         nftToken.transferFrom(
             address(this),
             msg.sender,
-            pubSignals[2]
+            worldBaseTokenId + pubSignals[2]
         );
-        nextTokenIdToBeAirdropped++;
     }
 
     // this function can only be called from the nftToken and passes:
     // the Token ID of the first NFT of the collection to be airdropped
-    function setInitialTokenId(uint256 _firstNFTID) external returns (uint256) {
+    function setWorldBaseTokenId(uint256 _firstNFTID) external returns (uint256) {
         require(msg.sender == address(nftToken));
-        nextTokenIdToBeAirdropped = _firstNFTID;
-        return nextTokenIdToBeAirdropped;
+        worldBaseTokenId = _firstNFTID;
+        return worldBaseTokenId;
     }
 
     /// @notice Allows the owner to update the root of the merkle tree.

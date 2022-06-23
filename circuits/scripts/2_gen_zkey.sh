@@ -1,1 +1,1 @@
-snarkjs plonk setup ./../build/circuit.r1cs ./../powersOfTau/powersOfTau28_hez_final_16.ptau ./../build/circuit_final.zkey
+snarkjs plonk setup ./build/circuit.r1cs ./powersOfTau/powersOfTau28_hez_final_16.ptau ./build/circuit_final.zkey

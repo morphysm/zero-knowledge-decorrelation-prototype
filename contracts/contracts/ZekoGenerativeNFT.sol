@@ -19,7 +19,7 @@ import "@openzeppelin/contracts/utils/Base64.sol";
 // NEED TO ADD AN INTERFACE TO CALL THE PRIVATE AIRDROP CONTRACT
 
 interface IAirdropContract {
-    function setInitialTokenId(uint256 _firstNFTID) external returns (uint256);
+    function setWorldBaseTokenId(uint256 _firstNFTID) external returns (uint256);
 }
 
 contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
@@ -55,7 +55,7 @@ contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
             strRoleBytes.length <= stringLimit,
             "String input exceeds limit."
         );
-        IAirdropContract(_PrivateAirdropContract).setInitialTokenId(
+        IAirdropContract(_PrivateAirdropContract).setWorldBaseTokenId(
             totalSupply() + 1
         );
         for (uint256 i = 0; i < _qty; i++) {
