@@ -17,7 +17,7 @@ export const collectAirdrop = async (
   );
   // TODO load signer from metamask & load address from source of truth
   const airdrop = PrivateAirdrop__factory.connect(
-    '0x2279b7a0a67db372996a5fab50d91eaa73d2ebe6',
+    '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
     signer
   );
 

@@ -8,8 +8,8 @@ async function main() {
     "ZekoGenerativeNFT",
     addresses.nft
   );
-  const daoName = "Zeko Badges"; // TO MODIFTY
-  const daoRole = "Hardcore contributor"; // TO MODIFTY
+  const daoName = "Famed"; // TO MODIFTY
+  const daoRole = "Famed contributor"; // TO MODIFTY
   const quantity = "8"; // TO MODIFTY
   const tx = await zekoNFT.mintRoleToAirdrop(
     daoName,

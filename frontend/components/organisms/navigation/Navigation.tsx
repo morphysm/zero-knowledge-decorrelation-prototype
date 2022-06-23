@@ -1,5 +1,4 @@
 import styles from './Navigation.module.css';
-import isMobile from '../../../utils/IsMobile';
 import { useContext } from 'react';
 import { SessionContext } from '../../../context/SessionProvider';
 import Button from '../../atoms/button/Button';
@@ -23,7 +22,7 @@ const Background: React.FC<BackgroundProps> = () => {
           <span>{user.login}</span>
         </div>
       )}
-      {bearerToken !== '' && <Button text='Log Out' onClick={handleLogout} />}
+      {bearerToken !== '' && <Button onClick={handleLogout}>Log Out</Button>}
     </div>
   );
 };

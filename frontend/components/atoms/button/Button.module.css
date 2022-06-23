@@ -4,7 +4,7 @@
   justify-content: space-evenly;
 
   position: relative;
-  height: 60px;
+  height: 30px;
   padding: 0 54px;
 
   cursor: pointer;
@@ -23,30 +23,17 @@
   border-radius: 10px;
 }
 
-.Light .button > button {
+.button > button {
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 21px;
+  letter-spacing: -0.02em;
+
   background: linear-gradient(
     233.28deg,
     rgba(255, 255, 255, 0.4) -20.85%,
     rgba(255, 255, 255, 0) 123.1%
   );
-}
-
-.button > button > span {
-  font-family: 'Maven Pro Bold';
-  font-weight: bold;
-  font-size: 18px;
-  line-height: 21px;
-  letter-spacing: -0.02em;
-}
-
-.Light span {
-  color: var(--main-light-font-color);
-}
-
-.button > button > svg {
-  height: 37.5%;
-
-  margin-right: 8px;
 }
 
 /* Animations */

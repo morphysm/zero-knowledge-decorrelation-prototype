@@ -2,7 +2,7 @@ import type { NextPage } from 'next';
 import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
-import Button from '../components/atoms/button/Button';
+import LoadingButton from '../components/atoms/loadingButton/LoadingButton';
 import { SessionContext } from '../context/SessionProvider';
 
 import { pedersenHashPreliminary, toHex } from 'zkp-merkle-airdrop-lib';
@@ -27,6 +27,10 @@ const Home: NextPage = () => {
   const [user, setUser] = useState<User | null>(null);
   const [rewards, setRewards] = useState<Reward[]>([]);
 
+  const [loadingGeneration, setLoadingGeneration] = useState<boolean>(false);
+  const [loadingClaim, setLoadingClaim] = useState<boolean>(false);
+  const [loadingCollect, setLoadingCollect] = useState<boolean>(false);
+
   useEffect(() => {
     if (bearerToken === '') {
       router.push('/auth/login');
@@ -41,6 +45,7 @@ const Home: NextPage = () => {
   }, [bearerToken]);
 
   const handleClickGeneratePreCommitment = async () => {
+    setLoadingGeneration(true);
     try {
       const preCommitment = await pedersenHashPreliminary(
         BigInt(nullifier),
@@ -50,9 +55,11 @@ const Home: NextPage = () => {
     } catch (err) {
       console.log(err);
     }
+    setLoadingGeneration(false);
   };
 
-  const handlePostCommitmentClick = async (rewardId: string) => {
+  const handleClaimClick = async (rewardId: string) => {
+    setLoadingClaim(true);
     try {
       // TODO add nonce to protect against replay attacks
       const rewards = await postPreCommitment(
@@ -64,9 +71,11 @@ const Home: NextPage = () => {
     } catch (err) {
       console.log(err);
     }
+    setLoadingClaim(false);
   };
 
-  const handleClaimClick = async (rewardId: string) => {
+  const handleCollectClick = async (rewardId: string) => {
+    setLoadingCollect(true);
     try {
       // TODO remove conversion to BigInt
       const proof = await generateProof(
@@ -81,6 +90,7 @@ const Home: NextPage = () => {
     } catch (err) {
       console.log(err);
     }
+    setLoadingCollect(false);
   };
 
   if (isLoading) return <p>Loading...</p>;
@@ -115,10 +125,12 @@ const Home: NextPage = () => {
         />
       </form>
       {preCommitment === '' && (
-        <Button
-          text='Generate Precommitment'
+        <LoadingButton
+          loading={loadingGeneration}
           onClick={handleClickGeneratePreCommitment}
-        />
+        >
+          Generate Precommitment
+        </LoadingButton>
       )}
       <h3>Rewards:</h3>
       <ul className={styles.list}>
@@ -129,17 +141,21 @@ const Home: NextPage = () => {
             {reward.claimed ? (
               <span>
                 {' '}
-                <Button
-                  text='Claim'
-                  onClick={() => handleClaimClick(reward.id)}
-                />
+                <LoadingButton
+                  loading={loadingCollect}
+                  onClick={() => handleCollectClick(reward.id)}
+                >
+                  Collect
+                </LoadingButton>
               </span>
             ) : (
               preCommitment !== '' && (
-                <Button
-                  text='Post Commitment'
-                  onClick={() => handlePostCommitmentClick(reward.id)}
-                />
+                <LoadingButton
+                  loading={loadingClaim}
+                  onClick={() => handleClaimClick(reward.id)}
+                >
+                  Claim
+                </LoadingButton>
               )
             )}
           </li>
