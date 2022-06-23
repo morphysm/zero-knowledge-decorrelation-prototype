@@ -2,8 +2,8 @@ import {
   generateProofCallData,
   pedersenHash,
   toHex,
+  getMerkleTreeFromCommitments,
 } from 'zkp-merkle-airdrop-lib';
-import { getMerkleTreeFromCommitments } from './MerkleTree';
 import {
   getPublicCommitments,
   getZKey,

@@ -13,9 +13,6 @@ export class MerkleTree {
    * For a set of leaves recursively computes hashes of adjacent nodes upwards until reaching a root.
    * Note: Significantly slower than `MerkleTree.createFromStorageString` as it rehashes the whole tree.
    */
-
-  // THAT THE CLASS I NEED TO USE
-
   public static async createFromLeaves(leaves: BigInt[]): Promise<MerkleTree> {
     let leafNodes = leaves.map((leaf) => new TreeNode(leaf));
     let rootNode = (await MerkleTree.hashChildrenAndLinkToParent(leafNodes))[0];
@@ -165,6 +162,11 @@ export class MerkleTree {
       throw new Error('Failed to find leaf.');
     }
     return matchingLeaf!;
+  }
+
+  public getRoot() {
+    const root = this.root.val;
+    return toHex(root);
   }
 }
 

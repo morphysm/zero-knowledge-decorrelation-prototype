@@ -3,6 +3,7 @@ import { Signer } from "ethers";
 import { PrivateAirdrop } from "../typechain";
 
 const REDEPTIONS = BigInt(1);
+const REDEPTIONS = BigInt(1);
 
 describe("Token", function () {
   let accounts: Signer[];
@@ -22,7 +23,8 @@ describe("Token", function () {
     const airdropFactory = await ethers.getContractFactory("PrivateAirdrop");
     airdropContract = await airdropFactory.deploy(
       zekoGenerativeNFTContract.address,
-      REDEPTIONS
+      REDEPTIONS,
+      plonkContract.address
     );
   });
 

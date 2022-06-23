@@ -7,3 +7,8 @@ export {
   pedersenHashPreliminary,
   pedersenHashFinal,
 } from './Library';
+export {
+  addNewCommitment,
+  getMerkleTreeFromPublicListOfCommitments,
+  getMerkleTreeFromCommitments,
+} from './MerkleTreeUtils';

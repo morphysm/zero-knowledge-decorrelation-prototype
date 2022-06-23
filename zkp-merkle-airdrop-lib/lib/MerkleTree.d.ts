@@ -47,6 +47,7 @@ export declare class MerkleTree {
      */
     private static getChildRow;
     private findMatchingLeaf;
+    getRoot(): string;
 }
 export declare class TreeNode {
     val: BigInt;
