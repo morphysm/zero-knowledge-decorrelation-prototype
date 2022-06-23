@@ -1,1 +1,0 @@
-snarkjs zkey export solidityverifier build/circuit_final.zkey contracts/compiled/MerkVerifier.sol
