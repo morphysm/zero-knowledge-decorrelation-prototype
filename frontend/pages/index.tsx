@@ -84,7 +84,7 @@ const Home: NextPage = () => {
   };
 
   if (isLoading) return <p>Loading...</p>;
-  if (!user) return <p>No profile data</p>;
+  if (!user) return <p>No reward data</p>;
 
   return (
     <div className={styles.home}>
@@ -122,8 +122,8 @@ const Home: NextPage = () => {
       )}
       <h3>Rewards:</h3>
       <ul className={styles.list}>
-        {rewards.map((reward) => (
-          <li>
+        {rewards.map((reward, i) => (
+          <li key={`reward_${i}`}>
             <span>{reward.id}</span> <span>{reward.value}</span>{' '}
             <span>{reward.date}</span> <span>{reward.url}</span>{' '}
             {reward.claimed ? (

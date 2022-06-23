@@ -30,16 +30,8 @@ const LoginPage: React.FC = () => {
   return (
     <div className='LoginPage'>
       {/* <img src={shiImg} alt={'shi'} /> */}
-      <h1>AI Tweets</h1>
-      <h3>Explore AI Generated Tweets</h3>
-      <p>
-        If you want to explore AI generated tweet suggestions created from your
-        Twitter bubble, please follow{' '}
-        <a href='https://twitter.com/Shi_suggests'>
-          https://twitter.com/Shi_suggests
-        </a>{' '}
-        and log in with your Twitter account.
-      </p>
+      <h1>Famed Airdrop Prototype</h1>
+      <h3>Claim and Collect Famed Rewards</h3>
       <Button
         onClick={handleClick}
         text={'Login with GitHub'}
