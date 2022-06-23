@@ -6,10 +6,11 @@ import Button from '../components/atoms/button/Button';
 import { SessionContext } from '../context/SessionProvider';
 
 import { pedersenHashPreliminary, toHex } from 'zkp-merkle-airdrop-lib';
-import { getRewards, postPreCommitment } from '../services/airdropService';
+import { getRewards, postPreCommitment } from '../services/AirdropService';
+import { collectAirdrop } from '../services/AirdropContractService';
 
 import styles from '../styles/Home.module.css';
-import Navigation from '../components/organisms/navigation/Navigation';
+import { generateProof, hashNullifier } from '../utils/GenerateProof';
 
 const Home: NextPage = () => {
   const router = useRouter();
@@ -51,15 +52,32 @@ const Home: NextPage = () => {
     }
   };
 
-  const handleClaimClick = async (rewardId: string) => {
+  const handlePostCommitmentClick = async (rewardId: string) => {
     try {
       // TODO add nonce to protect against replay attacks
-      const reward = await postPreCommitment(
+      const rewards = await postPreCommitment(
         bearerToken,
         rewardId,
         preCommitment
       );
-      // setReward(reward);
+      setRewards(rewards);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleClaimClick = async (rewardId: string) => {
+    try {
+      // TODO remove conversion to BigInt
+      const proof = await generateProof(
+        '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
+        nullifier,
+        secret,
+        toHex(BigInt(rewardId))
+      );
+      console.log(proof);
+      const nullifierHash = await hashNullifier(nullifier);
+      await collectAirdrop(proof, nullifierHash, rewardId);
     } catch (err) {
       console.log(err);
     }
@@ -103,17 +121,26 @@ const Home: NextPage = () => {
         />
       )}
       <h3>Rewards:</h3>
-      <ul>
+      <ul className={styles.list}>
         {rewards.map((reward) => (
           <li>
             <span>{reward.id}</span> <span>{reward.value}</span>{' '}
-            <span>{reward.date}</span> <span>{reward.paid}</span>
-            <span>{reward.url}</span>{' '}
-            {preCommitment !== '' && (
-              <Button
-                text='Post Commitment'
-                onClick={() => handleClaimClick(reward.id)}
-              />
+            <span>{reward.date}</span> <span>{reward.url}</span>{' '}
+            {reward.claimed ? (
+              <span>
+                {' '}
+                <Button
+                  text='Claim'
+                  onClick={() => handleClaimClick(reward.id)}
+                />
+              </span>
+            ) : (
+              preCommitment !== '' && (
+                <Button
+                  text='Post Commitment'
+                  onClick={() => handlePostCommitmentClick(reward.id)}
+                />
+              )
             )}
           </li>
         ))}

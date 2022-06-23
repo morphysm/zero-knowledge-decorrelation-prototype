@@ -1,11 +1,13 @@
 package airdrop
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -18,7 +20,7 @@ type (
 	}
 
 	PreCommitResponse struct {
-		Reward string `json:"reward"`
+		Rewards []Reward `json:"rewards"`
 	}
 )
 
@@ -36,6 +38,15 @@ func (a *airdropHandler) PostPreCommitment(c echo.Context) error {
 	if err := c.Validate(payload); err != nil {
 		return err
     }
+
+	// Check if reward has been claimed
+	claimed, err := a.db.GetStateOfRewardClaim(payload.RewardID)
+	if err != nil {
+		return err
+	}
+	if claimed {
+		return errors.New("reward has been already claimed")
+	}
 
 	// TODO get reward from famed-github-backend
 	user, err := a.gitHubClient.GetUser(c.Request().Context(), payload.BearerToken)
@@ -58,8 +69,6 @@ func (a *airdropHandler) PostPreCommitment(c echo.Context) error {
 		return err
 	}
 
-	
-
 	// Call node script with commitment to update list of commitments and calculate merkle root. 
 	commitmentHex := strings.TrimSuffix(string(commitmentBytes), "\n")
 	fmt.Println(commitmentHex)
@@ -73,12 +82,28 @@ func (a *airdropHandler) PostPreCommitment(c echo.Context) error {
 
 	splittedOutput := strings.Split(string(output), "root:")
 	newMerkleRoot := strings.TrimSuffix(splittedOutput[len(splittedOutput)-1], "\n")
-	err = a.ethClient.PostMerkleRoot(c.Request().Context(), []byte(newMerkleRoot))
+	err = a.ethClient.PostMerkleRoot(c.Request().Context(), newMerkleRoot)
 	if err != nil {
 		log.Printf("error posting merkle root: %v", err)
 		return err
 	}
 
-	response := PreCommitResponse{Reward: payload.RewardID}
+	// Mark reward as claimed
+	a.db.SetRewardToClaimed(payload.RewardID)
+	rewardClaims := a.db.GetRewards()
+	rewards := []Reward{}
+	// TODO populate with real data
+	for _, r := range rewardClaims {
+		rewards = append(rewards, Reward{
+				Claimed: r.Claimed,
+				ID: r.ID,
+				Value: "1000 Coins",
+				Date: time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC),
+				URL: "https://github.com/",
+			
+		})
+	}
+
+	response := PreCommitResponse{Rewards: rewards}
 	return c.JSON(http.StatusOK, response)
 }

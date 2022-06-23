@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const withTM = require('next-transpile-modules')(['contracts']);
+
+const nextConfig = withTM({
   reactStrictMode: true,
   webpack: function (config, options) {
     if (!options.isServer) {
@@ -14,6 +16,6 @@ const nextConfig = {
     // config.experiments = { asyncWebAssembly: true };
     return config;
   },
-};
+});
 
 module.exports = nextConfig;

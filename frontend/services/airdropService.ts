@@ -29,15 +29,15 @@ export const getRewards = async (
   }
 };
 
-interface CommitmentResponse {
-  reward: string;
+interface commitmentResponse {
+  rewards: Reward[];
 }
 
 export const postPreCommitment = async (
   accessToken: string,
   rewardId: string,
   preCommitment: string
-): Promise<string> => {
+): Promise<Reward[]> => {
   const requestOptions: RequestInit = {
     method: 'POST',
     headers: {
@@ -51,9 +51,55 @@ export const postPreCommitment = async (
       `${baseURL}/airdrop/precommit`,
       requestOptions
     );
-    const data: CommitmentResponse = await response.json();
-    console.log(data);
-    return data.reward;
+    const data: commitmentResponse = await response.json();
+    return data.rewards;
+  } catch (error) {
+    console.error(error);
+    return Promise.reject(error);
+  }
+};
+
+export const getZKey = async (): Promise<ArrayBuffer> => {
+  const requestOptions: RequestInit = {
+    method: 'GET',
+  };
+  try {
+    const response = await fetch(`${baseURL}/airdrop/zkey`, requestOptions);
+    return response.arrayBuffer();
+  } catch (error) {
+    console.error(error);
+    return Promise.reject(error);
+  }
+};
+
+export const getWasm = async (): Promise<ArrayBuffer> => {
+  const requestOptions: RequestInit = {
+    method: 'GET',
+  };
+  try {
+    const response = await fetch(`${baseURL}/airdrop/wasm`, requestOptions);
+    return response.arrayBuffer();
+  } catch (error) {
+    console.error(error);
+    return Promise.reject(error);
+  }
+};
+
+interface publicCommitmentResponse {
+  commitments: string[];
+}
+
+export const getPublicCommitments = async (): Promise<string[]> => {
+  const requestOptions: RequestInit = {
+    method: 'GET',
+  };
+  try {
+    const response = await fetch(
+      `${baseURL}/airdrop/publiccommitments`,
+      requestOptions
+    );
+    const data: publicCommitmentResponse = await response.json();
+    return data.commitments;
   } catch (error) {
     console.error(error);
     return Promise.reject(error);

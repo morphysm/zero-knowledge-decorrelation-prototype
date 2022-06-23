@@ -55,7 +55,7 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
 
     /// @notice verifies the proof, collects the airdrop if valid, and prevents this proof from working again.
     function collectAirdrop(bytes calldata proof, bytes32 nullifierHash, bytes32 rewardID)
-        public
+        external 
     {
         require(
             uint256(nullifierHash) < SNARK_FIELD,

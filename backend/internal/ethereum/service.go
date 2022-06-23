@@ -3,9 +3,11 @@ package ethereum
 import (
 	"context"
 	"crypto/ecdsa"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"math/big"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -15,7 +17,7 @@ import (
 )
 
 type Client interface {
-	PostMerkleRoot(ctx context.Context, root []byte) error
+	PostMerkleRoot(ctx context.Context, hexMerkleRoot string) error
 }
 
 // githubClient represents a GitHub client.
@@ -35,13 +37,19 @@ func NewClient(ethClient *ethclient.Client, accountAddress common.Address, priva
 	}
 }
 
-func (c *client) PostMerkleRoot(ctx context.Context, root []byte) error {
-	// TODO check why this worked with the old scripts
-	// if len(root) != 32 {
-	// 	log.Printf("root is %d not 32 bytes", len(root))
-	// 	return fmt.Errorf("root is %d not 32 bytes", len(root))
-	// }
+func (c *client) PostMerkleRoot(ctx context.Context, hexMerkleRoot string) error {
+	// Transform hex string to bytes
+	merkleRoot, err := hexToBytes(hexMerkleRoot)
+	if err != nil {
+		log.Printf("error transforming hex string to bytes", err)
+		return err
+	}
 
+	// Check bytes length to be 32 
+	if len(merkleRoot) != 32 {
+		log.Printf("root is %d not 32 bytes", len(merkleRoot))
+		return fmt.Errorf("root is %d not 32 bytes", len(merkleRoot))
+	}
 
 	nonce, err := c.ethClient.PendingNonceAt(context.Background(), c.accountAddress)
 	if err != nil {
@@ -68,8 +76,7 @@ func (c *client) PostMerkleRoot(ctx context.Context, root []byte) error {
     }
 
 	var root32 [32]byte
-	copy(root32[:], root)
-
+	copy(root32[:], merkleRoot)
     tx, err := instance.UpdateRoot(auth, root32)
     if err != nil {
 		log.Printf("error updating merkle root: %v", err)
@@ -78,13 +85,27 @@ func (c *client) PostMerkleRoot(ctx context.Context, root []byte) error {
 
     fmt.Printf("tx sent: %s \n", tx.Hash().Hex())
 
-	//TODO check if executed
+	// Check if root update executed correctly
     result, err := instance.Root(nil)
 	if err != nil {
 		log.Printf("error reading merkle root: %v", err)
         return err
     }
-   
-    log.Printf("new root: %s", string(result[:]))
+
+	// Check if updated root equals new root
+	contractMTRoot := fmt.Sprintf("0x%s", hex.EncodeToString(result[:]))
+	log.Printf("new root: %s", contractMTRoot)
+
+	if (contractMTRoot != hexMerkleRoot) {
+		log.Printf("contract merkle root %s does not match new merkletree root %s", contractMTRoot, hexMerkleRoot)
+        return fmt.Errorf("contract merkle root %s does not match new merkletree root %s", contractMTRoot, hexMerkleRoot)
+	}
+    
 	return nil
+}
+
+func hexToBytes(s string) ([]byte, error){
+	// Trim potential 0x prefix
+	s = strings.TrimPrefix(s, "0x")
+	return hex.DecodeString(s)
 }

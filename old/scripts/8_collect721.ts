@@ -1,12 +1,5 @@
 // Collect against locally created merkle tree (only the first 4 commitments)
 const hre = require('hardhat');
-import { readFileSync } from 'fs';
-import { getMerkleTreeFromPublicListOfCommitments } from '../utils/TestUtils';
-import {
-  generateProofCallData,
-  pedersenHash,
-  toHex,
-} from 'zkp-merkle-airdrop-lib';
 
 /** Collect an airdrop from the local merkle tree against deployed contract. */
 async function main() {

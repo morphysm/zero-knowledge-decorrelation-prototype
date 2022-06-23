@@ -18,6 +18,10 @@ func LoginRoutes(g *echo.Group, handler login.HTTPHandler) {
 func AirdropRoutes(g *echo.Group, handler airdrop.HTTPHandler) {
 	g.GET("/rewards", handler.GetRewards)
 	g.POST("/precommit", handler.PostPreCommitment)
+	g.GET("/zkey", handler.GetZkey)
+	g.GET("/wasm", handler.GetWasm)
+	g.GET("/publiccommitments", handler.GetPublicCommitments)
+	
 }
 
 // HealthRoutes defines endpoints exposed to serve uses cases of infrastructure and customer support.

@@ -9,3 +9,12 @@
   width: 80%;
   max-width: 500px;
 }
+
+.list > li {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 10px;
+}

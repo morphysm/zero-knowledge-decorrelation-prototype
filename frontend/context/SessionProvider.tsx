@@ -1,5 +1,5 @@
 import { useState, createContext, useEffect } from 'react';
-import { getRewards } from '../services/airdropService';
+import { getRewards } from '../services/AirdropService';
 
 const BEARER_TOKEN_KEY: string = 'BearerToken';
 

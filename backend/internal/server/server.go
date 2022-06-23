@@ -8,6 +8,7 @@ import (
 
 	"github.com/famed-airdrop-prototype/backend/internal/airdrop"
 	"github.com/famed-airdrop-prototype/backend/internal/config"
+	"github.com/famed-airdrop-prototype/backend/internal/database"
 	"github.com/famed-airdrop-prototype/backend/internal/ethereum"
 	"github.com/famed-airdrop-prototype/backend/internal/github"
 	"github.com/famed-airdrop-prototype/backend/internal/health"
@@ -39,6 +40,9 @@ func NewBackendServer(cfg *config.Config) (*echo.Echo, error) {
 		middleware.Recover(),
 	)
 
+	// TODO make database persistent and load rewards per user
+	// New database to track paiout state
+	database := database.NewDatabase()
 	// New GitHub client; handels requests to GitHub
 	githubClient := github.NewClient(cfg.Github.ClientID, cfg.Github.ClientSecret)
 	// New Ethereum client; handels requests to a L1 or L2
@@ -59,7 +63,7 @@ func NewBackendServer(cfg *config.Config) (*echo.Echo, error) {
 	airdropGroup := e.Group("/airdrop")
 	{
 		AirdropRoutes(
-			airdropGroup, airdrop.NewHandler(githubClient, ethereumClient),
+			airdropGroup, airdrop.NewHandler(githubClient, ethereumClient, database),
 		)
 	}
 	// Health endpoints exposed for heartbeat

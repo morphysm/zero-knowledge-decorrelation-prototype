@@ -1,5 +1,5 @@
 declare interface Reward {
-  paid: boolean;
+  claimed: boolean;
   id: string;
   value: string;
   date: string;
