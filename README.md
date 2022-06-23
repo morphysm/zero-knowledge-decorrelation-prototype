@@ -8,3 +8,18 @@ It is split into six sub-components:
 - contracts (airdrop solidity contracts)
 - frontend (frontend code)
 - zkp-merkle-airdrop-lib (js library for zero knowledge airdrops)
+
+# Development
+
+Start local development chain:
+
+```
+cd contracts
+npx hardhat node
+```
+
+Deploy contracts (in /contracts):
+
+```
+npm run deploy
+```
