@@ -11,6 +11,8 @@
   "dependencies": {
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
+    "@metamask/providers": "^9.0.0",
+    "@metamask/types": "^1.1.0",
     "@mui/material": "^5.8.5",
     "contracts": "file:../contracts",
     "ethers": "^5.6.9",

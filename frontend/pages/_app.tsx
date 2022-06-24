@@ -4,13 +4,16 @@ import { SessionProvider } from '../context/SessionProvider';
 import ViewportProvider from '../context/ViewportProvider';
 import Background from '../components/organisms/background/Background';
 import Navigation from '../components/organisms/navigation/Navigation';
+import MetamaskProvider from '../context/MetamaskProvider';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <SessionProvider>
       <ViewportProvider>
-        <Navigation />
-        <Component {...pageProps} />
+        <MetamaskProvider>
+          <Navigation />
+          <Component {...pageProps} />
+        </MetamaskProvider>
         <Background />
       </ViewportProvider>
     </SessionProvider>

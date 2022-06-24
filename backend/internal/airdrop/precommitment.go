@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os/exec"
 	"strings"
-	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -17,10 +16,6 @@ type (
 		BearerToken string `header:"Authorization" validate:"required"`
 		RewardID string `json:"rewardId" validate:"required"`
 		PreCommitment string `json:"preCommitment" validate:"required"`
-	}
-
-	PreCommitResponse struct {
-		Rewards []Reward `json:"rewards"`
 	}
 )
 
@@ -90,20 +85,6 @@ func (a *airdropHandler) PostPreCommitment(c echo.Context) error {
 
 	// Mark reward as claimed
 	a.db.SetRewardToClaimed(payload.RewardID)
-	rewardClaims := a.db.GetRewards()
-	rewards := []Reward{}
-	// TODO populate with real data
-	for _, r := range rewardClaims {
-		rewards = append(rewards, Reward{
-				Claimed: r.Claimed,
-				ID: r.ID,
-				Value: "1000 Coins",
-				Date: time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC),
-				URL: "https://github.com/",
-			
-		})
-	}
 
-	response := PreCommitResponse{Rewards: rewards}
-	return c.JSON(http.StatusOK, response)
+	return c.NoContent(http.StatusOK)
 }

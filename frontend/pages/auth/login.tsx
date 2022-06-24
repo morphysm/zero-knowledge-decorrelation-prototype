@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 // import './LoginPage.css';
-import Button from '../../components/atoms/button/Button';
+import Button from '../../components/atoms/loadingButton/LoadingButton';
 // import { ReactComponent as TwitterIcon } from '../../static/images/twitter.svg';
 import { SessionContext } from '../../context/SessionProvider';
 
@@ -28,7 +28,7 @@ const LoginPage: React.FC = () => {
   }, [router, bearerToken]);
 
   return (
-    <div className='LoginPage'>
+    <div>
       {/* <img src={shiImg} alt={'shi'} /> */}
       <h1>Famed Airdrop Prototype</h1>
       <h3>Claim and Collect Famed Rewards</h3>
