@@ -1,10 +1,11 @@
 import React, { useContext, useEffect } from 'react';
+import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import Button from '../../components/atoms/button/Button';
 import { SessionContext } from '../../context/SessionProvider';
 import styles from '../../styles/Home.module.css';
 
-const LoginPage: React.FC = () => {
+const LoginPage: NextPage = () => {
   const router = useRouter();
   const { bearerToken, setBearerToken } = useContext(SessionContext);
 

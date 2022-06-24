@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { SessionContext } from './../../../context/SessionProvider';
 import styles from '../../../styles/Home.module.css';
@@ -6,7 +7,7 @@ import LoadingButton from './../../../components/atoms/loadingButton/LoadingButt
 import { pedersenHashPreliminary, toHex } from 'zkp-merkle-airdrop-lib';
 import { postPreCommitment } from './../../../services/AirdropService';
 
-const ClaimPage: React.FC = () => {
+const ClaimPage: NextPage = () => {
   const router = useRouter();
   const { rewardId } = router.query;
   const { bearerToken } = useContext(SessionContext);

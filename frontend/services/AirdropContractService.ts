@@ -11,6 +11,7 @@ export const collectAirdrop = async (
   const provider = new ethers.providers.JsonRpcProvider(
     'http://127.0.0.1:8545/'
   );
+  // TODO replace with sign from metamask
   const signer = new ethers.Wallet(
     '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d',
     provider

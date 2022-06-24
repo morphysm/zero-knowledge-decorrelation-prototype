@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { SessionContext } from './../../../context/SessionProvider';
 import styles from '../../../styles/Home.module.css';
@@ -8,7 +9,7 @@ import { generateProof, hashNullifier } from '../../../utils/GenerateProof';
 import { MetamaskContext } from '../../../context/MetamaskProvider';
 import { collectAirdrop } from '../../../services/AirdropContractService';
 
-const CollectPage: React.FC = () => {
+const CollectPage: NextPage = () => {
   const router = useRouter();
   const { rewardId } = router.query;
   const { bearerToken } = useContext(SessionContext);

@@ -1,8 +1,11 @@
 import styles from './Navigation.module.css';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { SessionContext } from '../../../context/SessionProvider';
+import { MetamaskContext } from '../../../context/MetamaskProvider';
+
 import Button from '../../atoms/button/Button';
 import MetamaskConnect from '../../molecule/metamaskConnect/MetamaskConnect';
+import router from 'next/router';
 
 interface BackgroundProps {
   user?: User;
@@ -10,9 +13,18 @@ interface BackgroundProps {
 
 const Background: React.FC<BackgroundProps> = () => {
   const { user, bearerToken, setBearerToken } = useContext(SessionContext);
+  const { address } = useContext(MetamaskContext);
 
-  const handleLogout = async () => {
+  const handleLogoutClick = async () => {
     setBearerToken('');
+  };
+
+  const handleNFTsClick = async () => {
+    router.push('/nfts');
+  };
+
+  const handleHomeClick = async () => {
+    router.push('/');
   };
 
   return (
@@ -26,7 +38,13 @@ const Background: React.FC<BackgroundProps> = () => {
       {bearerToken !== '' && (
         <>
           <MetamaskConnect />
-          <Button onClick={handleLogout}>Log Out</Button>
+          {address !== '' &&
+            (router.pathname !== '/nfts' ? (
+              <Button onClick={handleNFTsClick}>See NFTs</Button>
+            ) : (
+              <Button onClick={handleHomeClick}>Home</Button>
+            ))}
+          <Button onClick={handleLogoutClick}>Log Out</Button>
         </>
       )}
     </div>
