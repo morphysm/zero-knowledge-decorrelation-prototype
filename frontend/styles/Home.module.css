@@ -1,4 +1,4 @@
-.home {
+.padding {
   padding: 0px 30px;
 }
 
@@ -8,6 +8,8 @@
 
   width: 80%;
   max-width: 500px;
+
+  margin-bottom: 15px;
 }
 
 .list > li {

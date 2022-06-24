@@ -20,7 +20,6 @@ const CollectPage: React.FC = () => {
   const [secret, setSecret] = useState(
     '0x00c46daf8a91c6b69e260765036de0ccf4b2e1cfe063ca630a6611f13adadee0'
   );
-  const [preCommitment, setPreCommitment] = useState('');
   const [loadingCollect, setLoadingCollect] = useState<boolean>(false);
 
   useEffect(() => {
@@ -49,7 +48,7 @@ const CollectPage: React.FC = () => {
   };
 
   return (
-    <div className='LoginPage'>
+    <div className={styles.padding}>
       <form className={styles.form}>
         <label htmlFor='nullifier'>Nullifier</label>
         <input
@@ -67,27 +66,16 @@ const CollectPage: React.FC = () => {
           value={secret}
           onChange={(e) => setSecret(e.target.value)}
         />
-        <label htmlFor='secret'>Precommitment</label>
-        <input
-          type='text'
-          id='preCommitment'
-          name='preCommitment'
-          value={preCommitment}
-          onChange={(e) => setPreCommitment(e.target.value)}
-        />
-        {preCommitment !== '' && address !== '' && (
-          <span>
-            {' '}
-            <LoadingButton
-              loading={loadingCollect}
-              onClick={() => handleCollectClick(rewardId as string)}
-            >
-              Collect
-            </LoadingButton>
-          </span>
-        )}
-        {address === '' && <span>Connect Metamask</span>}
       </form>
+      {address !== '' && (
+        <LoadingButton
+          loading={loadingCollect}
+          onClick={() => handleCollectClick(rewardId as string)}
+        >
+          Collect
+        </LoadingButton>
+      )}
+      {address === '' && <span>Connect Metamask</span>}
     </div>
   );
 };

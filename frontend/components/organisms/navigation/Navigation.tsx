@@ -23,8 +23,12 @@ const Background: React.FC<BackgroundProps> = () => {
           <span>{user.login}</span>
         </div>
       )}
-      <MetamaskConnect />
-      {bearerToken !== '' && <Button onClick={handleLogout}>Log Out</Button>}
+      {bearerToken !== '' && (
+        <>
+          <MetamaskConnect />
+          <Button onClick={handleLogout}>Log Out</Button>
+        </>
+      )}
     </div>
   );
 };

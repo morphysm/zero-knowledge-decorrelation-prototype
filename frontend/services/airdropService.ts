@@ -29,15 +29,11 @@ export const getRewards = async (
   }
 };
 
-interface commitmentResponse {
-  rewards: Reward[];
-}
-
 export const postPreCommitment = async (
   accessToken: string,
   rewardId: string,
   preCommitment: string
-): Promise<Reward[]> => {
+): Promise<void> => {
   const requestOptions: RequestInit = {
     method: 'POST',
     headers: {
@@ -47,12 +43,8 @@ export const postPreCommitment = async (
     body: JSON.stringify({ rewardId, preCommitment }),
   };
   try {
-    const response = await fetch(
-      `${baseURL}/airdrop/precommit`,
-      requestOptions
-    );
-    const data: commitmentResponse = await response.json();
-    return data.rewards;
+    await fetch(`${baseURL}/airdrop/precommit`, requestOptions);
+    return;
   } catch (error) {
     console.error(error);
     return Promise.reject(error);

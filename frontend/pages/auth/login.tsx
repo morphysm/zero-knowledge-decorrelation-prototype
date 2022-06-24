@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
-// import './LoginPage.css';
-import Button from '../../components/atoms/loadingButton/LoadingButton';
-// import { ReactComponent as TwitterIcon } from '../../static/images/twitter.svg';
+import Button from '../../components/atoms/button/Button';
 import { SessionContext } from '../../context/SessionProvider';
+import styles from '../../styles/Home.module.css';
 
 const LoginPage: React.FC = () => {
   const router = useRouter();
@@ -28,15 +27,11 @@ const LoginPage: React.FC = () => {
   }, [router, bearerToken]);
 
   return (
-    <div>
+    <div className={styles.padding}>
       {/* <img src={shiImg} alt={'shi'} /> */}
       <h1>Famed Airdrop Prototype</h1>
       <h3>Claim and Collect Famed Rewards</h3>
-      <Button
-        onClick={handleClick}
-        text={'Login with GitHub'}
-        // Icon={GitHubIcon}
-      />
+      <Button onClick={handleClick}>Login with GitHub</Button>
     </div>
   );
 };

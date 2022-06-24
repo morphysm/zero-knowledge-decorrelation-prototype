@@ -6,7 +6,6 @@ import { SessionContext } from '../context/SessionProvider';
 import { getRewards } from '../services/AirdropService';
 
 import Button from '../components/atoms/button/Button';
-import LoadingButton from '../components/atoms/loadingButton/LoadingButton';
 
 import styles from '../styles/Home.module.css';
 
@@ -18,8 +17,6 @@ const Home: NextPage = () => {
 
   const [user, setUser] = useState<User | null>(null);
   const [rewards, setRewards] = useState<Reward[]>([]);
-
-  const [loadingCollect, setLoadingCollect] = useState<boolean>(false);
 
   useEffect(() => {
     if (bearerToken === '') {
@@ -42,11 +39,21 @@ const Home: NextPage = () => {
     router.push(`/airdrop/collect/${rewardId}`);
   };
 
-  if (isLoading) return <p>Loading...</p>;
-  if (!user) return <p>No reward data</p>;
+  if (isLoading)
+    return (
+      <div className={styles.padding}>
+        <p>Loading...</p>
+      </div>
+    );
+  if (!user)
+    return (
+      <div className={styles.padding}>
+        <p>No reward data</p>
+      </div>
+    );
 
   return (
-    <div className={styles.home}>
+    <div className={styles.padding}>
       <h3>Rewards:</h3>
       <ul className={styles.list}>
         {rewards.map((reward, i) => (
@@ -56,12 +63,9 @@ const Home: NextPage = () => {
             {reward.claimed ? (
               <span>
                 {' '}
-                <LoadingButton
-                  loading={loadingCollect}
-                  onClick={() => handleCollectClick(reward.id)}
-                >
+                <Button onClick={() => handleCollectClick(reward.id)}>
                   Collect
-                </LoadingButton>
+                </Button>
               </span>
             ) : (
               <Button onClick={() => handleClaimClick(reward.id)}>Claim</Button>

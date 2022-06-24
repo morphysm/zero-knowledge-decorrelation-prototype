@@ -55,7 +55,7 @@ const ClaimPage: React.FC = () => {
   };
 
   return (
-    <div className='LoginPage'>
+    <div className={styles.padding}>
       <form className={styles.form}>
         <label htmlFor='nullifier'>Nullifier</label>
         <input
@@ -81,19 +81,19 @@ const ClaimPage: React.FC = () => {
           value={preCommitment}
           onChange={(e) => setPreCommitment(e.target.value)}
         />
-        {preCommitment === '' ? (
-          <LoadingButton
-            loading={loadingGeneration}
-            onClick={handleClickGeneratePreCommitment}
-          >
-            Generate Precommitment
-          </LoadingButton>
-        ) : (
-          <LoadingButton loading={loadingClaim} onClick={handleClaimClick}>
-            Claim Reward {rewardId}
-          </LoadingButton>
-        )}
       </form>
+      {preCommitment === '' ? (
+        <LoadingButton
+          loading={loadingGeneration}
+          onClick={handleClickGeneratePreCommitment}
+        >
+          Generate Precommitment
+        </LoadingButton>
+      ) : (
+        <LoadingButton loading={loadingClaim} onClick={handleClaimClick}>
+          Claim Reward {rewardId}
+        </LoadingButton>
+      )}
     </div>
   );
 };
