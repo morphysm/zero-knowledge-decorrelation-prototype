@@ -11,8 +11,8 @@
   "dependencies": {
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
+    "@metamask/detect-provider": "^1.2.0",
     "@metamask/providers": "^9.0.0",
-    "@metamask/types": "^1.1.0",
     "@mui/material": "^5.8.5",
     "contracts": "file:../contracts",
     "ethers": "^5.6.9",
@@ -23,6 +23,7 @@
     "zkp-merkle-airdrop-lib": "file:../zkp-merkle-airdrop-lib"
   },
   "devDependencies": {
+    "@metamask/types": "^1.1.0",
     "@mui/types": "^7.1.4",
     "@types/node": "17.0.36",
     "@types/react": "18.0.9",

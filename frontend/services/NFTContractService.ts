@@ -17,13 +17,14 @@ interface Attributes {
 export const getNFTs = async (
   address: string
 ): Promise<ZekoGenerativeNFT[]> => {
-  //TODO dynamically set rpc url
-  const provider = new ethers.providers.JsonRpcProvider(
-    'http://127.0.0.1:8545/'
-  );
-  // TODO load signer from metamask & load address from source of truth
+  if (!window.ethereum) {
+    throw new Error('could not connect to metamask');
+  }
+
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  // TODO load address from source of truth
   const airdrop = ZekoGenerativeNFT__factory.connect(
-    '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+    '0x60492b0755D8dba01dB9915a1f8Bf28D242BF6dC',
     provider
   );
 
@@ -31,13 +32,11 @@ export const getNFTs = async (
 
   let NFTs: ZekoGenerativeNFT[] = [];
   for (let i = 0; i < balance.toNumber(); i++) {
-    const tokenId = await airdrop.tokenOfOwnerByIndex(
-      '0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0',
-      i
-    );
+    //TODO replace by metamask address
+    const tokenId = await airdrop.tokenOfOwnerByIndex(address, i);
     const URI = await airdrop.tokenURI(tokenId);
     // 29 = length of "data:application/json;base64,"
-    const json = atob(URI.substring(29));
+    const json = window.atob(URI.substring(29));
     const nft = JSON.parse(json) as ZekoGenerativeNFT;
     NFTs.push(nft);
   }

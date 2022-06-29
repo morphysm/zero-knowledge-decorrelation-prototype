@@ -85,6 +85,13 @@ func (c *client) PostMerkleRoot(ctx context.Context, hexMerkleRoot string) error
 
     fmt.Printf("tx sent: %s \n", tx.Hash().Hex())
 
+	// Wait for the transaction to finalize.
+	_, err = bind.WaitMined(ctx, c.ethClient, tx)
+	    if err != nil {
+		log.Printf("error while waiting for transaction to finalize: %v", err)
+        return err
+    }
+
 	// Check if root update executed correctly
     result, err := instance.Root(nil)
 	if err != nil {

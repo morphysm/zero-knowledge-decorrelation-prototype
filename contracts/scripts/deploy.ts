@@ -3,7 +3,7 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
-import { ethers } from "hardhat";
+import hre, { ethers } from "hardhat";
 const { BigNumber } = ethers;
 
 import { PrivateAirdrop } from "../typechain/PrivateAirdrop";
@@ -12,7 +12,10 @@ import {
   getMerkleTreeFromPublicListOfCommitments,
   getMerkleRoot,
 } from "../utils/TestUtils";
-import { putContractAddresses } from "../utils/AddressStore";
+import {
+  isOfTypeNetworkName,
+  putContractAddresses,
+} from "../utils/AddressStore";
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
@@ -22,7 +25,13 @@ async function main() {
   // manually to make sure everything is compiled
   // await hre.run('compile');
 
-  // We get the contract to deploy
+  const networkName = hre.network.name;
+  if (!isOfTypeNetworkName(networkName)) {
+    throw new Error(
+      "unexpected network name, please verify and update list of supported networks"
+    );
+  }
+
   const NUM_ERC721_PER_REDEMPTION = 1;
   const inputFileName = "../backend/public/publicCommitments.txt";
   const treeHeight = 5;
@@ -45,7 +54,7 @@ async function main() {
 
   // DEPLOY PRIVATE AIRDROP
   const mainFactory = await ethers.getContractFactory("PrivateAirdrop");
-  const privateAirdrop: PrivateAirdrop = (await mainFactory.deploy(
+  const privateAirdrop = (await mainFactory.deploy(
     zekoNFT.address,
     BigNumber.from(NUM_ERC721_PER_REDEMPTION),
     plonk.address,
@@ -55,7 +64,12 @@ async function main() {
     `PrivateAirdrop contract address: ${privateAirdrop.address} merkconstree root: ${merkconstreeRoot}`
   );
 
-  putContractAddresses(zekoNFT.address, plonk.address, privateAirdrop.address);
+  putContractAddresses(
+    zekoNFT.address,
+    plonk.address,
+    privateAirdrop.address,
+    networkName
+  );
 }
 
 // We recommend this pattern to be able to use async/await everywhere

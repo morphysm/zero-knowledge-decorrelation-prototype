@@ -1,9 +1,19 @@
 // Mint a setofNFT to the privateAidrop contract
-import { getContractAddresses } from "../utils/AddressStore";
+import {
+  getContractAddresses,
+  isOfTypeNetworkName,
+} from "../utils/AddressStore";
 const hre = require("hardhat");
 
 async function main() {
-  const addresses = getContractAddresses();
+  const networkName = hre.network.name;
+  if (!isOfTypeNetworkName(networkName)) {
+    throw new Error(
+      "unexpected network name, please verify and update list of supported networks"
+    );
+  }
+
+  const addresses = getContractAddresses(networkName);
   const zekoNFT = await hre.ethers.getContractAt(
     "ZekoGenerativeNFT",
     addresses.nft

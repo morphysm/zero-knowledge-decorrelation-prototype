@@ -1,13 +1,6 @@
-import { Button, Paper, Stack, Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { MetamaskContext } from '../../../context/MetamaskProvider';
-import { MetaMaskInpageProvider } from '@metamask/providers';
-
-declare global {
-  interface Window {
-    ethereum: MetaMaskInpageProvider | undefined;
-  }
-}
 
 const MetamaskConnect = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
