@@ -16,8 +16,6 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 
-// NEED TO ADD AN INTERFACE TO CALL THE PRIVATE AIRDROP CONTRACT
-
 interface IAirdropContract {
     function setWorldBaseTokenId(uint256 _firstNFTID) external returns (uint256);
 }
@@ -39,6 +37,7 @@ contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
 
     constructor() ERC721("ZekoNFT", "ZK") {}
 
+    // TODO investigate if external and calldata cann be used
     function mintRoleToAirdrop(
         string memory _daoName,
         string memory _role,
@@ -47,29 +46,16 @@ contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
     ) public onlyOwner {
         bytes memory strDaoBytes = bytes(_daoName);
         bytes memory strRoleBytes = bytes(_role);
-        require(
-            strDaoBytes.length <= stringLimit,
-            "String input exceeds limit."
-        );
-        require(
-            strRoleBytes.length <= stringLimit,
-            "String input exceeds limit."
-        );
-        IAirdropContract(_PrivateAirdropContract).setWorldBaseTokenId(
-            totalSupply() + 1
-        );
+        require(strDaoBytes.length <= stringLimit, "String input exceeds limit.");
+        require(strRoleBytes.length <= stringLimit, "String input exceeds limit.");
+        IAirdropContract(_PrivateAirdropContract).setWorldBaseTokenId(totalSupply() + 1);
         for (uint256 i = 0; i < _qty; i++) {
             uint256 supply = totalSupply();
             Word memory newWord = Word(
                 _daoName,
                 _role,
                 string(
-                    abi.encodePacked(
-                        "#",
-                        uint256(i + 1).toString(),
-                        "/",
-                        uint256(_qty).toString()
-                    )
+                    abi.encodePacked("#", uint256(i + 1).toString(), "/", uint256(_qty).toString())
                 ),
                 randomNum(361, block.difficulty, supply).toString(),
                 randomNum(361, block.timestamp, supply).toString()
@@ -87,9 +73,7 @@ contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
         uint256 _salt
     ) public view returns (uint256) {
         uint256 num = uint256(
-            keccak256(
-                abi.encodePacked(block.timestamp, msg.sender, _seed, _salt)
-            )
+            keccak256(abi.encodePacked(block.timestamp, msg.sender, _seed, _salt))
         ) % _mod;
         return num;
     }
@@ -101,23 +85,23 @@ contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
             Base64.encode(
                 bytes(
                     abi.encodePacked(
-                        '<svg width="500" height="500" xmlns="http://www.w3.org/2000/svg">',
-                        '<rect height="500" width="500" y="0" x="0" fill="hsl(',
+                        "<svg width='500' height='500' xmlns='http://www.w3.org/2000/svg'>",
+                        "<rect height='500' width='500' y='0' x='0' fill='hsl(",
                         currentWord.bgHue,
-                        ',50%,25%)"/>',
-                        '<text font-size="18" y="10%" x="50%" text-anchor="middle" fill="hsl(',
+                        ",50%,25%)'/>",
+                        "<text font-size='18' y='10%' x='50%' text-anchor='middle' fill='hsl(",
                         random,
-                        ',100%,80%)">',
+                        ",100%,80%)'>",
                         currentWord.tokenIdInCollection,
                         "</text>",
-                        '<text font-size="18" y="50%" x="50%" text-anchor="middle" fill="hsl(',
+                        "<text font-size='18' y='50%' x='50%' text-anchor='middle' fill='hsl(",
                         random,
-                        ',100%,80%)"> daoName:',
+                        ",100%,80%)'> daoName:",
                         currentWord.daoName,
                         "</text>",
-                        '<text font-size="18" y="80%" x="50%" text-anchor="middle" fill="hsl(',
+                        "<text font-size='18' y='80%' x='50%' text-anchor='middle' fill='hsl(",
                         random,
-                        ',100%,80%)"> daoRole:',
+                        ",100%,80%)'> daoRole:",
                         currentWord.role,
                         "</text>",
                         "</svg>"
@@ -126,11 +110,7 @@ contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
             );
     }
 
-    function buildMetadata(uint256 _tokenId)
-        private
-        view
-        returns (string memory)
-    {
+    function buildMetadata(uint256 _tokenId) private view returns (string memory) {
         Word memory currentWord = TokenIdToWord[_tokenId];
         return
             string(
@@ -139,21 +119,21 @@ contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
                     Base64.encode(
                         bytes(
                             abi.encodePacked(
-                                '{"Dao":"',
+                                "{'Dao':'",
                                 currentWord.daoName,
-                                '", "Role":"',
+                                "', 'Role':'",
                                 currentWord.role,
-                                '", "TokenIdInRoleCollection":"',
+                                "', 'TokenIdInRoleCollection':'",
                                 currentWord.tokenIdInCollection,
-                                '", "image": "',
+                                "', 'image': '",
                                 "data:image/svg+xml;base64,",
                                 buildImage(_tokenId),
-                                '", "attributes": ',
+                                "', 'attributes': ",
                                 "[",
-                                '{"trait_type": "TextColor",',
-                                '"value":"',
+                                "{'trait_type': 'TextColor',",
+                                "'value':'",
                                 currentWord.textHue,
-                                '"}',
+                                "'}",
                                 "]",
                                 "}"
                             )
@@ -163,17 +143,8 @@ contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
             );
     }
 
-    function tokenURI(uint256 _tokenId)
-        public
-        view
-        virtual
-        override
-        returns (string memory)
-    {
-        require(
-            _exists(_tokenId),
-            "ERC721Metadata: URI query for nonexistent token"
-        );
+    function tokenURI(uint256 _tokenId) public view virtual override returns (string memory) {
+        require(_exists(_tokenId), "ERC721Metadata: URI query for nonexistent token");
         return buildMetadata(_tokenId);
     }
 
@@ -183,10 +154,7 @@ contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
         address to,
         uint256 tokenId
     ) internal override {
-        require(
-            TransferCounterForTokenId[tokenId] == 0,
-            "The token is no longer transferable"
-        );
+        require(TransferCounterForTokenId[tokenId] == 0, "The token is no longer transferable");
         super._transfer(from, to, tokenId);
         TransferCounterForTokenId[tokenId] += 1;
     }

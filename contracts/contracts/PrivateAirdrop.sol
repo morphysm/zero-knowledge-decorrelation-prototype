@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: AGPL-3.0
+pragma solidity >=0.8.0 <0.9.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
@@ -54,29 +54,21 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
     }
 
     /// @notice verifies the proof, collects the airdrop if valid, and prevents this proof from working again.
-    function collectAirdrop(bytes calldata proof, bytes32 nullifierHash, bytes32 rewardID)
-        external 
-    {
-        require(
-            uint256(nullifierHash) < SNARK_FIELD,
-            "Nullifier is not within the field"
-        );
-        require(!nullifierSpent[nullifierHash], "Airdrop already redeemed");
+    function collectAirdrop(
+        bytes calldata _proof,
+        bytes32 _nullifierHash,
+        bytes32 _rewardID
+    ) external {
+        require(uint256(_nullifierHash) < SNARK_FIELD, "Nullifier is not within the field");
+        require(!nullifierSpent[_nullifierHash], "Airdrop already redeemed");
         uint256[] memory pubSignals = new uint256[](4);
         pubSignals[0] = uint256(root);
-        pubSignals[1] = uint256(nullifierHash);
-        pubSignals[2] = uint256(rewardID);
+        pubSignals[1] = uint256(_nullifierHash);
+        pubSignals[2] = uint256(_rewardID);
         pubSignals[3] = uint256(uint160(msg.sender));
-        require(
-            verifier.verifyProof(proof, pubSignals),
-            "Proof verification failed"
-        );
-        nullifierSpent[nullifierHash] = true;
-        nftToken.transferFrom(
-            address(this),
-            msg.sender,
-            worldBaseTokenId + pubSignals[2]
-        );
+        require(verifier.verifyProof(_proof, pubSignals), "Proof verification failed");
+        nullifierSpent[_nullifierHash] = true;
+        nftToken.transferFrom(address(this), msg.sender, worldBaseTokenId + pubSignals[2]);
     }
 
     // this function can only be called from the nftToken and passes:
@@ -89,7 +81,7 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
 
     /// @notice Allows the owner to update the root of the merkle tree.
     /// @dev Function can be removed to make the merkle tree immutable. If removed, the ownable extension can also be removed for gas savings.
-    function updateRoot(bytes32 newRoot) public onlyOwner {
-        root = newRoot;
+    function updateRoot(bytes32 _root) public onlyOwner {
+        root = _root;
     }
 }
