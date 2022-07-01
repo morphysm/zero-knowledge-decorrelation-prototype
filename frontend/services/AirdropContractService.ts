@@ -1,7 +1,7 @@
-import { ethers } from 'ethers';
+import { ethers, utils } from 'ethers';
 // import detectEthereumProvider from '@metamask/detect-provider';
 import { PrivateAirdrop__factory } from 'contracts/typechain';
-import { toHex } from 'zkp-merkle-airdrop-lib';
+import { getAirdropAddress } from './AddressService';
 
 export const collectAirdrop = async (
   proof: string,
@@ -16,15 +16,14 @@ export const collectAirdrop = async (
   const signer = provider.getSigner();
   // TODO load address from source of truth
   const airdrop = PrivateAirdrop__factory.connect(
-    '0x7EfE41334ef01319CABe340669A028516cD2f9b0',
+    await getAirdropAddress(provider),
     signer
   );
 
-  //TODO imporve toHex
   const tx = await airdrop.collectAirdrop(
     proof,
     nullifierHash,
-    toHex(BigInt(rewardID))
+    utils.formatBytes32String(rewardID)
   );
   const receipt = await tx.wait();
   console.log(receipt);

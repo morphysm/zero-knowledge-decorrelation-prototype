@@ -4,18 +4,9 @@
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
 import hre, { ethers } from "hardhat";
-const { BigNumber } = ethers;
 
-import { PrivateAirdrop } from "../typechain/PrivateAirdrop";
-
-import {
-  getMerkleTreeFromPublicListOfCommitments,
-  getMerkleRoot,
-} from "../utils/TestUtils";
-import {
-  isOfTypeNetworkName,
-  putContractAddresses,
-} from "../utils/AddressStore";
+import { getMerkleTreeFromPublicListOfCommitments, getMerkleRoot } from "../utils/TestUtils";
+import { isOfTypeNetworkName, putContractAddresses } from "../utils/AddressStore";
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
@@ -27,47 +18,47 @@ async function main() {
 
   const networkName = hre.network.name;
   if (!isOfTypeNetworkName(networkName)) {
-    throw new Error(
-      "unexpected network name, please verify and update list of supported networks"
-    );
+    throw new Error("unexpected network name, please verify and update list of supported networks");
   }
 
   const NUM_ERC721_PER_REDEMPTION = 1;
   const inputFileName = "../backend/public/publicCommitments.txt";
   const treeHeight = 5;
 
-  const mt = await getMerkleTreeFromPublicListOfCommitments(
-    inputFileName,
-    treeHeight
-  );
-  const merkconstreeRoot = getMerkleRoot(mt);
+  const mt = await getMerkleTreeFromPublicListOfCommitments(inputFileName, treeHeight);
+  const merkleTreeRoot = getMerkleRoot(mt);
 
-  // DEPLOY ERC721 contract
-  const zekoNFTFactory = await ethers.getContractFactory("ZekoGenerativeNFT");
-  const zekoNFT = await zekoNFTFactory.deploy();
-  console.log(`ERC721 address: ${zekoNFT.address}`);
+  // Deploy NFT contract
+  const zekoGenerativeNFTFactory = await ethers.getContractFactory("ZekoGenerativeNFT");
+  const zekoGenerativeNFTContract = await zekoGenerativeNFTFactory.deploy();
 
-  // DEPLOY PLONK VERIFIER
+  // Deploy ZK verfication contract
   const plonkFactory = await ethers.getContractFactory("PlonkVerifier");
-  const plonk = await plonkFactory.deploy();
-  console.log(`Plonk Verifier contract address: ${plonk.address}`);
+  const plonkContract = await plonkFactory.deploy();
 
-  // DEPLOY PRIVATE AIRDROP
-  const mainFactory = await ethers.getContractFactory("PrivateAirdrop");
-  const privateAirdrop = (await mainFactory.deploy(
-    zekoNFT.address,
-    BigNumber.from(NUM_ERC721_PER_REDEMPTION),
-    plonk.address,
-    merkconstreeRoot
-  )) as PrivateAirdrop;
+  // Deploy approve contract
+  const approveFactory = await ethers.getContractFactory("Approve");
+  const approveContract = await approveFactory.deploy();
+
+  // Deploy airdrop contract
+  const airdropFactory = await ethers.getContractFactory("PrivateAirdrop");
+  const airdropContract = await airdropFactory.deploy(
+    zekoGenerativeNFTContract.address,
+    NUM_ERC721_PER_REDEMPTION,
+    plonkContract.address,
+    approveContract.address,
+    merkleTreeRoot
+  );
+
   console.log(
-    `PrivateAirdrop contract address: ${privateAirdrop.address} merkconstree root: ${merkconstreeRoot}`
+    `PrivateAirdrop contract address: ${airdropContract.address} merkconstree root: ${merkleTreeRoot}`
   );
 
   putContractAddresses(
-    zekoNFT.address,
-    plonk.address,
-    privateAirdrop.address,
+    zekoGenerativeNFTContract.address,
+    plonkContract.address,
+    airdropContract.address,
+    approveContract.address,
     networkName
   );
 }

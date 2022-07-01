@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 import { ZekoGenerativeNFT__factory } from 'contracts/typechain';
+import { getNFTAddress } from './AddressService';
 
 export interface ZekoGenerativeNFT {
   Dao: string;
@@ -22,9 +23,10 @@ export const getNFTs = async (
   }
 
   const provider = new ethers.providers.Web3Provider(window.ethereum);
+
   // TODO load address from source of truth
   const airdrop = ZekoGenerativeNFT__factory.connect(
-    '0x60492b0755D8dba01dB9915a1f8Bf28D242BF6dC',
+    await getNFTAddress(provider),
     provider
   );
 

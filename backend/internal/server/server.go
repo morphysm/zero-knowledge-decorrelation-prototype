@@ -8,8 +8,8 @@ import (
 
 	"github.com/famed-airdrop-prototype/backend/internal/airdrop"
 	"github.com/famed-airdrop-prototype/backend/internal/config"
-	"github.com/famed-airdrop-prototype/backend/internal/database"
 	"github.com/famed-airdrop-prototype/backend/internal/ethereum"
+	"github.com/famed-airdrop-prototype/backend/internal/famedgithub"
 	"github.com/famed-airdrop-prototype/backend/internal/github"
 	"github.com/famed-airdrop-prototype/backend/internal/health"
 	"github.com/famed-airdrop-prototype/backend/internal/login"
@@ -30,19 +30,18 @@ func NewBackendServer(cfg *config.Config) (*echo.Echo, error) {
 	// TODO set correct frontend URLS
 	e.Use(
 		middleware.CORSWithConfig(middleware.CORSConfig{
-			//TODO set depending on development or production
-			AllowOrigins: []string{"http://localhost:3000"},
+			// TODO set depending on development or production
+			AllowOrigins:     []string{"http://localhost:3000"},
 			AllowCredentials: true,
-			AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
-			AllowMethods: []string{"GET", "POST"},
+			AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
+			AllowMethods:     []string{"GET", "POST"},
 		}),
 		middleware.Logger(),
 		middleware.Recover(),
 	)
 
-	// TODO make database persistent and load rewards per user
-	// New database to track paiout state
-	database := database.NewDatabase()
+	// New famedGithubClient client; handles request to the famed-github-backend
+	famedGithubClient := famedgithub.NewClient()
 	// New GitHub client; handels requests to GitHub
 	githubClient := github.NewClient(cfg.Github.ClientID, cfg.Github.ClientSecret)
 	// New Ethereum client; handels requests to a L1 or L2
@@ -63,7 +62,7 @@ func NewBackendServer(cfg *config.Config) (*echo.Echo, error) {
 	airdropGroup := e.Group("/airdrop")
 	{
 		AirdropRoutes(
-			airdropGroup, airdrop.NewHandler(githubClient, ethereumClient, database),
+			airdropGroup, airdrop.NewHandler(famedGithubClient, githubClient, ethereumClient),
 		)
 	}
 	// Health endpoints exposed for heartbeat

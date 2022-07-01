@@ -1,5 +1,5 @@
 import { useState, createContext, useEffect } from 'react';
-import { getRewards } from '../services/AirdropService';
+import { getRewardsByUser } from '../services/AirdropService';
 
 const BEARER_TOKEN_KEY: string = 'BearerToken';
 
@@ -36,7 +36,7 @@ export const SessionProvider: React.FC<Props> = ({ children }: Props) => {
       return;
     }
     // TODO dedicated user call
-    getRewards(bearerToken).then((data) => {
+    getRewardsByUser(bearerToken).then((data) => {
       setUser(data.user);
     });
   }, [bearerToken]);

@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 
 import { SessionContext } from '../context/SessionProvider';
-import { getRewards } from '../services/AirdropService';
+import { getRewardsByUser } from '../services/AirdropService';
 
 import Button from '../components/atoms/button/Button';
 
@@ -24,7 +24,7 @@ const Home: NextPage = () => {
     }
 
     setLoading(true);
-    getRewards(bearerToken).then((data) => {
+    getRewardsByUser(bearerToken).then((data) => {
       setUser(data.user);
       setRewards(data.rewards);
       setLoading(false);

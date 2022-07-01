@@ -19,28 +19,39 @@ interface IZekoGenerativeNFT {
     ) external;
 }
 
+interface IApprove {
+    function rewards(
+        bytes32 rewardId
+    ) external view returns (bytes32);
+}
+
 /// @title An example airdrop contract utilizing a zk-proof of MerkleTree inclusion.
 contract PrivateAirdrop is Ownable, IERC721Receiver {
+    uint256 constant SNARK_FIELD =
+        21888242871839275222246405745257275088548364400416034343698204186575808495617;
+
     IZekoGenerativeNFT public nftToken;
     uint256 public amountPerRedemption;
+
     IPlonkVerifier verifier;
     bytes32 public root;
     uint256 public worldBaseTokenId;
 
-    mapping(bytes32 => bool) public nullifierSpent;
+    IApprove approve;
 
-    uint256 constant SNARK_FIELD =
-        21888242871839275222246405745257275088548364400416034343698204186575808495617;
+    mapping(bytes32 => bool) public nullifierSpent;
 
     constructor(
         IZekoGenerativeNFT _nftToken,
         uint256 _amountPerRedemption,
         IPlonkVerifier _verifier,
+        IApprove _approve,
         bytes32 _root
     ) {
         nftToken = _nftToken;
         amountPerRedemption = _amountPerRedemption;
         verifier = _verifier;
+        approve = _approve;
         root = _root;
     }
 
@@ -53,29 +64,10 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
         return this.onERC721Received.selector;
     }
 
-    /// @notice verifies the proof, collects the airdrop if valid, and prevents this proof from working again.
-    function collectAirdrop(
-        bytes calldata _proof,
-        bytes32 _nullifierHash,
-        bytes32 _rewardID
-    ) external {
-        require(uint256(_nullifierHash) < SNARK_FIELD, "Nullifier is not within the field");
-        require(!nullifierSpent[_nullifierHash], "Airdrop already redeemed");
-        uint256[] memory pubSignals = new uint256[](4);
-        pubSignals[0] = uint256(root);
-        pubSignals[1] = uint256(_nullifierHash);
-        pubSignals[2] = uint256(_rewardID);
-        pubSignals[3] = uint256(uint160(msg.sender));
-        require(verifier.verifyProof(_proof, pubSignals), "Proof verification failed");
-        nullifierSpent[_nullifierHash] = true;
-        nftToken.transferFrom(address(this), msg.sender, worldBaseTokenId + pubSignals[2]);
-    }
-
-    // this function can only be called from the nftToken and passes:
-    // the Token ID of the first NFT of the collection to be airdropped
-    function setWorldBaseTokenId(uint256 _firstNFTID) external returns (uint256) {
+    /// @notice Allows only the NFT contract to up the Token Id of the first NFT of the collection to be airdropped.
+    function setWorldBaseTokenId(uint256 _firstNFTId) external returns (uint256) {
         require(msg.sender == address(nftToken));
-        worldBaseTokenId = _firstNFTID;
+        worldBaseTokenId = _firstNFTId;
         return worldBaseTokenId;
     }
 
@@ -83,5 +75,24 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
     /// @dev Function can be removed to make the merkle tree immutable. If removed, the ownable extension can also be removed for gas savings.
     function updateRoot(bytes32 _root) public onlyOwner {
         root = _root;
+    }
+
+    /// @notice verifies the proof, collects the airdrop if valid, and prevents this proof from working again.
+    function collectAirdrop(
+        bytes calldata _proof,
+        bytes32 _nullifierHash,
+        bytes32 _rewardId
+    ) external {
+        require(approve.rewards(_rewardId) != 0, "Reward has not been approved");
+        require(uint256(_nullifierHash) < SNARK_FIELD, "Nullifier is not within the field");
+        require(!nullifierSpent[_nullifierHash], "Airdrop already redeemed");
+        uint256[] memory pubSignals = new uint256[](4);
+        pubSignals[0] = uint256(root);
+        pubSignals[1] = uint256(_nullifierHash);
+        pubSignals[2] = uint256(_rewardId);
+        pubSignals[3] = uint256(uint160(msg.sender));
+        require(verifier.verifyProof(_proof, pubSignals), "Proof verification failed");
+        nullifierSpent[_nullifierHash] = true;
+        nftToken.transferFrom(address(this), msg.sender, worldBaseTokenId + pubSignals[2]);
     }
 }

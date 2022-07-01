@@ -27,6 +27,10 @@ const Background: React.FC<BackgroundProps> = () => {
     router.push('/');
   };
 
+  const handleApproveClick = async () => {
+    router.push('/approve');
+  };
+
   return (
     <div className={styles.navigation}>
       {user && (
@@ -38,12 +42,16 @@ const Background: React.FC<BackgroundProps> = () => {
       {bearerToken !== '' && (
         <>
           <MetamaskConnect />
-          {address !== '' &&
-            (router.pathname !== '/nfts' ? (
-              <Button onClick={handleNFTsClick}>See NFTs</Button>
-            ) : (
-              <Button onClick={handleHomeClick}>Home</Button>
-            ))}
+          {address !== '' && router.pathname !== '/nfts' && (
+            <Button onClick={handleNFTsClick}>See NFTs</Button>
+          )}
+          {router.pathname !== '/approve' && (
+            <Button onClick={handleApproveClick}>Approve</Button>
+          )}
+          {router.pathname !== '/' && (
+            <Button onClick={handleHomeClick}>Home</Button>
+          )}
+
           <Button onClick={handleLogoutClick}>Log Out</Button>
         </>
       )}

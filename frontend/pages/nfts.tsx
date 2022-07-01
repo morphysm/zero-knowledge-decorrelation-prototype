@@ -25,7 +25,6 @@ const NFTs: NextPage = () => {
 
     setLoading(true);
     getNFTs(address).then((nfts) => setnfts(nfts));
-    console.log(nfts);
     setLoading(false);
   }, [bearerToken]);
 

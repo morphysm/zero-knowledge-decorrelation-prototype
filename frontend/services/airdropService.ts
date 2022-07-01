@@ -2,26 +2,59 @@
 // You have to add the protocol name here see https://stackoverflow.com/questions/69150593/next-js-localhost-is-prepended-when-making-external-api-call
 const baseURL: string = 'http://127.0.0.1:8080';
 
-interface RewardResponse {
+interface UserRewardResponse {
   user: User;
   rewards: Reward[];
 }
 
-export const getRewards = async (
+export const getRewardsByUser = async (
   accessToken: string
-): Promise<RewardResponse> => {
+): Promise<UserRewardResponse> => {
   const requestOptions: RequestInit = {
     method: 'GET',
-    // credentials: 'include',
     mode: 'cors',
     headers: {
       authorization: 'Bearer ' + accessToken,
     },
   };
   try {
-    const response = await fetch(`${baseURL}/airdrop/rewards`, requestOptions);
-    const data: RewardResponse = await response.json();
-    console.log(data);
+    const response = await fetch(
+      `${baseURL}/airdrop/user/rewards`,
+      requestOptions
+    );
+    const data: UserRewardResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    return Promise.reject(error);
+  }
+};
+
+interface RepoRewardsResponse {
+  repos: RepoRewards[];
+}
+
+interface RepoRewards {
+  name: string;
+  rewards: Reward[];
+}
+
+export const getRewardsByRepo = async (
+  accessToken: string
+): Promise<RepoRewardsResponse> => {
+  const requestOptions: RequestInit = {
+    method: 'GET',
+    mode: 'cors',
+    headers: {
+      authorization: 'Bearer ' + accessToken,
+    },
+  };
+  try {
+    const response = await fetch(
+      `${baseURL}/airdrop/repo/rewards`,
+      requestOptions
+    );
+    const data: RepoRewardsResponse = await response.json();
     return data;
   } catch (error) {
     console.error(error);
