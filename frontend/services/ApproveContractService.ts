@@ -4,8 +4,19 @@ import { getApproveAddress } from './AddressService';
 
 interface ApprovedResponse {
   approved: boolean;
-  value?: string;
+  approvedValue?: string;
 }
+
+export const appendApproval = async (
+  suggestedRewards: Reward[]
+): Promise<Reward[]> => {
+  return Promise.all(
+    suggestedRewards.map(async (suggestedReward) => {
+      const approvedResponse = await getValue(suggestedReward.id);
+      return { ...suggestedReward, ...approvedResponse };
+    })
+  );
+};
 
 // TODO naming
 export const getValue = async (rewardId: string): Promise<ApprovedResponse> => {
@@ -26,7 +37,7 @@ export const getValue = async (rewardId: string): Promise<ApprovedResponse> => {
   ) {
     return { approved: false };
   }
-  return { approved: true, value: utils.parseBytes32String(value) };
+  return { approved: true, approvedValue: utils.parseBytes32String(value) };
 };
 
 export const getOwner = async (): Promise<string> => {

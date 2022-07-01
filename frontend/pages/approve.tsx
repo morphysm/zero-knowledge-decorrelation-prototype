@@ -9,6 +9,7 @@ import {
   getValue,
   getOwner,
   postApproval,
+  appendApproval,
 } from '../services/ApproveContractService';
 
 import { SessionContext } from '../context/SessionProvider';
@@ -17,16 +18,9 @@ import Button from '../components/atoms/button/Button';
 import styles from '../styles/Home.module.css';
 import { MetamaskContext } from '../context/MetamaskProvider';
 
-interface Approved {
-  approved: boolean;
-  value?: string;
-}
-
-type RewardApproved = Reward & Approved;
-
 interface Repo {
   name: string;
-  rewards: RewardApproved[];
+  rewards: Reward[];
 }
 
 const Home: NextPage = () => {
@@ -61,13 +55,10 @@ const Home: NextPage = () => {
     // Load approval for all rewards from approval smart contract
     let rewardsApproved = await Promise.all(
       rewardsResponse.repos.map(async (repo) => {
-        const rewardsApproved = await Promise.all(
-          repo.rewards.map(async (reward): Promise<RewardApproved> => {
-            const approved = await getValue(reward.id);
-            return { ...reward, ...approved };
-          })
-        );
-        return { name: repo.name, rewards: rewardsApproved };
+        return {
+          name: repo.name,
+          rewards: await appendApproval(repo.rewards),
+        };
       })
     );
 
@@ -98,7 +89,7 @@ const Home: NextPage = () => {
             <ul>
               {repo.rewards.map((reward, j) => (
                 <li key={`repo_${j}`}>
-                  <span>{reward.id}</span> <span>{reward.value}</span>{' '}
+                  <span>{reward.id}</span> <span>{reward.suggestedReward}</span>{' '}
                   <span>{reward.date}</span> <span>{reward.url}</span>{' '}
                   {reward.approved ? (
                     <span>Approved</span>
@@ -108,7 +99,7 @@ const Home: NextPage = () => {
                         {' '}
                         <ApproveButton
                           rewardId={reward.id}
-                          reward={reward.value}
+                          reward={reward.suggestedReward}
                         />
                       </span>
                     )

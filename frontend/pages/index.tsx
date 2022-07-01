@@ -8,6 +8,7 @@ import { getRewardsByUser } from '../services/AirdropService';
 import Button from '../components/atoms/button/Button';
 
 import styles from '../styles/Home.module.css';
+import { appendApproval } from '../services/ApproveContractService';
 
 const Home: NextPage = () => {
   const router = useRouter();
@@ -26,7 +27,9 @@ const Home: NextPage = () => {
     setLoading(true);
     getRewardsByUser(bearerToken).then((data) => {
       setUser(data.user);
-      setRewards(data.rewards);
+      appendApproval(data.rewards).then((rewards) => {
+        setRewards(rewards);
+      });
       setLoading(false);
     });
   }, [bearerToken]);
@@ -58,17 +61,26 @@ const Home: NextPage = () => {
       <ul className={styles.list}>
         {rewards.map((reward, i) => (
           <li key={`reward_${i}`}>
-            <span>{reward.id}</span> <span>{reward.value}</span>{' '}
+            <span>{reward.id}</span>{' '}
+            <span>
+              {reward.approvedReward
+                ? reward.approvedReward
+                : reward.suggestedReward}
+            </span>{' '}
             <span>{reward.date}</span> <span>{reward.url}</span>{' '}
-            {reward.claimed ? (
+            {reward.claimed && (
               <span>
                 {' '}
                 <Button onClick={() => handleCollectClick(reward.id)}>
                   Collect
                 </Button>
               </span>
-            ) : (
+            )}
+            {reward.approved && (
               <Button onClick={() => handleClaimClick(reward.id)}>Claim</Button>
+            )}
+            {!reward.claimed && !reward.approved && (
+              <span>Waiting for approval</span>
             )}
           </li>
         ))}
