@@ -96,8 +96,8 @@ const Home: NextPage = () => {
           <li key={`reward_${i}`}>
             <h4>{repo.name}</h4>
             <ul>
-              {repo.rewards.map((reward) => (
-                <li>
+              {repo.rewards.map((reward, j) => (
+                <li key={`repo_${j}`}>
                   <span>{reward.id}</span> <span>{reward.value}</span>{' '}
                   <span>{reward.date}</span> <span>{reward.url}</span>{' '}
                   {reward.approved ? (
