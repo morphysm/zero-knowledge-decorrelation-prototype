@@ -1,15 +1,8 @@
 // TODO use env variable
 // You have to add the protocol name here see https://stackoverflow.com/questions/69150593/next-js-localhost-is-prepended-when-making-external-api-call
-const baseURL: string = 'http://127.0.0.1:8080';
+const baseURL: string = 'http://127.0.0.1:8081';
 
-interface UserRewardResponse {
-  user: User;
-  rewards: Reward[];
-}
-
-export const getRewardsByUser = async (
-  accessToken: string
-): Promise<UserRewardResponse> => {
+export const getUser = async (accessToken: string): Promise<User> => {
   const requestOptions: RequestInit = {
     method: 'GET',
     mode: 'cors',
@@ -18,11 +11,8 @@ export const getRewardsByUser = async (
     },
   };
   try {
-    const response = await fetch(
-      `${baseURL}/airdrop/user/rewards`,
-      requestOptions
-    );
-    const data: UserRewardResponse = await response.json();
+    const response = await fetch(`${baseURL}/airdrop/users`, requestOptions);
+    const data: User = await response.json();
     return data;
   } catch (error) {
     console.error(error);
@@ -30,18 +20,9 @@ export const getRewardsByUser = async (
   }
 };
 
-interface RepoRewardsResponse {
-  repos: RepoRewards[];
-}
-
-interface RepoRewards {
-  name: string;
-  rewards: Reward[];
-}
-
-export const getRewardsByRepo = async (
+export const getRewardsByUser = async (
   accessToken: string
-): Promise<RepoRewardsResponse> => {
+): Promise<RewardResponse> => {
   const requestOptions: RequestInit = {
     method: 'GET',
     mode: 'cors',
@@ -51,10 +32,33 @@ export const getRewardsByRepo = async (
   };
   try {
     const response = await fetch(
-      `${baseURL}/airdrop/repo/rewards`,
+      `${baseURL}/airdrop/users/rewards`,
       requestOptions
     );
-    const data: RepoRewardsResponse = await response.json();
+    const data: RewardResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    return Promise.reject(error);
+  }
+};
+
+export const getRewardsByOwner = async (
+  accessToken: string
+): Promise<RewardResponse> => {
+  const requestOptions: RequestInit = {
+    method: 'GET',
+    mode: 'cors',
+    headers: {
+      authorization: 'Bearer ' + accessToken,
+    },
+  };
+  try {
+    const response = await fetch(
+      `${baseURL}/airdrop/owners/rewards`,
+      requestOptions
+    );
+    const data: RewardResponse = await response.json();
     return data;
   } catch (error) {
     console.error(error);

@@ -1,12 +1,12 @@
 import { useState, createContext, useEffect } from 'react';
-import { getRewardsByUser } from '../services/AirdropService';
-
-const BEARER_TOKEN_KEY: string = 'BearerToken';
+import { getUser } from '../services/AirdropService';
+import { supabase } from '../services/SuperbaseService';
+import { Session } from '@supabase/supabase-js';
 
 type ContextType = {
-  bearerToken: string;
+  session: Session | null;
   user: User | null;
-  setBearerToken: (bearerToken: string) => void;
+  logOut: () => void;
 };
 
 type Props = {
@@ -14,51 +14,45 @@ type Props = {
 };
 
 export const SessionContext = createContext<ContextType>({
-  bearerToken: '',
+  session: null,
   user: null,
-  setBearerToken: () => {},
+  logOut: () => {},
 });
 
 export const SessionProvider: React.FC<Props> = ({ children }: Props) => {
-  const [bearerToken, setBearerTokenInternal] = useState<string>('');
+  const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const bearerToken = localStorage.getItem(BEARER_TOKEN_KEY);
-    if (bearerToken) {
-      setBearerTokenInternal(bearerToken);
-    }
-  });
+    setSession(supabase.auth.session());
+    loadUser(session);
 
-  useEffect(() => {
-    if (bearerToken === '') {
-      setUser(null);
-      return;
-    }
-    // TODO dedicated user call
-    getRewardsByUser(bearerToken).then((data) => {
-      setUser(data.user);
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      loadUser(session);
     });
-  }, [bearerToken]);
+  }, []);
 
-  const updateLocalStorage = (key: string, value: string) => {
-    if (value === '') {
-      return localStorage.removeItem(key);
+  const loadUser = async (session: Session | null) => {
+    if (session !== null && session.provider_token) {
+      const user = await getUser(session.provider_token);
+      console.log('Hey', user);
+      setUser(user);
     }
-    return localStorage.setItem(key, value);
   };
 
-  const setBearerToken = (bearerToken: string) => {
-    updateLocalStorage(BEARER_TOKEN_KEY, bearerToken);
-    setBearerTokenInternal(bearerToken);
+  const logOut = async () => {
+    setUser(null);
+    setSession(null);
+    await supabase.auth.signOut();
   };
 
   return (
     <SessionContext.Provider
       value={{
         user,
-        bearerToken,
-        setBearerToken,
+        session,
+        logOut,
       }}
     >
       {children}

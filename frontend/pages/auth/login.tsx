@@ -1,38 +1,26 @@
 import React, { useContext, useEffect } from 'react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import Button from '../../components/atoms/button/Button';
+
 import { SessionContext } from '../../context/SessionProvider';
 import styles from '../../styles/Home.module.css';
+import GitHubLogin from '../../components/molecule/gitHubLogin/GitHubLogin';
 
 const LoginPage: NextPage = () => {
   const router = useRouter();
-  const { bearerToken, setBearerToken } = useContext(SessionContext);
-
-  const handleClick = async () => {
-    window.open('http://localhost:8080/login', '_self');
-  };
+  const { session } = useContext(SessionContext);
 
   useEffect(() => {
-    if (bearerToken !== '') {
+    if (session !== null) {
       router.push('/');
     }
-    if (router.query.accessToken) {
-      const uri = window.location.toString();
-      if (uri.indexOf('?') > 0) {
-        const clean_uri = uri.substring(0, uri.indexOf('?'));
-        window.history.replaceState({}, document.title, clean_uri);
-      }
-      setBearerToken(router.query.accessToken as string);
-    }
-  }, [router, bearerToken]);
+  }, [session]);
 
   return (
     <div className={styles.padding}>
-      {/* <img src={shiImg} alt={'shi'} /> */}
       <h1>Famed Airdrop Prototype</h1>
       <h3>Claim and Collect Famed Rewards</h3>
-      <Button onClick={handleClick}>Login with GitHub</Button>
+      <GitHubLogin />
     </div>
   );
 };

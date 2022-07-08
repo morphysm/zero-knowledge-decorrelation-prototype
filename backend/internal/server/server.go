@@ -12,7 +12,6 @@ import (
 	"github.com/famed-airdrop-prototype/backend/internal/famedgithub"
 	"github.com/famed-airdrop-prototype/backend/internal/github"
 	"github.com/famed-airdrop-prototype/backend/internal/health"
-	"github.com/famed-airdrop-prototype/backend/internal/login"
 )
 
 // NewServer returns an echo server with default configuration
@@ -27,10 +26,9 @@ func NewBackendServer(cfg *config.Config) (*echo.Echo, error) {
 	e.Validator = &CustomValidator{validator: validator.New()}
 
 	// Middleware
-	// TODO set correct frontend URLS
 	e.Use(
 		middleware.CORSWithConfig(middleware.CORSConfig{
-			// TODO set depending on development or production
+			// TODO set depending on development or production via config
 			AllowOrigins:     []string{"http://localhost:3000"},
 			AllowCredentials: true,
 			AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
@@ -40,24 +38,18 @@ func NewBackendServer(cfg *config.Config) (*echo.Echo, error) {
 		middleware.Recover(),
 	)
 
+	// TODO set via config
 	// New famedGithubClient client; handles request to the famed-github-backend
-	famedGithubClient := famedgithub.NewClient()
-	// New GitHub client; handels requests to GitHub
+	famedGithubClient := famedgithub.NewClient("http://localhost:8080/famed/")
+	// New GitHub client; handles requests to GitHub
 	githubClient := github.NewClient(cfg.Github.ClientID, cfg.Github.ClientSecret)
-	// New Ethereum client; handels requests to a L1 or L2
+	// New Ethereum client; handles requests to a L1 or L2
 	ethClient, err := ethclient.Dial(cfg.Ethereum.RPCEndpoint)
 	if err != nil {
 		return nil, err
 	}
 	ethereumClient := ethereum.NewClient(ethClient, cfg.Ethereum.Address, cfg.Ethereum.PrivateKey, cfg.Ethereum.AirdropAddress)
-
-	// Login endpoints exposed for login with GitHub
-	loginGroup := e.Group("/login")
-	{
-		LoginRoutes(
-			loginGroup, login.NewHandler(githubClient),
-		)
-	}
+	
 	// Airdrop endpoints exposed for airdrop I/O
 	airdropGroup := e.Group("/airdrop")
 	{

@@ -4,23 +4,26 @@ import { getApproveAddress } from './AddressService';
 
 interface ApprovedResponse {
   approved: boolean;
-  approvedValue?: string;
+  value?: string;
 }
 
-export const appendApproval = async (
-  suggestedRewards: Reward[]
-): Promise<Reward[]> => {
-  return Promise.all(
-    suggestedRewards.map(async (suggestedReward) => {
-      const approvedResponse = await getValue(suggestedReward.id);
-      return { ...suggestedReward, ...approvedResponse };
-    })
-  );
-};
+// TODO romove if unneded
+// export const appendApproval = async (
+//   suggestedRewards: Reward[]
+// ): Promise<Reward[]> => {
+//   return Promise.all(
+//     suggestedRewards.map(async (suggestedReward) => {
+//       const approvedResponse = await getValue(suggestedReward.id);
+//       return { ...suggestedReward, ...approvedResponse };
+//     })
+//   );
+// };
 
 // TODO naming
 export const getValue = async (rewardId: string): Promise<ApprovedResponse> => {
+  console.log(window.ethereum);
   if (!window.ethereum) {
+    console.log('not con');
     throw new Error('could not connect to metamask');
   }
 
@@ -30,14 +33,20 @@ export const getValue = async (rewardId: string): Promise<ApprovedResponse> => {
     provider
   );
 
-  const value = await approve.rewards(utils.formatBytes32String(rewardId));
+  console.log('A');
+
+  let value;
+
+  value = await approve.rewards(utils.formatBytes32String(rewardId));
+
+  console.log('B');
   if (
     value ===
     '0x0000000000000000000000000000000000000000000000000000000000000000'
   ) {
     return { approved: false };
   }
-  return { approved: true, approvedValue: utils.parseBytes32String(value) };
+  return { approved: true, value: utils.parseBytes32String(value) };
 };
 
 export const getOwner = async (): Promise<string> => {

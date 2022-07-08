@@ -5,42 +5,40 @@ import { useContext, useEffect, useState } from 'react';
 import { SessionContext } from '../context/SessionProvider';
 import { getRewardsByUser } from '../services/AirdropService';
 
-import Button from '../components/atoms/button/Button';
-
 import styles from '../styles/Home.module.css';
-import { appendApproval } from '../services/ApproveContractService';
+import RewardApproval from '../components/molecule/rewardApproval/RewardApproval';
+import Typography from '@mui/material/Typography';
 
 const Home: NextPage = () => {
   const router = useRouter();
-  const { bearerToken } = useContext(SessionContext);
+  const { session } = useContext(SessionContext);
 
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [rewards, setRewards] = useState<Repo[]>([]);
   const [isLoading, setLoading] = useState(false);
 
-  const [user, setUser] = useState<User | null>(null);
-  const [rewards, setRewards] = useState<Reward[]>([]);
-
   useEffect(() => {
-    if (bearerToken === '') {
+    if (session === null) {
       router.push('/auth/login');
+      return;
+    }
+
+    if (
+      session.provider_token === null ||
+      session.provider_token === undefined
+    ) {
+      setErrorMessage(
+        'missing provider_token in session, please log out and login. If the issue persists, please contact contact@morphysm.com.'
+      );
+      return;
     }
 
     setLoading(true);
-    getRewardsByUser(bearerToken).then((data) => {
-      setUser(data.user);
-      appendApproval(data.rewards).then((rewards) => {
-        setRewards(rewards);
-      });
+    getRewardsByUser(session.provider_token).then((data) => {
+      setRewards(data.repos);
       setLoading(false);
     });
-  }, [bearerToken]);
-
-  const handleClaimClick = (rewardId: string) => {
-    router.push(`/airdrop/claim/${rewardId}`);
-  };
-
-  const handleCollectClick = async (rewardId: string) => {
-    router.push(`/airdrop/collect/${rewardId}`);
-  };
+  }, [session]);
 
   if (isLoading)
     return (
@@ -48,7 +46,12 @@ const Home: NextPage = () => {
         <p>Loading...</p>
       </div>
     );
-  if (!user)
+
+  if (errorMessage) {
+    return <Typography color='red'>Error: {errorMessage}</Typography>;
+  }
+
+  if (rewards.length === 0)
     return (
       <div className={styles.padding}>
         <p>No reward data</p>
@@ -59,29 +62,18 @@ const Home: NextPage = () => {
     <div className={styles.padding}>
       <h3>Rewards:</h3>
       <ul className={styles.list}>
-        {rewards.map((reward, i) => (
-          <li key={`reward_${i}`}>
-            <span>{reward.id}</span>{' '}
-            <span>
-              {reward.approvedReward
-                ? reward.approvedReward
-                : reward.suggestedReward}
-            </span>{' '}
-            <span>{reward.date}</span> <span>{reward.url}</span>{' '}
-            {reward.claimed && (
-              <span>
-                {' '}
-                <Button onClick={() => handleCollectClick(reward.id)}>
-                  Collect
-                </Button>
-              </span>
-            )}
-            {reward.approved && (
-              <Button onClick={() => handleClaimClick(reward.id)}>Claim</Button>
-            )}
-            {!reward.claimed && !reward.approved && (
-              <span>Waiting for approval</span>
-            )}
+        {rewards.map((repo, i) => (
+          <li key={`repo_${repo.name}`}>
+            <span>{repo.name}</span>
+            <ul>
+              {repo.issues.map((issue) => (
+                <li key={`repo_${repo.name}_issue_${issue.id}`}>
+                  <a href={issue.htmlurl}>Number: {issue.number}</a>{' '}
+                  <span>{issue.contributors[0].rewardSum}</span>
+                  <RewardApproval id={issue.id.toString(10)}></RewardApproval>
+                </li>
+              ))}
+            </ul>
           </li>
         ))}
       </ul>

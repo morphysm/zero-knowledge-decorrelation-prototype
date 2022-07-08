@@ -4,66 +4,53 @@ import { useContext, useEffect, useState } from 'react';
 
 import Alert from '@mui/material/Alert';
 
-import { getRewardsByRepo } from '../services/AirdropService';
-import {
-  getValue,
-  getOwner,
-  postApproval,
-  appendApproval,
-} from '../services/ApproveContractService';
+import { getRewardsByOwner } from '../services/AirdropService';
+import { getOwner, postApproval } from '../services/ApproveContractService';
 
 import { SessionContext } from '../context/SessionProvider';
 import Button from '../components/atoms/button/Button';
 
 import styles from '../styles/Home.module.css';
 import { MetamaskContext } from '../context/MetamaskProvider';
-
-interface Repo {
-  name: string;
-  rewards: Reward[];
-}
+import RewardApproval from '../components/molecule/rewardApproval/RewardApproval';
+import Typography from '@mui/material/Typography';
 
 const Home: NextPage = () => {
   const router = useRouter();
 
-  const { bearerToken } = useContext(SessionContext);
+  const { session } = useContext(SessionContext);
   const { address } = useContext(MetamaskContext);
 
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const [isLoading, setLoading] = useState(true);
-  const [repos, setRepos] = useState<Repo[]>([]);
+  const [rewards, setRewards] = useState<Repo[]>([]);
   const [owner, setOwner] = useState<string>('');
 
   useEffect(() => {
-    if (bearerToken === '') {
+    if (session === null) {
       router.push('/auth/login');
+      return;
+    }
+
+    if (
+      session.provider_token === null ||
+      session.provider_token === undefined
+    ) {
+      setErrorMessage(
+        'missing provider_token in session, please log out and login. If the issue persists, please contact contact@morphysm.com.'
+      );
+      return;
     }
 
     setLoading(true);
-
-    loadData(bearerToken).then(() => {
+    loadOwner();
+    getRewardsByOwner(session.provider_token).then((data) => {
+      console.log(data);
+      setRewards(data.repos);
       setLoading(false);
     });
-  }, [bearerToken]);
-
-  const loadData = async (bearerToken: string): Promise<void> => {
-    await Promise.all([loadRewardsApproved(bearerToken), loadOwner()]);
-  };
-
-  const loadRewardsApproved = async (bearerToken: string): Promise<void> => {
-    const rewardsResponse = await getRewardsByRepo(bearerToken);
-
-    // Load approval for all rewards from approval smart contract
-    let rewardsApproved = await Promise.all(
-      rewardsResponse.repos.map(async (repo) => {
-        return {
-          name: repo.name,
-          rewards: await appendApproval(repo.rewards),
-        };
-      })
-    );
-
-    setRepos(rewardsApproved);
-  };
+  }, [session]);
 
   const loadOwner = async (): Promise<void> => {
     const owner = await getOwner();
@@ -78,32 +65,24 @@ const Home: NextPage = () => {
     );
   }
 
+  if (errorMessage) {
+    return <Typography color='red'>Error: {errorMessage}</Typography>;
+  }
+
   return (
     <div className={styles.padding}>
       <Warning address={address} owner={owner} />
       <h3>Rewards:</h3>
       <ul className={styles.list}>
-        {repos.map((repo, i) => (
-          <li key={`reward_${i}`}>
-            <h4>{repo.name}</h4>
+        {rewards.map((repo, i) => (
+          <li key={`repo_${repo.name}`}>
+            <span>{repo.name}</span>
             <ul>
-              {repo.rewards.map((reward, j) => (
-                <li key={`repo_${j}`}>
-                  <span>{reward.id}</span> <span>{reward.suggestedReward}</span>{' '}
-                  <span>{reward.date}</span> <span>{reward.url}</span>{' '}
-                  {reward.approved ? (
-                    <span>Approved</span>
-                  ) : (
-                    address.toLowerCase() === owner.toLowerCase() && (
-                      <span>
-                        {' '}
-                        <ApproveButton
-                          rewardId={reward.id}
-                          reward={reward.suggestedReward}
-                        />
-                      </span>
-                    )
-                  )}
+              {repo.issues.map((issue) => (
+                <li key={`repo_${repo.name}_issue_${issue.id}`}>
+                  <a href={issue.htmlurl}>Number: {issue.number}</a>{' '}
+                  <span>{issue.contributors[0].rewardSum}</span>
+                  <RewardApproval id={issue.id.toString(10)}></RewardApproval>
                 </li>
               ))}
             </ul>

@@ -1,8 +1,11 @@
-import { Button, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
+import { Button, Typography } from '@mui/material';
+import { ExternalProvider } from '@ethersproject/providers';
+import { MetaMaskInpageProvider } from '@metamask/providers';
+
 import { MetamaskContext } from '../../../context/MetamaskProvider';
 
-const MetamaskConnect = () => {
+const MetamaskConnect: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { address, setAddress } = useContext(MetamaskContext);
 
@@ -10,22 +13,13 @@ const MetamaskConnect = () => {
     if (window.ethereum) {
       window.ethereum.on('accountsChanged', accountsChanged);
       window.ethereum.on('chainChanged', chainChanged);
+      reqestAccounts(window.ethereum);
     }
-  }, []);
+  }, [window.ethereum]);
 
   const connectHandler = async () => {
     if (window.ethereum) {
-      try {
-        const res = await window.ethereum.request<string[]>({
-          method: 'eth_requestAccounts',
-        });
-        if (res && res[0]) {
-          setAddress(res[0]);
-        }
-      } catch (err) {
-        console.error(err);
-        setErrorMessage('There was a problem connecting to MetaMask');
-      }
+      await reqestAccounts(window.ethereum);
     } else {
       setErrorMessage('Install MetaMask');
     }
@@ -42,6 +36,22 @@ const MetamaskConnect = () => {
     setAddress('');
   };
 
+  const reqestAccounts = async (
+    ethereum: ExternalProvider & MetaMaskInpageProvider
+  ) => {
+    try {
+      const res = await ethereum.request<string[]>({
+        method: 'eth_requestAccounts',
+      });
+      if (res && res[0]) {
+        setAddress(res[0]);
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMessage('There was a problem connecting to MetaMask');
+    }
+  };
+
   return (
     <>
       {address ? (
@@ -50,9 +60,7 @@ const MetamaskConnect = () => {
         <Button onClick={connectHandler}>Connect Metamask</Button>
       )}
       {errorMessage ? (
-        <Typography variant='body1' color='red'>
-          Error: {errorMessage}
-        </Typography>
+        <Typography color='red'>Error: {errorMessage}</Typography>
       ) : null}
     </>
   );

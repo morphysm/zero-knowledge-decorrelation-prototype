@@ -2,90 +2,69 @@ package famedgithub
 
 import (
 	"context"
-	"time"
+	"encoding/json"
+	"io"
+	"net/http"
 )
 
 type Client interface {
-	GetOwnedRepos(ctx context.Context, userLogin string) []Repo
-	GetProposedRewardsByRepo(ctx context.Context, repoName string) []Reward
-
-	GetProposedRewardsByUser(ctx context.Context, repoName string) []Reward
+	GetRewardsByOwner(ctx context.Context, repoName string) ([]byte, error)
+	GetRewardsByContributor(ctx context.Context, repoName string) ([]byte, error)
 }
 
-type client struct{}
-
-func NewClient() Client {
-	return &client{}
+// client
+type client struct {
+	baseURL string
+	//apiKey    string
+	//apiSecret string
+	client *http.Client
 }
 
-type Repo struct {
-	Name string `json:"name"`
-	URL  string `json:"url"`
+// NewClient returns a new instance of the famed-github-backend client.
+func NewClient(baseURL string) Client {
+	return &client{
+		baseURL: baseURL,
+		client:  http.DefaultClient,
+	}
 }
 
-// GetOwnedRepos returns all famed enabled reposed owned by a user.
-func (c *client) GetOwnedRepos(ctx context.Context, userLogin string) []Repo {
-	mockResponse := []Repo{{Name: "MockRepo1", URL: "https://github.com/"}, {Name: "MockRepo2", URL: "https://github.com/"}}
-
-	return mockResponse
-}
-
-type Reward struct {
-	ID string `json:"id"`
-	// SuggestedReward could be monetary value or NFT, to be defined
-	SuggestedReward string    `json:"suggestedReward"`
-	Date            time.Time `json:"date"`
-	URL             string    `json:"url"`
-}
-
-// GetProposedRewardsByRepo returns the list of rewards proposed by the fame protocol of a repo.
-func (c *client) GetProposedRewardsByRepo(ctx context.Context, repoName string) []Reward {
-	mockResponse := []Reward{
-		{
-			ID:              "1",
-			SuggestedReward: "NFT_1",
-			Date:            time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC),
-			URL:             "https://github.com/",
-		},
-		{
-			ID:              "2",
-			SuggestedReward: "NFT_2",
-			Date:            time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC),
-			URL:             "https://github.com/",
-		},
-		{
-			ID:              "3",
-			SuggestedReward: "NFT_3",
-			Date:            time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC),
-			URL:             "https://github.com/",
-		},
-		{
-			ID:              "4",
-			SuggestedReward: "NFT_4",
-			Date:            time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC),
-			URL:             "https://github.com/",
-		},
+// execute executes a http request.
+func (c *client) execute(ctx context.Context, method string, path string, obj interface{}, bytes *[]byte) (*http.Response, error) {
+	// Prepare request to send
+	req, err := http.NewRequestWithContext(ctx, method, c.baseURL+path, nil)
+	if err != nil {
+		return nil, err
 	}
 
-	return mockResponse
-}
-
-// GetProposedRewardsByUser returns the list of rewards proposed by the fame protocol of a user.
-func (c *client) GetProposedRewardsByUser(ctx context.Context, repoName string) []Reward {
-	mockResponse := []Reward{
-		{
-			ID:              "2",
-			SuggestedReward: "NFT_2",
-			Date:            time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC),
-			URL:             "https://github.com/",
-		},
-		{
-			ID:              "4",
-			SuggestedReward: "NFT_4",
-			Date:            time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC),
-			URL:             "https://github.com/",
-		},
+	// Set headers
+	req.Header.Add(http.CanonicalHeaderKey("Accept"), "application/json;version=1")
+	if method == http.MethodPost || method == http.MethodPut || method == http.MethodPatch {
+		req.Header.Add(http.CanonicalHeaderKey("Content-Type"), "application/json;charset=UTF-8")
 	}
 
-	return mockResponse
+	// Send the request
+	// TODO Add status code check
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return resp, err
+	}
+
+	defer resp.Body.Close()
+	if bytes != nil {
+		*bytes, err = io.ReadAll(resp.Body)
+		if err != nil {
+			return resp, err
+		}
+	}
+
+	if obj != nil {
+		// Decode the response body
+		decoder := json.NewDecoder(resp.Body)
+		err = decoder.Decode(&obj)
+		if err != nil {
+			return resp, err
+		}
+	}
+
+	return resp, err
 }

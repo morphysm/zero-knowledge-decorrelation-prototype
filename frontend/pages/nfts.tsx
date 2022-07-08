@@ -11,22 +11,21 @@ import styles from '../styles/Home.module.css';
 
 const NFTs: NextPage = () => {
   const router = useRouter();
-  const { bearerToken } = useContext(SessionContext);
+  const { session } = useContext(SessionContext);
   const { address } = useContext(MetamaskContext);
 
   const [isLoading, setLoading] = useState(false);
-  const [nfts, setnfts] = useState<ZekoGenerativeNFT[]>([]);
+  const [nfts, setNFTs] = useState<ZekoGenerativeNFT[]>([]);
 
   useEffect(() => {
-    console.log('bearerToken', bearerToken);
-    if (bearerToken === '') {
+    if (session === null) {
       router.push('/auth/login');
     }
 
     setLoading(true);
-    getNFTs(address).then((nfts) => setnfts(nfts));
+    getNFTs(address).then((nfts) => setNFTs(nfts));
     setLoading(false);
-  }, [bearerToken]);
+  }, [session]);
 
   if (isLoading)
     return (

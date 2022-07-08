@@ -9,8 +9,10 @@ import (
 )
 
 type HTTPHandler interface {
+	GetUser(c echo.Context) error
+
 	GetRewardsByUser(c echo.Context) error
-	GetRewardsByRepo(c echo.Context) error
+	GetRewardsByOwner(c echo.Context) error
 
 	GetZkey(c echo.Context) error
 	GetPublicCommitments(c echo.Context) error

@@ -1,22 +1,19 @@
 import styles from './Navigation.module.css';
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { SessionContext } from '../../../context/SessionProvider';
 import { MetamaskContext } from '../../../context/MetamaskProvider';
+import { supabase } from '../../../services/SuperbaseService';
 
 import Button from '../../atoms/button/Button';
 import MetamaskConnect from '../../molecule/metamaskConnect/MetamaskConnect';
 import router from 'next/router';
 
-interface BackgroundProps {
-  user?: User;
-}
-
-const Background: React.FC<BackgroundProps> = () => {
-  const { user, bearerToken, setBearerToken } = useContext(SessionContext);
+const Navigation: React.FC = () => {
+  const { session, user, logOut } = useContext(SessionContext);
   const { address } = useContext(MetamaskContext);
 
   const handleLogoutClick = async () => {
-    setBearerToken('');
+    await logOut();
   };
 
   const handleNFTsClick = async () => {
@@ -39,7 +36,7 @@ const Background: React.FC<BackgroundProps> = () => {
           <span>{user.login}</span>
         </div>
       )}
-      {bearerToken !== '' && (
+      {session !== null && (
         <>
           <MetamaskConnect />
           {address !== '' && router.pathname !== '/nfts' && (
@@ -59,4 +56,4 @@ const Background: React.FC<BackgroundProps> = () => {
   );
 };
 
-export default Background;
+export default Navigation;
