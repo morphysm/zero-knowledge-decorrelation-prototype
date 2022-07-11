@@ -1,7 +1,4 @@
-node_modules
-typechain
-artifacts
-cache
-local
-build
-coverage
+circuits/build
+/node_modules
+.vscode
+__debug_bin

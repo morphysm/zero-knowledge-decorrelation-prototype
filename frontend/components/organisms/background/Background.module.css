@@ -1,0 +1,189 @@
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -100;
+  width: 100%;
+  height: 100%;
+  background-color: #f9fdff;
+}
+
+.desktopCircle1 {
+  position: fixed;
+  width: 350px;
+  height: 350px;
+  left: -150px;
+  top: 200px;
+
+  background: linear-gradient(180deg, #ff52c4 0%, #009ee3 100%);
+  opacity: 0.35;
+  filter: blur(100px);
+  transform: rotate(150deg);
+}
+
+.desktopCircle2 {
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  left: -150px;
+  top: 400px;
+
+  background: linear-gradient(180deg, #ff52c4 0%, #009ee3 100%);
+  opacity: 0.35;
+  filter: blur(100px);
+  transform: rotate(-120deg);
+}
+
+.desktopCircle3 {
+  position: absolute;
+  width: 480px;
+  height: 480px;
+  right: -300px;
+  bottom: -150px;
+
+  background: linear-gradient(180deg, #ff52c4 0%, #009ee3 100%);
+  opacity: 0.35;
+  filter: blur(100px);
+  transform: rotate(-150deg);
+}
+
+.desktopCircle4 {
+  position: absolute;
+  width: 480px;
+  height: 480px;
+  right: -100px;
+  bottom: -300px;
+
+  background: linear-gradient(180deg, #ff52c4 0%, #009ee3 100%);
+  opacity: 0.35;
+  filter: blur(100px);
+  transform: rotate(-60deg);
+}
+
+.mobileCircle1 {
+  position: fixed;
+  background: linear-gradient(180deg, #ff52c4 0%, #009ee3 100%);
+  opacity: 0.35;
+  filter: blur(100px);
+  transform: rotate(-81.68deg);
+  display: block;
+
+  width: 700px;
+  height: 700px;
+  left: -150px;
+  top: -500px;
+}
+
+.mobileCircle2 {
+  position: fixed;
+  background: linear-gradient(180deg, #ff52c4 0%, #009ee3 100%);
+  opacity: 0.35;
+  filter: blur(100px);
+  transform: rotate(-81.68deg);
+  display: block;
+
+  width: 500px;
+  height: 500px;
+  left: 350px;
+  top: -200px;
+}
+
+.mobileCircle3 {
+  position: fixed;
+  background: linear-gradient(180deg, #ff52c4 0%, #009ee3 100%);
+  opacity: 0.35;
+  filter: blur(100px);
+  transform: rotate(-30deg);
+  display: block;
+
+  width: 600px;
+  height: 600px;
+  left: -500px;
+  top: -130px;
+}
+
+.mobileCircle4 {
+  position: fixed;
+  background: linear-gradient(180deg, #ff52c4 0%, #009ee3 100%);
+  opacity: 0.35;
+  filter: blur(100px);
+  transform: rotate(-30deg);
+  display: block;
+
+  width: 650px;
+  height: 650px;
+  left: -50px;
+  top: -350px;
+}
+
+.mobileCircle5 {
+  position: fixed;
+  background: linear-gradient(180deg, #ff52c4 0%, #009ee3 100%);
+  opacity: 0.35;
+  filter: blur(100px);
+  transform: rotate(-120deg);
+  display: block;
+
+  width: 600px;
+  height: 600px;
+  left: 0px;
+  top: 630px;
+}
+
+.mobileCircle6 {
+  position: fixed;
+  background: linear-gradient(180deg, #ff52c4 0%, #009ee3 100%);
+  opacity: 0.35;
+  filter: blur(100px);
+  transform: rotate(-30deg);
+  display: block;
+
+  width: 600px;
+  height: 600px;
+  left: -396px;
+  top: 670px;
+}
+
+@media (max-width: 500px) {
+  .mobileCircle1 {
+    width: 520px;
+    height: 520px;
+    left: -200px;
+    top: -320px;
+  }
+
+  .mobileCircle2 {
+    width: 400px;
+    height: 400px;
+    left: 150px;
+    top: -150px;
+  }
+
+  .mobileCircle3 {
+    width: 520px;
+    height: 520px;
+    left: -450px;
+    top: -80px;
+  }
+
+  .mobileCircle4 {
+    width: 520px;
+    height: 520px;
+    left: -100px;
+    top: -250px;
+  }
+
+  .mobileCircle5 {
+    width: 480px;
+    height: 480px;
+    left: -100px;
+    top: 630px;
+  }
+
+  .mobileCircle6 {
+    width: 480px;
+    height: 480px;
+    left: -396px;
+    top: 600px;
+  }
+}

@@ -1,0 +1,24 @@
+.navigation {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 10px 20px;
+}
+
+.user {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.user > img {
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+}
+
+.user > span {
+  margin-left: 4px;
+}

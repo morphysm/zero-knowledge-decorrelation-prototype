@@ -7,7 +7,7 @@ export declare class MerkleTree {
      * For a set of leaves recursively computes hashes of adjacent nodes upwards until reaching a root.
      * Note: Significantly slower than `MerkleTree.createFromStorageString` as it rehashes the whole tree.
      */
-    static createFromLeaves(leaves: BigInt[]): MerkleTree;
+    static createFromLeaves(leaves: BigInt[]): Promise<MerkleTree>;
     private static hashChildrenAndLinkToParent;
     /**
      *
@@ -47,6 +47,7 @@ export declare class MerkleTree {
      */
     private static getChildRow;
     private findMatchingLeaf;
+    getRoot(): string;
 }
 export declare class TreeNode {
     val: BigInt;

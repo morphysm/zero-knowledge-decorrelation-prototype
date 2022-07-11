@@ -1,0 +1,22 @@
+.padding {
+  padding: 0px 30px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+
+  width: 80%;
+  max-width: 500px;
+
+  margin-bottom: 15px;
+}
+
+.list > li {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 10px;
+}

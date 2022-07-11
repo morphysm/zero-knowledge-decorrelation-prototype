@@ -1,0 +1,17 @@
+{
+  "name": "famed-airdrop-prototype-circuits",
+  "version": "0.0.1",
+  "description": "",
+  "prepare": "npm run build",
+  "files": [
+    "./lib"
+  ],
+  "scripts": {
+    "build": "./scripts/1_build_circuit.sh && ./scripts/2_gen_zkey.sh && ./scripts/3_gen_verifier_smartcontract.sh"
+  },
+  "author": "Kilian Kälsin @morphysm.com",
+  "license": "ISC",
+  "dependencies": {
+    "circomlib": "^2.0.3"
+  }
+}

@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TreeNode = exports.MerkleTree = void 0;
-var Library_1 = require("./Library");
+const Library_1 = require("./Library");
 /** Merkle tree of MimcSponge hashes */
-var MerkleTree = /** @class */ (function () {
-    function MerkleTree(linkedRoot, linkedLeaves) {
+class MerkleTree {
+    constructor(linkedRoot, linkedLeaves) {
         this.root = linkedRoot;
         this.leaves = linkedLeaves;
     }
@@ -12,26 +12,26 @@ var MerkleTree = /** @class */ (function () {
      * For a set of leaves recursively computes hashes of adjacent nodes upwards until reaching a root.
      * Note: Significantly slower than `MerkleTree.createFromStorageString` as it rehashes the whole tree.
      */
-    MerkleTree.createFromLeaves = function (leaves) {
-        var leafNodes = leaves.map(function (leaf) { return new TreeNode(leaf); });
-        var rootNode = MerkleTree.hashChildrenAndLinkToParent(leafNodes)[0];
+    static async createFromLeaves(leaves) {
+        let leafNodes = leaves.map((leaf) => new TreeNode(leaf));
+        let rootNode = (await MerkleTree.hashChildrenAndLinkToParent(leafNodes))[0];
         return new MerkleTree(rootNode, leafNodes);
-    };
-    MerkleTree.hashChildrenAndLinkToParent = function (levelLeaves) {
+    }
+    static async hashChildrenAndLinkToParent(levelLeaves) {
         if (levelLeaves.length == 1)
             return levelLeaves;
-        var parents = [];
-        for (var i = 0; i < levelLeaves.length; i += 2) {
-            var l = levelLeaves[i];
-            var r = levelLeaves[i + 1];
-            var hash = (0, Library_1.mimcSponge)(l.val, r.val);
-            var parent_1 = new TreeNode(hash, l, r);
-            parents.push(parent_1);
-            l.parent = parent_1;
-            r.parent = parent_1;
+        let parents = [];
+        for (let i = 0; i < levelLeaves.length; i += 2) {
+            let l = levelLeaves[i];
+            let r = levelLeaves[i + 1];
+            let hash = await (0, Library_1.mimcSponge)(l.val, r.val);
+            let parent = new TreeNode(hash, l, r);
+            parents.push(parent);
+            l.parent = parent;
+            r.parent = parent;
         }
         return this.hashChildrenAndLinkToParent(parents);
-    };
+    }
     /**
      *
      *  For ("A\nB,C\nD,E,F,G"), return the MerkleTree boject(A).
@@ -43,40 +43,42 @@ var MerkleTree = /** @class */ (function () {
      *     D   E F   G
      *
      */
-    MerkleTree.createFromStorageString = function (ss) {
-        var lines = ss.split("\n");
-        var rootNode = new TreeNode(BigInt(lines[0]));
-        var currRow = [rootNode];
-        for (var lineIndex = 1; lineIndex < lines.length; lineIndex++) {
-            var vals = lines[lineIndex].split(",");
+    static createFromStorageString(ss) {
+        let lines = ss.split('\n');
+        let rootNode = new TreeNode(BigInt(lines[0]));
+        let currRow = [rootNode];
+        for (let lineIndex = 1; lineIndex < lines.length; lineIndex++) {
+            let vals = lines[lineIndex].split(',');
             if (vals.length / 2 != currRow.length)
-                throw new Error("Malformatted tree.");
-            for (var rowIndex = 0; rowIndex < currRow.length; rowIndex++) {
-                var parent_2 = currRow[rowIndex];
-                var lChild = new TreeNode(BigInt(vals[2 * rowIndex]), undefined, undefined, parent_2);
-                var rChild = new TreeNode(BigInt(vals[2 * rowIndex + 1]), undefined, undefined, parent_2);
-                parent_2.lChild = lChild;
-                parent_2.rChild = rChild;
+                throw new Error('Malformatted tree.');
+            for (let rowIndex = 0; rowIndex < currRow.length; rowIndex++) {
+                let parent = currRow[rowIndex];
+                let lChild = new TreeNode(BigInt(vals[2 * rowIndex]), undefined, undefined, parent);
+                let rChild = new TreeNode(BigInt(vals[2 * rowIndex + 1]), undefined, undefined, parent);
+                parent.lChild = lChild;
+                parent.rChild = rChild;
             }
             currRow = MerkleTree.getChildRow(currRow);
         }
         return new MerkleTree(rootNode, currRow);
-    };
+    }
     /**
      * Computes the MerkleProof for a given leafVal in the tree.
      */
-    MerkleTree.prototype.getMerkleProof = function (leafVal) {
+    getMerkleProof(leafVal) {
         var leaf = this.findMatchingLeaf(leafVal);
-        var merkleProof = {
+        let merkleProof = {
             vals: new Array(),
-            indices: new Array()
+            indices: new Array(),
         };
         while (leaf.val != this.root.val) {
-            if (leaf.parent.lChild.val == leaf.val) { // Right child
+            if (leaf.parent.lChild.val == leaf.val) {
+                // Right child
                 merkleProof.vals.push(leaf.parent.rChild.val);
                 merkleProof.indices.push(0);
             }
-            else if (leaf.parent.rChild.val == leaf.val) { // Left child
+            else if (leaf.parent.rChild.val == leaf.val) {
+                // Left child
                 merkleProof.vals.push(leaf.parent.lChild.val);
                 merkleProof.indices.push(1);
             }
@@ -86,7 +88,7 @@ var MerkleTree = /** @class */ (function () {
             leaf = leaf.parent;
         }
         return merkleProof;
-    };
+    }
     /**
      *          A
      *        /   \
@@ -96,24 +98,24 @@ var MerkleTree = /** @class */ (function () {
      *
      *  For tree above we create "A\nB,C\nD,E,F,G".
      */
-    MerkleTree.prototype.getStorageString = function () {
-        var result = "";
-        var currRow = [this.root];
+    getStorageString() {
+        let result = '';
+        let currRow = [this.root];
         while (currRow.length > 0) {
-            for (var i = 0; i < currRow.length; i++) {
+            for (let i = 0; i < currRow.length; i++) {
                 result += (0, Library_1.toHex)(currRow[i].val);
                 if (i != currRow.length - 1)
-                    result += ",";
+                    result += ',';
             }
             currRow = MerkleTree.getChildRow(currRow);
             if (currRow.length != 0)
-                result += "\n";
+                result += '\n';
         }
         return result;
-    };
-    MerkleTree.prototype.leafExists = function (search) {
-        return this.leaves.find(function (node) { return node.val == search; }) !== undefined;
-    };
+    }
+    leafExists(search) {
+        return this.leaves.find((node) => node.val == search) !== undefined;
+    }
     /**
      *          A
      *        /   \
@@ -123,34 +125,35 @@ var MerkleTree = /** @class */ (function () {
      *
      *  getChildRow([B,C]) -> [D,E,F,G]
      */
-    MerkleTree.getChildRow = function (parentLevel) {
-        var children = [];
-        for (var _i = 0, parentLevel_1 = parentLevel; _i < parentLevel_1.length; _i++) {
-            var parent_3 = parentLevel_1[_i];
-            if (parent_3.lChild && parent_3.rChild) {
-                children.push(parent_3.lChild);
-                children.push(parent_3.rChild);
+    static getChildRow(parentLevel) {
+        let children = [];
+        for (let parent of parentLevel) {
+            if (parent.lChild && parent.rChild) {
+                children.push(parent.lChild);
+                children.push(parent.rChild);
             }
         }
         return children;
-    };
-    MerkleTree.prototype.findMatchingLeaf = function (leafVal) {
-        var matchingLeaf = this.leaves.find(function (leaf) { return leaf.val == leafVal; });
+    }
+    findMatchingLeaf(leafVal) {
+        let matchingLeaf = this.leaves.find((leaf) => leaf.val == leafVal);
         if (matchingLeaf == undefined) {
-            throw new Error("Failed to find leaf.");
+            throw new Error('Failed to find leaf.');
         }
         return matchingLeaf;
-    };
-    return MerkleTree;
-}());
+    }
+    getRoot() {
+        const root = this.root.val;
+        return (0, Library_1.toHex)(root);
+    }
+}
 exports.MerkleTree = MerkleTree;
-var TreeNode = /** @class */ (function () {
-    function TreeNode(val, lChild, rChild, parent) {
+class TreeNode {
+    constructor(val, lChild, rChild, parent) {
         this.val = val;
         this.lChild = lChild;
         this.rChild = rChild;
         this.parent = parent;
     }
-    return TreeNode;
-}());
+}
 exports.TreeNode = TreeNode;
