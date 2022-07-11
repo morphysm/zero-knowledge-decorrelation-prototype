@@ -19,10 +19,16 @@ interface IZekoGenerativeNFT {
     ) external;
 }
 
-interface IApprove {
+interface IApprovedRewards {
+    enum RewardType { ZEKONFT, FAMEDTOKEN }
+    struct Reward {
+        bool approved;
+        RewardType rewardType;
+        uint256 value;
+    }
     function rewards(
         bytes32 rewardId
-    ) external view returns (bytes32);
+    ) external view returns (Reward memory);
 }
 
 /// @title An example airdrop contract utilizing a zk-proof of MerkleTree inclusion.
@@ -37,7 +43,7 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
     bytes32 public root;
     uint256 public worldBaseTokenId;
 
-    IApprove approve;
+    IApprovedRewards approve;
 
     mapping(bytes32 => bool) public nullifierSpent;
 
@@ -45,7 +51,7 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
         IZekoGenerativeNFT _nftToken,
         uint256 _amountPerRedemption,
         IPlonkVerifier _verifier,
-        IApprove _approve,
+        IApprovedRewards _approve,
         bytes32 _root
     ) {
         nftToken = _nftToken;
@@ -83,7 +89,8 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
         bytes32 _nullifierHash,
         bytes32 _rewardId
     ) external {
-        require(approve.rewards(_rewardId) != 0, "Reward has not been approved");
+        IApprovedRewards.Reward memory reward = approve.rewards(_rewardId);
+        require(reward.approved, "Reward has not been approved");
         require(uint256(_nullifierHash) < SNARK_FIELD, "Nullifier is not within the field");
         require(!nullifierSpent[_nullifierHash], "Airdrop already redeemed");
         uint256[] memory pubSignals = new uint256[](4);
@@ -93,6 +100,13 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
         pubSignals[3] = uint256(uint160(msg.sender));
         require(verifier.verifyProof(_proof, pubSignals), "Proof verification failed");
         nullifierSpent[_nullifierHash] = true;
-        nftToken.transferFrom(address(this), msg.sender, worldBaseTokenId + pubSignals[2]);
+        if (reward.rewardType == IApprovedRewards.RewardType.ZEKONFT) {
+            nftToken.transferFrom(address(this), msg.sender, worldBaseTokenId + pubSignals[2]);
+            return;
+        }
+        if (reward.rewardType == IApprovedRewards.RewardType.FAMEDTOKEN) {
+            //TODO
+            return;
+        }
     }
 }

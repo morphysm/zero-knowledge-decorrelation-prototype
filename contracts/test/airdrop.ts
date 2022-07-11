@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 import { Signer } from "ethers";
 const { expect } = require("chai");
 
-import { Approve, PrivateAirdrop, ZekoGenerativeNFT } from "../typechain";
+import { ApprovedRewards, PrivateAirdrop, ZekoGenerativeNFT } from "../typechain";
 import {
   getMerkleTreeFromPublicListOfCommitments,
   addNewCommitment,
@@ -28,7 +28,7 @@ describe("Airdrop", function () {
   let accounts: Signer[];
   let airdropContract: PrivateAirdrop;
   let zekoGenerativeNFTContract: ZekoGenerativeNFT;
-  let approveContract: Approve;
+  let approvedRewardsContract: ApprovedRewards;
 
   let validProof: string;
   let validNullifierHash: string;
@@ -48,9 +48,9 @@ describe("Airdrop", function () {
     const plonkFactory = await ethers.getContractFactory("PlonkVerifier");
     const plonkContract = await plonkFactory.deploy();
 
-    // Deploy approve contract
-    const approveFactory = await ethers.getContractFactory("Approve");
-    approveContract = await approveFactory.deploy();
+    // Deploy approvedRewards contract
+    const approvedRewardsFactory = await ethers.getContractFactory("ApprovedRewards");
+    approvedRewardsContract = await approvedRewardsFactory.deploy();
 
     // Deploy airdrop contract
     const airdropFactory = await ethers.getContractFactory("PrivateAirdrop");
@@ -58,7 +58,7 @@ describe("Airdrop", function () {
       zekoGenerativeNFTContract.address,
       REDEPTIONS,
       plonkContract.address,
-      approveContract.address,
+      approvedRewardsContract.address,
       merkleTreeRoot
     );
 
@@ -76,7 +76,8 @@ describe("Airdrop", function () {
     const nullifierHex = "0x00a88cb7c2ab7f014b7b9cca92d42b7fe9416d4a1d9872267aefc2e8a6388c66";
     const secretHex = "0x00fb4a7280d470f619c59a341c65e874acc1f0b890815e07f41531f878e9ba08";
     const rewardIDHex = toHex(BigInt(1));
-    const rewardHex = toHex(BigInt(1));
+    const rewardType = 0;
+    const rewardValue = 1;
 
     const nullifier = BigInt(nullifierHex);
     const secret = BigInt(secretHex);
@@ -95,8 +96,8 @@ describe("Airdrop", function () {
     const newRoot = mt.getRoot();
     console.log(`new commitment ${hexCommitment} added to the commitments merkle tree`);
 
-    // Approve reward // TODO
-    await approveContract.addReward(rewardIDHex, rewardHex);
+    // Approve reward
+    await approvedRewardsContract.addReward(rewardIDHex, rewardType, rewardValue);
 
     // Update the root on Private Airdrop contract
     await airdropContract.updateRoot(newRoot);

@@ -1,52 +1,41 @@
 import { ethers, utils } from 'ethers';
-import { Approve__factory } from 'contracts/typechain';
+import { ApprovedRewards__factory } from 'contracts/typechain';
 import { getApproveAddress } from './AddressService';
+
+export enum RewardType {
+  ZEKONFT = 0,
+  FAMEDTOKEN = 1,
+}
 
 interface ApprovedResponse {
   approved: boolean;
-  value?: string;
+  type?: RewardType;
+  value?: number;
 }
 
-// TODO romove if unneded
-// export const appendApproval = async (
-//   suggestedRewards: Reward[]
-// ): Promise<Reward[]> => {
-//   return Promise.all(
-//     suggestedRewards.map(async (suggestedReward) => {
-//       const approvedResponse = await getValue(suggestedReward.id);
-//       return { ...suggestedReward, ...approvedResponse };
-//     })
-//   );
-// };
-
 // TODO naming
-export const getValue = async (rewardId: string): Promise<ApprovedResponse> => {
+export const getReward = async (
+  rewardId: string
+): Promise<ApprovedResponse> => {
   console.log(window.ethereum);
   if (!window.ethereum) {
-    console.log('not con');
     throw new Error('could not connect to metamask');
   }
 
   const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const approve = Approve__factory.connect(
+  const approve = ApprovedRewards__factory.connect(
     await getApproveAddress(provider),
     provider
   );
 
-  console.log('A');
+  const [approved, type, value] = await approve.rewards(
+    utils.formatBytes32String(rewardId)
+  );
 
-  let value;
-
-  value = await approve.rewards(utils.formatBytes32String(rewardId));
-
-  console.log('B');
-  if (
-    value ===
-    '0x0000000000000000000000000000000000000000000000000000000000000000'
-  ) {
-    return { approved: false };
+  if (!approved) {
+    return { approved };
   }
-  return { approved: true, value: utils.parseBytes32String(value) };
+  return { approved, type, value: value.toNumber() };
 };
 
 export const getOwner = async (): Promise<string> => {
@@ -55,7 +44,7 @@ export const getOwner = async (): Promise<string> => {
   }
 
   const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const approve = Approve__factory.connect(
+  const approve = ApprovedRewards__factory.connect(
     await getApproveAddress(provider),
     provider
   );
@@ -66,7 +55,8 @@ export const getOwner = async (): Promise<string> => {
 
 export const postApproval = async (
   rewardId: string,
-  reward: string
+  rewardType: number,
+  rewardValue: number
 ): Promise<void> => {
   if (!window.ethereum) {
     throw new Error('could not connect to metamask');
@@ -74,7 +64,7 @@ export const postApproval = async (
 
   const provider = new ethers.providers.Web3Provider(window.ethereum);
   const signer = provider.getSigner();
-  const approve = Approve__factory.connect(
+  const approve = ApprovedRewards__factory.connect(
     await getApproveAddress(provider),
     signer
   );
@@ -82,7 +72,8 @@ export const postApproval = async (
   // TODO check for max length of reward (32 bytes )
   const tx = await approve.addReward(
     utils.formatBytes32String(rewardId),
-    utils.formatBytes32String(reward)
+    rewardType,
+    rewardValue
   );
   await tx.wait();
 

@@ -3,19 +3,18 @@ import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 
 import Alert from '@mui/material/Alert';
+import Typography from '@mui/material/Typography';
 
 import { getRewardsByOwner } from '../services/AirdropService';
-import { getOwner, postApproval } from '../services/ApproveContractService';
+import { getOwner } from '../services/ApproveContractService';
 
 import { SessionContext } from '../context/SessionProvider';
-import Button from '../components/atoms/button/Button';
 
 import styles from '../styles/Home.module.css';
 import { MetamaskContext } from '../context/MetamaskProvider';
-import RewardApproval from '../components/molecule/rewardApproval/RewardApproval';
-import Typography from '@mui/material/Typography';
+import ApproveReward from '../components/molecule/reward/ApproveReward';
 
-const Home: NextPage = () => {
+const Approve: NextPage = () => {
   const router = useRouter();
 
   const { session } = useContext(SessionContext);
@@ -82,7 +81,7 @@ const Home: NextPage = () => {
                 <li key={`repo_${repo.name}_issue_${issue.id}`}>
                   <a href={issue.htmlurl}>Number: {issue.number}</a>{' '}
                   <span>{issue.contributors[0].rewardSum}</span>
-                  <RewardApproval id={issue.id.toString(10)}></RewardApproval>
+                  <ApproveReward id={issue.id.toString(10)}></ApproveReward>
                 </li>
               ))}
             </ul>
@@ -119,17 +118,4 @@ const Warning: React.FC<WarningProps> = ({ address, owner }) => {
   return <></>;
 };
 
-interface ApproveButtonProps {
-  rewardId: string;
-  reward: string;
-}
-
-const ApproveButton: React.FC<ApproveButtonProps> = ({ rewardId, reward }) => {
-  const handleApproveClick = (rewardId: string) => {
-    postApproval(rewardId, reward);
-  };
-
-  return <Button onClick={() => handleApproveClick(rewardId)}>Approve</Button>;
-};
-
-export default Home;
+export default Approve;

@@ -33,7 +33,7 @@ describe("Airdrop", function () {
     const plonkContract = await plonkFactory.deploy();
 
     // Deploy approve contract
-    const approveFactory = await ethers.getContractFactory("Approve");
+    const approveFactory = await ethers.getContractFactory("ApprovedRewards");
     const aproveContract = await approveFactory.deploy();
 
     // Deploy airdrop contract

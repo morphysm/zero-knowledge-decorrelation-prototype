@@ -6,8 +6,9 @@ import { SessionContext } from '../context/SessionProvider';
 import { getRewardsByUser } from '../services/AirdropService';
 
 import styles from '../styles/Home.module.css';
-import RewardApproval from '../components/molecule/rewardApproval/RewardApproval';
+import Reward from '../components/molecule/reward/ClaimAndCollectReward';
 import Typography from '@mui/material/Typography';
+import ClaimAndCollectReward from '../components/molecule/reward/ClaimAndCollectReward';
 
 const Home: NextPage = () => {
   const router = useRouter();
@@ -70,7 +71,9 @@ const Home: NextPage = () => {
                 <li key={`repo_${repo.name}_issue_${issue.id}`}>
                   <a href={issue.htmlurl}>Number: {issue.number}</a>{' '}
                   <span>{issue.contributors[0].rewardSum}</span>
-                  <RewardApproval id={issue.id.toString(10)}></RewardApproval>
+                  <ClaimAndCollectReward
+                    id={issue.id.toString(10)}
+                  ></ClaimAndCollectReward>
                 </li>
               ))}
             </ul>

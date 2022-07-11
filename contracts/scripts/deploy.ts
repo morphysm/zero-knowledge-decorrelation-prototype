@@ -37,7 +37,7 @@ async function main() {
   const plonkContract = await plonkFactory.deploy();
 
   // Deploy approve contract
-  const approveFactory = await ethers.getContractFactory("Approve");
+  const approveFactory = await ethers.getContractFactory("ApprovedRewards");
   const approveContract = await approveFactory.deploy();
 
   // Deploy airdrop contract
