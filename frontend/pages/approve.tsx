@@ -27,18 +27,12 @@ const Approve: NextPage = () => {
   const [owner, setOwner] = useState<string>('');
 
   useEffect(() => {
-    if (session === null) {
-      router.push('/auth/login');
-      return;
-    }
-
     if (
+      session === null ||
       session.provider_token === null ||
       session.provider_token === undefined
     ) {
-      setErrorMessage(
-        'missing provider_token in session, please log out and login. If the issue persists, please contact contact@morphysm.com.'
-      );
+      router.push('/auth/login');
       return;
     }
 

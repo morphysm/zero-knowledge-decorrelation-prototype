@@ -11,7 +11,11 @@ const LoginPage: NextPage = () => {
   const { session } = useContext(SessionContext);
 
   useEffect(() => {
-    if (session !== null) {
+    if (
+      session !== null &&
+      session.provider_token !== null &&
+      session.provider_token !== undefined
+    ) {
       router.push('/');
     }
   }, [session]);
