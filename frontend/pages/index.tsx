@@ -6,7 +6,6 @@ import { SessionContext } from '../context/SessionProvider';
 import { getRewardsByUser } from '../services/AirdropService';
 
 import styles from '../styles/Home.module.css';
-import Reward from '../components/molecule/reward/ClaimAndCollectReward';
 import Typography from '@mui/material/Typography';
 import ClaimAndCollectReward from '../components/molecule/reward/ClaimAndCollectReward';
 
@@ -18,6 +17,8 @@ const Home: NextPage = () => {
   const [rewards, setRewards] = useState<Repo[]>([]);
   const [isLoading, setLoading] = useState(false);
 
+  // @accepts arbitrary file writes to WebApp:FileSystem with filename restrictions
+  // @mitigates WebApp:FileSystem against unauthorised access with strict file permissions
   useEffect(() => {
     if (
       session === null ||

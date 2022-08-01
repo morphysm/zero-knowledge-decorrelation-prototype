@@ -37,12 +37,14 @@ describe("Airdrop", function () {
     const aproveContract = await approveFactory.deploy();
 
     // Deploy airdrop contract
+    const mockFamedTokenAddress = await accounts[1].getAddress();
     const airdropFactory = await ethers.getContractFactory("PrivateAirdrop");
     airdropContract = await airdropFactory.deploy(
       zekoGenerativeNFTContract.address,
       REDEPTIONS,
       plonkContract.address,
       aproveContract.address,
+      mockFamedTokenAddress,
       merkleTreeRoot
     );
 
@@ -60,12 +62,10 @@ describe("Airdrop", function () {
     const collector = accounts[2];
     const collectorAddress = await collector.getAddress();
     const receiverAddress = await accounts[4].getAddress();
-
     // WHEN
     const tx = zekoGenerativeNFTContract
       .connect(collector)
       .transferFrom(collectorAddress, receiverAddress, 1);
-
     // THEN
     await expect(tx).to.be.reverted;
   });
@@ -78,10 +78,8 @@ describe("Airdrop", function () {
       NFT_QUANTITY,
       airdropContract.address
     );
-
     // WHEN
     const worldBaseTokenId = await airdropContract.worldBaseTokenId();
-
     // THEN
     expect(worldBaseTokenId.toNumber()).equal(NFT_QUANTITY + 1);
   });

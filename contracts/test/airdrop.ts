@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 import { Signer } from "ethers";
 const { expect } = require("chai");
 
-import { ApprovedRewards, PrivateAirdrop, ZekoGenerativeNFT } from "../typechain";
+import { ApprovedRewards, FamedToken, PrivateAirdrop, ZekoGenerativeNFT } from "../typechain";
 import {
   getMerkleTreeFromPublicListOfCommitments,
   addNewCommitment,
@@ -29,6 +29,7 @@ describe("Airdrop", function () {
   let airdropContract: PrivateAirdrop;
   let zekoGenerativeNFTContract: ZekoGenerativeNFT;
   let approvedRewardsContract: ApprovedRewards;
+  let famedTokenContract: FamedToken;
 
   let validProof: string;
   let validNullifierHash: string;
@@ -48,9 +49,13 @@ describe("Airdrop", function () {
     const plonkFactory = await ethers.getContractFactory("PlonkVerifier");
     const plonkContract = await plonkFactory.deploy();
 
-    // Deploy approvedRewards contract
+    // Deploy approved rewards contract
     const approvedRewardsFactory = await ethers.getContractFactory("ApprovedRewards");
     approvedRewardsContract = await approvedRewardsFactory.deploy();
+
+    // Deploy famed token contract
+    const famedTokenFactory = await ethers.getContractFactory("FamedToken");
+    famedTokenContract = await famedTokenFactory.deploy();
 
     // Deploy airdrop contract
     const airdropFactory = await ethers.getContractFactory("PrivateAirdrop");
@@ -59,6 +64,7 @@ describe("Airdrop", function () {
       REDEPTIONS,
       plonkContract.address,
       approvedRewardsContract.address,
+      famedTokenContract.address,
       merkleTreeRoot
     );
 
@@ -69,6 +75,9 @@ describe("Airdrop", function () {
       NFT_QUANTITY,
       airdropContract.address
     );
+
+    // Set aidrop address to allow airdrop to mint
+    famedTokenContract.setPrivateAirdropContract(airdropContract.address);
   });
 
   it("should allow a user that provides a valid proof to collect an NFT from the airdrop contract", async () => {
@@ -76,7 +85,7 @@ describe("Airdrop", function () {
     const nullifierHex = "0x00a88cb7c2ab7f014b7b9cca92d42b7fe9416d4a1d9872267aefc2e8a6388c66";
     const secretHex = "0x00fb4a7280d470f619c59a341c65e874acc1f0b890815e07f41531f878e9ba08";
     const rewardIDHex = toHex(BigInt(1));
-    const rewardType = 0;
+    const rewardTypeNFT = 0;
     const rewardValue = 1;
 
     const nullifier = BigInt(nullifierHex);
@@ -97,7 +106,7 @@ describe("Airdrop", function () {
     console.log(`new commitment ${hexCommitment} added to the commitments merkle tree`);
 
     // Approve reward
-    await approvedRewardsContract.addReward(rewardIDHex, rewardType, rewardValue);
+    await approvedRewardsContract.addReward(rewardIDHex, rewardTypeNFT, rewardValue);
 
     // Update the root on Private Airdrop contract
     await airdropContract.updateRoot(newRoot);
@@ -139,7 +148,78 @@ describe("Airdrop", function () {
 
     // THEN
     const balance = await zekoGenerativeNFTContract.balanceOf(collectorAddress);
-    expect(balance.toNumber()).equal(1);
+    expect(balance.toNumber()).equal(rewardValue);
+  });
+
+  it("should allow a user that provides a valid proof to collect famed tokens from the airdrop contract", async () => {
+    // GIVEN
+    const nullifierHex = "0x00a88cb7c2ab7f014b7b9cca92d42b7fe9416d4a1d9872267aefc2e8a6388c66";
+    const secretHex = "0x00fb4a7280d470f619c59a341c65e874acc1f0b890815e07f41531f878e9ba08";
+    const rewardIDHex = toHex(BigInt(1));
+    const rewardTypeFamedToken = 1;
+    const rewardValue = 100;
+
+    const nullifier = BigInt(nullifierHex);
+    const secret = BigInt(secretHex);
+    const rewardID = BigInt(rewardIDHex);
+    const preCommitment = await pedersenHashPreliminary(nullifier, secret);
+    const commitment = await pedersenHashFinal(preCommitment, rewardID);
+    const hexCommitment = toHex(commitment);
+
+    console.log(`My private values are nullifier: ${nullifierHex} and secret ${secretHex}`);
+
+    // WHEN
+    // Update the public list of commitments
+    await addNewCommitment(INPUT_FILE_NAME, hexCommitment, TREE_HIGHT);
+    // Generate the merkletree
+    const mt = await getMerkleTreeFromPublicListOfCommitments(INPUT_FILE_NAME, TREE_HIGHT);
+    const newRoot = mt.getRoot();
+    console.log(`new commitment ${hexCommitment} added to the commitments merkle tree`);
+
+    // Approve reward
+    await approvedRewardsContract.addReward(rewardIDHex, rewardTypeFamedToken, rewardValue);
+
+    // Update the root on Private Airdrop contract
+    await airdropContract.updateRoot(newRoot);
+    console.log(
+      `merkleRoot storage variable at @private Airdrop contract succesfully updated to ${newRoot}`
+    );
+
+    // Generate proof call data
+    const WASM_BUFF = readFileSync(WASM_PATH);
+    const ZKEY_BUFF = readFileSync(ZKEY_PATH);
+
+    const collector = accounts[1];
+    const collectorAddress = await collector.getAddress();
+
+    console.log("Generating Proof...");
+    validProof = await generateProofCallData(
+      mt,
+      nullifier,
+      secret,
+      rewardID,
+      collectorAddress,
+      WASM_BUFF,
+      ZKEY_BUFF
+    );
+
+    const nullifierHash = await pedersenHash(nullifier);
+    validNullifierHash = toHex(nullifierHash); // hash of the nullifier => need to be passed to avoid double spending
+
+    console.log("Proof: ", validProof);
+    console.log("nullifierHash", validNullifierHash);
+
+    await airdropContract
+      .connect(collector)
+      .collectAirdrop(validProof, validNullifierHash, toHex(rewardID));
+
+    console.log(
+      `Proof verified => NFT succesfully collected by ${collectorAddress}! without knowing which commitments corresponds to this verification!`
+    );
+
+    // THEN
+    const balance = await famedTokenContract.balanceOf(collectorAddress);
+    expect(balance.toNumber()).equal(rewardValue);
   });
 
   it("should revert if a user provides an invalid proof", async () => {

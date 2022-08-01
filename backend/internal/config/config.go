@@ -8,6 +8,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -38,7 +39,13 @@ func Load() (*Config, error) {
 		}{
 			Host: "127.0.0.1",
 			Port: "8081",
-		}}
+		},
+	}
+
+	err := godotenv.Load(".env.local")
+	if err != nil {
+		fmt.Println("Error loading .env.local: ", err)
+	}
 
 	githubClientID, ok := os.LookupEnv("CLIENT_ID")
 	if !ok {

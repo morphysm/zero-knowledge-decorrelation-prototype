@@ -2,3 +2,4 @@ circuits/build
 /node_modules
 .vscode
 __debug_bin
+.env.local

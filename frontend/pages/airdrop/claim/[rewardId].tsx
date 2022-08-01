@@ -10,7 +10,7 @@ import { postPreCommitment } from './../../../services/AirdropService';
 const ClaimPage: NextPage = () => {
   const router = useRouter();
   const { rewardId } = router.query;
-  const { bearerToken } = useContext(SessionContext);
+  const { session } = useContext(SessionContext);
 
   const [nullifier, setNullifier] = useState(
     '0x00202a03cea47b7918a36f12e6522c88f8fbcc9f74e07d529e9ce8f3a113ea87'
@@ -24,10 +24,18 @@ const ClaimPage: NextPage = () => {
   const [loadingClaim, setLoadingClaim] = useState<boolean>(false);
 
   useEffect(() => {
+    if (
+      session === null ||
+      session.provider_token === null ||
+      session.provider_token === undefined
+    ) {
+      router.push('/auth/login');
+      return;
+    }
     if (!rewardId || rewardId === '' || typeof rewardId !== 'string') {
       router.push('/');
     }
-  }, [rewardId, bearerToken]);
+  }, [rewardId, session]);
 
   const handleClickGeneratePreCommitment = async () => {
     setLoadingGeneration(true);

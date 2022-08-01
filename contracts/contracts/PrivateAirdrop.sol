@@ -31,6 +31,10 @@ interface IApprovedRewards {
     ) external view returns (Reward memory);
 }
 
+interface IFamedToken {
+    function mint(address _receiver, uint256 _amount) external;
+}
+
 /// @title An example airdrop contract utilizing a zk-proof of MerkleTree inclusion.
 contract PrivateAirdrop is Ownable, IERC721Receiver {
     uint256 constant SNARK_FIELD =
@@ -44,6 +48,7 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
     uint256 public worldBaseTokenId;
 
     IApprovedRewards approve;
+    IFamedToken token;
 
     mapping(bytes32 => bool) public nullifierSpent;
 
@@ -52,6 +57,7 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
         uint256 _amountPerRedemption,
         IPlonkVerifier _verifier,
         IApprovedRewards _approve,
+        IFamedToken _token,
         bytes32 _root
     ) {
         nftToken = _nftToken;
@@ -59,6 +65,7 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
         verifier = _verifier;
         approve = _approve;
         root = _root;
+        token = _token;
     }
 
     function onERC721Received(
@@ -105,7 +112,7 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
             return;
         }
         if (reward.rewardType == IApprovedRewards.RewardType.FAMEDTOKEN) {
-            //TODO
+            token.mint(msg.sender, reward.value);
             return;
         }
     }

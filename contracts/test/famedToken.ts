@@ -1,10 +1,10 @@
 import { ethers } from "hardhat";
-import { Signer, utils } from "ethers";
+import { Signer } from "ethers";
 const { expect } = require("chai");
 
 import { FamedToken } from "../typechain";
 
-describe.only("FamedToken", function () {
+describe("FamedToken", function () {
   let accounts: Signer[];
   let mockPrivateAirdrop: Signer;
   let famedTokenContract: FamedToken;
@@ -15,7 +15,8 @@ describe.only("FamedToken", function () {
 
     const famedTokenFactory = await ethers.getContractFactory("FamedToken");
     const mockPrivateAidropAddress = await mockPrivateAirdrop.getAddress();
-    famedTokenContract = await famedTokenFactory.deploy(mockPrivateAidropAddress);
+    famedTokenContract = await famedTokenFactory.deploy();
+    famedTokenContract.setPrivateAirdropContract(mockPrivateAidropAddress);
   });
 
   it("should allow the private airdrop to mint new tokens", async () => {

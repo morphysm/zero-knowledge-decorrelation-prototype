@@ -40,6 +40,10 @@ async function main() {
   const approveFactory = await ethers.getContractFactory("ApprovedRewards");
   const approveContract = await approveFactory.deploy();
 
+  // Deploy famed token contract
+  const famedTokenFactory = await ethers.getContractFactory("FamedToken");
+  const famedTokenContract = await famedTokenFactory.deploy();
+
   // Deploy airdrop contract
   const airdropFactory = await ethers.getContractFactory("PrivateAirdrop");
   const airdropContract = await airdropFactory.deploy(
@@ -47,8 +51,12 @@ async function main() {
     NUM_ERC721_PER_REDEMPTION,
     plonkContract.address,
     approveContract.address,
+    famedTokenContract.address,
     merkleTreeRoot
   );
+
+  // Set aidrop address to allow airdrop to mint
+  famedTokenContract.setPrivateAirdropContract(airdropContract.address);
 
   console.log(
     `PrivateAirdrop contract address: ${airdropContract.address} merkconstree root: ${merkleTreeRoot}`

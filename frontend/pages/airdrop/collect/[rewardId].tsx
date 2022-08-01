@@ -12,7 +12,7 @@ import { collectAirdrop } from '../../../services/AirdropContractService';
 const CollectPage: NextPage = () => {
   const router = useRouter();
   const { rewardId } = router.query;
-  const { bearerToken } = useContext(SessionContext);
+  const { session } = useContext(SessionContext);
   const { address } = useContext(MetamaskContext);
 
   const [nullifier, setNullifier] = useState(
@@ -24,10 +24,18 @@ const CollectPage: NextPage = () => {
   const [loadingCollect, setLoadingCollect] = useState<boolean>(false);
 
   useEffect(() => {
+    if (
+      session === null ||
+      session.provider_token === null ||
+      session.provider_token === undefined
+    ) {
+      router.push('/auth/login');
+      return;
+    }
     if (!rewardId || rewardId === '' || typeof rewardId !== 'string') {
       router.push('/');
     }
-  }, [rewardId, bearerToken]);
+  }, [rewardId, session]);
 
   const handleCollectClick = async (rewardId: string) => {
     setLoadingCollect(true);
