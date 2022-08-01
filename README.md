@@ -34,9 +34,11 @@ ETHEREUM_PRIVATE_KEY=<Ethereum private key to interact with contract>
 ETHREUM_RPC=<Ethereum (L2) rpc url>
 ```
 
-**Note:** Env variables can be set in a .env.local file in `./backend`
+**Note:** Env variables can be set in a `.env.local` file in `./backend`
 
 **Start backend:**
+
+Open new terminal window:
 
 ```
 cd backend
@@ -44,6 +46,8 @@ go run main.go
 ```
 
 **Start frontend:**
+
+Open new terminal window:
 
 ```
 cd frontend
