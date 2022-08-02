@@ -18,13 +18,13 @@ cd contracts
 npx hardhat node
 ```
 
-**Deploy contracts (in /contracts):**
+**Deploy the contracts (in /contracts):**
 
 ```
 npm run deploy
 ```
 
-**Set backend environment variables (in /backend):**
+**Set the backend environment variables (in /backend):**
 
 ```
 CLIENT_ID=<Github app id>
@@ -36,7 +36,13 @@ ETHREUM_RPC=<Ethereum (L2) rpc url>
 
 **Note:** Env variables can be set in a `.env.local` file in `./backend`
 
-**Start backend:**
+**Start the famed-github-backend:**
+
+Clone https://github.com/morphysm/famed-github-backend.
+Check out the `feature/FB-123-retriveRewards` branch.
+Follow the instructions in the `famed-github-backend` readme and start the service.
+
+**Start the backend:**
 
 Open new terminal window:
 
@@ -45,7 +51,7 @@ cd backend
 go run main.go
 ```
 
-**Start frontend:**
+**Start the frontend:**
 
 Open new terminal window:
 

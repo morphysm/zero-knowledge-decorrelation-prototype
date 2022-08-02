@@ -47,7 +47,7 @@ const Home: NextPage = () => {
     return <Typography color='red'>Error: {errorMessage}</Typography>;
   }
 
-  if (rewards.length === 0)
+  if (!rewards || rewards.length === 0)
     return (
       <div className={styles.padding}>
         <p>No reward data</p>
