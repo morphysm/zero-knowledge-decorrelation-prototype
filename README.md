@@ -1,13 +1,13 @@
-# fame-airdrop-prototype
+# fame-zero-knowedgle-decorrelation-prototype
 
-This repository contains the code for the famed airdrop prototype.
+This repository contains the code for the famed zero knowledge prototypes.
 It is split into six sub-components:
 
 - backend (backend code)
 - circuits (zero knowledge circuits)
-- contracts (airdrop solidity contracts)
+- contracts (solidity decorrelation contracts)
 - frontend (frontend code)
-- zkp-merkle-airdrop-lib (js library for zero knowledge airdrops)
+- zkp-merkle-decorrelation-lib (js library for zero knowledge decorrelation )
 
 # Development
 
@@ -29,7 +29,7 @@ npm run deploy
 ```
 CLIENT_ID=<Github app id>
 CLIENT_SECRET=<Github app secret>
-ETHEREUM_AIRDROP_ADDRESS=<Address of the airdrop contract>
+ETHEREUM_CONTRACT_ADDRESS=<Address of the zk contract>
 ETHEREUM_PRIVATE_KEY=<Ethereum private key to interact with contract>
 ETHREUM_RPC=<Ethereum (L2) rpc url>
 ```
