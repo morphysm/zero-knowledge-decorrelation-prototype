@@ -1,6 +1,8 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
+import Link from '@mui/material/Link';
+import Stack from '@mui/material/Stack';
 
 import { SessionContext } from '../context/SessionProvider';
 import { getRewardsByUser } from '../services/AirdropService';
@@ -8,6 +10,7 @@ import { getRewardsByUser } from '../services/AirdropService';
 import styles from '../styles/Home.module.css';
 import Typography from '@mui/material/Typography';
 import ClaimAndCollectReward from '../components/molecule/reward/ClaimAndCollectReward';
+
 
 const Home: NextPage = () => {
   const router = useRouter();
@@ -60,18 +63,22 @@ const Home: NextPage = () => {
       <ul className={styles.list}>
         {rewards.map((repo, i) => (
           <li key={`repo_${repo.name}`}>
-            <span>{repo.name}</span>
+            <Stack direction="column">
+            <Link href={repo.htmlurl}>{`${repo.owner}/${repo.name}`}</Link>
             <ul>
               {repo.issues.map((issue) => (
                 <li key={`repo_${repo.name}_issue_${issue.id}`}>
-                  <a href={issue.htmlurl}>Number: {issue.number}</a>{' '}
-                  <span>{issue.contributors[0].rewardSum}</span>
-                  <ClaimAndCollectReward
-                    id={issue.id.toString(10)}
-                  ></ClaimAndCollectReward>
+                  <Stack direction="row" gap={2}>
+                    <a href={issue.htmlurl}>Number: {issue.number}</a>{' '}
+                    <span>Points: {(Math.round(issue.contributors[0].rewardSum * 100) / 100).toFixed(2)}</span>
+                    <ClaimAndCollectReward
+                      id={issue.id.toString(10)}
+                    ></ClaimAndCollectReward>
+                  </Stack>
                 </li>
               ))}
             </ul>
+            </Stack>
           </li>
         ))}
       </ul>

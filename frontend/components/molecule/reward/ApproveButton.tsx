@@ -1,3 +1,9 @@
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
 import React, { useState } from 'react';
 import {
   postApproval,
@@ -24,27 +30,29 @@ const ApproveButton: React.FC<ApproveButtonProps> = ({
   };
 
   return (
-    <span>
-      <form>
-        <label htmlFor='type'>RewardType: </label>
-        <select
+    <Stack component="form" gap={2}>
+        <FormControl fullWidth>
+        <InputLabel id="demo-simple-select-label">Reward Type</InputLabel>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
           value={type}
-          onChange={(e) => setType(parseInt(e.target.value, 10))}
+          label="Reward Type"
+          onChange={(e) => setType(e.target.value as number)}
         >
-          <option value={RewardType.ZEKONFT}>NFT</option>
-          <option value={RewardType.FAMEDTOKEN}>Famed Token</option>
-        </select>
-        <label htmlFor='value'>Value: </label>
-        <input
-          type='text'
-          id='value'
-          name='value'
-          value={value}
-          onChange={(e) => setValue(parseInt(e.target.value, 10))}
+          <MenuItem value={RewardType.ZEKONFT}>NFT</MenuItem>
+          <MenuItem value={RewardType.FAMEDTOKEN}>Famed Token</MenuItem>
+        </Select>
+      </FormControl>
+        <TextField
+          required
+          id="outlined-required"
+          label={type == RewardType.ZEKONFT ? 'NFT with ID' : 'Tokens'}
+          defaultValue={value}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(parseInt(e.target.value, 10))}
         />
-      </form>
       <Button onClick={() => handleApproveClick(id)}>Approve</Button>
-    </span>
+    </Stack>
   );
 };
 

@@ -6,6 +6,7 @@ import styles from '../../../styles/Home.module.css';
 import LoadingButton from './../../../components/atoms/loadingButton/LoadingButton';
 import { pedersenHashPreliminary, toHex } from 'zkp-merkle-airdrop-lib';
 import { postPreCommitment } from './../../../services/AirdropService';
+import Alert from '@mui/material/Alert';
 
 const ClaimPage: NextPage = () => {
   const router = useRouter();
@@ -52,10 +53,19 @@ const ClaimPage: NextPage = () => {
   };
 
   const handleClaimClick = async () => {
+    if (
+      session === null ||
+      session.provider_token === null ||
+      session.provider_token === undefined
+    ) {
+      router.push('/auth/login');
+      return;
+    }
+
     setLoadingClaim(true);
     try {
       // TODO add nonce to protect against replay attacks
-      await postPreCommitment(bearerToken, rewardId as string, preCommitment);
+      await postPreCommitment(session.provider_token, rewardId as string, preCommitment);
     } catch (err) {
       console.log(err);
     }

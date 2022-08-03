@@ -45,6 +45,8 @@ declare interface Issue {
 
 declare interface Repo {
   name: string;
+  owner: string;
+  htmlurl: string;
   issues: Issue[];
 }
 
