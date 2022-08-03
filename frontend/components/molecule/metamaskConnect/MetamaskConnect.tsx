@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, Typography } from '@mui/material';
+import { Button, Typography, Box } from '@mui/material';
 import { ExternalProvider } from '@ethersproject/providers';
 import { MetaMaskInpageProvider } from '@metamask/providers';
+import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
 
 import { MetamaskContext } from '../../../context/MetamaskProvider';
 
@@ -55,7 +56,10 @@ const MetamaskConnect: React.FC = () => {
   return (
     <>
       {address ? (
-        <span>Account: {address}</span>
+      <Box display='flex' justifyContent='center' gap={1}>
+        <Jazzicon diameter={20} seed={jsNumberForAddress(address)} />
+        <span>Account: {`${address.substring(0, 5)}...${address.substring(address.length - 4)}`}</span>
+      </Box>
       ) : (
         <Button onClick={connectHandler}>Connect Metamask</Button>
       )}

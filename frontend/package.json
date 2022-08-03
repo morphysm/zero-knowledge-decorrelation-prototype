@@ -12,6 +12,7 @@
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@metamask/detect-provider": "^1.2.0",
+    "@metamask/jazzicon": "^2.0.0",
     "@metamask/providers": "^9.0.0",
     "@mui/material": "^5.9.3",
     "@supabase/supabase-js": "^1.35.4",
@@ -21,6 +22,7 @@
     "next-transpile-modules": "^9.0.0",
     "react": "18.1.0",
     "react-dom": "18.1.0",
+    "react-jazzicon": "^1.0.4",
     "zkp-merkle-airdrop-lib": "file:../zkp-merkle-airdrop-lib"
   },
   "devDependencies": {
