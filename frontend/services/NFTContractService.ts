@@ -39,6 +39,7 @@ export const getNFTs = async (
     const URI = await airdrop.tokenURI(tokenId);
     // 29 = length of "data:application/json;base64,"
     const json = window.atob(URI.substring(29));
+    console.log(json);
     const nft = JSON.parse(json) as ZekoGenerativeNFT;
     NFTs.push(nft);
   }

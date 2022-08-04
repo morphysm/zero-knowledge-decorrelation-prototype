@@ -119,21 +119,21 @@ contract ZekoGenerativeNFT is ERC721Enumerable, Ownable {
                     Base64.encode(
                         bytes(
                             abi.encodePacked(
-                                "{'Dao':'",
+                                '{"Dao":"',
                                 currentWord.daoName,
-                                "', 'Role':'",
+                                '", "Role":"',
                                 currentWord.role,
-                                "', 'TokenIdInRoleCollection':'",
+                                '", "TokenIdInRoleCollection":"',
                                 currentWord.tokenIdInCollection,
-                                "', 'image': '",
+                                '", "image": "',
                                 "data:image/svg+xml;base64,",
                                 buildImage(_tokenId),
-                                "', 'attributes': ",
+                                '", "attributes": ',
                                 "[",
-                                "{'trait_type': 'TextColor',",
-                                "'value':'",
+                                '{"trait_type": "TextColor",',
+                                '"value":"',
                                 currentWord.textHue,
-                                "'}",
+                                '"}',
                                 "]",
                                 "}"
                             )

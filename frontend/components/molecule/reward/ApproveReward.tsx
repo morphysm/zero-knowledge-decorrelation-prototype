@@ -65,9 +65,21 @@ const Reward: React.FC<RewardApprovalProps> = ({ id }: RewardApprovalProps) => {
   }
 
   if (rewardState === RewardState.Approved) {
+    let type: string;
+    switch (rewardType) {
+      case RewardType.ZEKONFT:
+        type = 'NFT';
+        break;
+      case RewardType.FAMEDTOKEN:
+        type = 'FAMEDTOKEN';
+        break
+      default:
+        type = 'UNKNOWN';
+        break;
+    }
     return (
       <span>
-        Approved, Type: {rewardType}, Value: {rewardValue}
+        Approved, Type: {type}, Value: {rewardValue}
       </span>
     );
   }
