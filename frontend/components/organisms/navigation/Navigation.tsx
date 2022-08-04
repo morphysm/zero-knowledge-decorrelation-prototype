@@ -2,7 +2,6 @@ import styles from './Navigation.module.css';
 import { useContext } from 'react';
 import { SessionContext } from '../../../context/SessionProvider';
 import { MetamaskContext } from '../../../context/MetamaskProvider';
-import { supabase } from '../../../services/SuperbaseService';
 
 import Button from '../../atoms/button/Button';
 import MetamaskConnect from '../../molecule/metamaskConnect/MetamaskConnect';

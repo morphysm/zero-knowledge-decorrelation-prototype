@@ -108,7 +108,7 @@ contract PrivateAirdrop is Ownable, IERC721Receiver {
         require(verifier.verifyProof(_proof, pubSignals), "Proof verification failed");
         nullifierSpent[_nullifierHash] = true;
         if (reward.rewardType == IApprovedRewards.RewardType.ZEKONFT) {
-            nftToken.transferFrom(address(this), msg.sender, worldBaseTokenId + pubSignals[2]);
+            nftToken.transferFrom(address(this), msg.sender, worldBaseTokenId + reward.value);
             return;
         }
         if (reward.rewardType == IApprovedRewards.RewardType.FAMEDTOKEN) {

@@ -18,6 +18,12 @@ const MetamaskConnect: React.FC = () => {
     }
   }, [window.ethereum]);
 
+  useEffect(() => {
+    console.log("TYPE:", typeof(address))
+    console.log("address:", address)
+
+  }, [address]);
+
   const connectHandler = async () => {
     if (window.ethereum) {
       await reqestAccounts(window.ethereum);
@@ -28,7 +34,8 @@ const MetamaskConnect: React.FC = () => {
 
   const accountsChanged = (...args: unknown[]) => {
     if (args && args[0] && typeof (args[0] as string[])[0] === 'string') {
-      setAddress(args[0] as string[][0]);
+      const addresses = args[0] as string[][0]
+      setAddress(addresses[0]);
     }
   };
 

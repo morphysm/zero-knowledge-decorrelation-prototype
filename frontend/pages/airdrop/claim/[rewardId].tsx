@@ -5,7 +5,7 @@ import { SessionContext } from './../../../context/SessionProvider';
 import styles from '../../../styles/Home.module.css';
 import LoadingButton from './../../../components/atoms/loadingButton/LoadingButton';
 import { pedersenHashPreliminary, toHex } from 'zkp-merkle-airdrop-lib';
-import { postPreCommitment } from './../../../services/AirdropService';
+import { postPreCommitment } from '../../../services/AirdropService';
 import Alert from '@mui/material/Alert';
 
 const ClaimPage: NextPage = () => {

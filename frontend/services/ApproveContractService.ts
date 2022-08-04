@@ -1,6 +1,7 @@
 import { ethers, utils } from 'ethers';
 import { ApprovedRewards__factory } from 'contracts/typechain';
 import { getApproveAddress } from './AddressService';
+import { toHex } from 'zkp-merkle-airdrop-lib/';
 
 export enum RewardType {
   ZEKONFT = 0,
@@ -29,7 +30,7 @@ export const getReward = async (
   );
 
   const [approved, type, value] = await approve.rewards(
-    utils.formatBytes32String(rewardId)
+    toHex(BigInt(rewardId))
   );
 
   if (!approved) {
@@ -71,7 +72,7 @@ export const postApproval = async (
 
   // TODO check for max length of reward (32 bytes )
   const tx = await approve.addReward(
-    utils.formatBytes32String(rewardId),
+    toHex(BigInt(rewardId)),
     rewardType,
     rewardValue
   );

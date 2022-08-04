@@ -2,6 +2,7 @@ import { ethers, utils } from 'ethers';
 // import detectEthereumProvider from '@metamask/detect-provider';
 import { PrivateAirdrop__factory } from 'contracts/typechain';
 import { getAirdropAddress } from './AddressService';
+import { toHex } from 'zkp-merkle-airdrop-lib';
 
 export const collectAirdrop = async (
   proof: string,
@@ -11,6 +12,7 @@ export const collectAirdrop = async (
   if (!window.ethereum) {
     throw new Error('could not connect to metamask');
   }
+  console.log(toHex(BigInt(rewardID)))
 
   const provider = new ethers.providers.Web3Provider(window.ethereum);
   const signer = provider.getSigner();
@@ -23,7 +25,7 @@ export const collectAirdrop = async (
   const tx = await airdrop.collectAirdrop(
     proof,
     nullifierHash,
-    utils.formatBytes32String(rewardID)
+    toHex(BigInt(rewardID))
   );
   const receipt = await tx.wait();
   console.log(receipt);

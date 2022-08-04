@@ -75,6 +75,11 @@ func (a *airdropHandler) PostPreCommitment(c echo.Context) error {
 		return err
 	}
 
+	fmt.Printf("RewardID %s \n", payload.RewardID)
+	fmt.Printf("PreCommitment %s \n", payload.PreCommitment)
+	fmt.Printf("commitmentHex %s \n", commitmentHex)
+	fmt.Printf("newMerkleRoot %s \n", newMerkleRoot)
+
 	// TO add SC claim updated
 
 	return c.NoContent(http.StatusOK)

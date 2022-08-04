@@ -82,9 +82,9 @@ describe("Airdrop", function () {
 
   it("should allow a user that provides a valid proof to collect an NFT from the airdrop contract", async () => {
     // GIVEN
-    const nullifierHex = "0x00a88cb7c2ab7f014b7b9cca92d42b7fe9416d4a1d9872267aefc2e8a6388c66";
-    const secretHex = "0x00fb4a7280d470f619c59a341c65e874acc1f0b890815e07f41531f878e9ba08";
-    const rewardIDHex = toHex(BigInt(1));
+    const nullifierHex = "0x00202a03cea47b7918a36f12e6522c88f8fbcc9f74e07d529e9ce8f3a113ea87";
+    const secretHex = "0x00c46daf8a91c6b69e260765036de0ccf4b2e1cfe063ca630a6611f13adadee0";
+    const rewardIDHex = toHex(BigInt(1158460482));
     const rewardTypeNFT = 0;
     const rewardValue = 1;
 
@@ -92,8 +92,11 @@ describe("Airdrop", function () {
     const secret = BigInt(secretHex);
     const rewardID = BigInt(rewardIDHex);
     const preCommitment = await pedersenHashPreliminary(nullifier, secret);
+    console.log('hexpreCommitment', toHex(preCommitment))
     const commitment = await pedersenHashFinal(preCommitment, rewardID);
+    console.log('commitment', commitment)
     const hexCommitment = toHex(commitment);
+    console.log('hexCommitment', hexCommitment)
 
     console.log(`My private values are nullifier: ${nullifierHex} and secret ${secretHex}`);
 
@@ -103,6 +106,7 @@ describe("Airdrop", function () {
     // Generate the merkletree
     const mt = await getMerkleTreeFromPublicListOfCommitments(INPUT_FILE_NAME, TREE_HIGHT);
     const newRoot = mt.getRoot();
+    console.log('hexCommitment', hexCommitment)
     console.log(`new commitment ${hexCommitment} added to the commitments merkle tree`);
 
     // Approve reward
@@ -155,7 +159,7 @@ describe("Airdrop", function () {
     // GIVEN
     const nullifierHex = "0x00a88cb7c2ab7f014b7b9cca92d42b7fe9416d4a1d9872267aefc2e8a6388c66";
     const secretHex = "0x00fb4a7280d470f619c59a341c65e874acc1f0b890815e07f41531f878e9ba08";
-    const rewardIDHex = toHex(BigInt(1));
+    const rewardIDHex = toHex(BigInt(1204378280));
     const rewardTypeFamedToken = 1;
     const rewardValue = 100;
 
