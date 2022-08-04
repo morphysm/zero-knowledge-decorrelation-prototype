@@ -23,20 +23,30 @@ export const SessionProvider: React.FC<Props> = ({ children }: Props) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
 
+  
   useEffect(() => {
-    setSession(supabase.auth.session());
-    loadUser(session);
+    // Check active sessions and sets the user
+    const session = supabase.auth.session()
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      loadUser(session);
-    });
-  }, []);
+    setSession(session);
+    loadUser(session?.provider_token)
 
-  const loadUser = async (session: Session | null) => {
-    if (session !== null && session.provider_token) {
-      const user = await getUser(session.provider_token);
-      console.log('Hey', user);
+    // Listen for changes on auth state (logged in, signed out, etc.)
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        loadUser(session?.provider_token)
+      }
+    )
+
+    return () => {
+      listener?.unsubscribe()
+    }
+  }, [])
+
+  // TODO use user metadata from supabase
+  const loadUser = async (token: string | null | undefined) => {
+    if (token) {
+      const user = await getUser(token);
       setUser(user);
     }
   };

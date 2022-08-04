@@ -1,5 +1,5 @@
 import styles from './Navigation.module.css';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { SessionContext } from '../../../context/SessionProvider';
 import { MetamaskContext } from '../../../context/MetamaskProvider';
 
@@ -10,6 +10,12 @@ import router from 'next/router';
 const Navigation: React.FC = () => {
   const { session, user, logOut } = useContext(SessionContext);
   const { address } = useContext(MetamaskContext);
+
+  useEffect(
+    () => {
+      console.log(user);
+    }, [user]
+  )
 
   const handleLogoutClick = async () => {
     await logOut();
