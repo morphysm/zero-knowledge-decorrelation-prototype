@@ -1,8 +1,7 @@
 /** @type {import('next').NextConfig} */
-const withTM = require('next-transpile-modules')(['@famed-airdrop-prototype/frontend']);
+const withTM = require('next-transpile-modules')(['@famed-airdrop-prototype/contracts']);
 
 const nextConfig = withTM({
-  reactStrictMode: true,
   webpack: function (config, options) {
     if (!options.isServer) {
       config.resolve.fallback = {
@@ -13,9 +12,9 @@ const nextConfig = withTM({
         os: false,
       };
     }
-    // config.experiments = { asyncWebAssembly: true };
     return config;
   },
 });
+
 
 module.exports = nextConfig;
