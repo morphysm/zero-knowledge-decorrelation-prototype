@@ -38,7 +38,6 @@
     "eslint-plugin-prettier": "^3.4.1",
     "eslint-plugin-promise": "^5.2.0",
     "ethereum-waffle": "^3.4.4",
-    "ethers": "^5.6.8",
     "hardhat": "^2.9.6",
     "hardhat-gas-reporter": "^1.0.8",
     "prettier": "^2.6.2",
@@ -54,6 +53,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.7.1",
-    "circuits": "file:../circuits"
+    "circuits": "file:../circuits",
+    "ethers": "^5.6.8"
   }
 }
