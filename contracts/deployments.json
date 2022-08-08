@@ -12,9 +12,9 @@
     "approve": ""
   },
   "optimismKovan": {
-    "nft": "0x60492b0755D8dba01dB9915a1f8Bf28D242BF6dC",
-    "plonkVerifier": "0x998ec5A791ec57b95E25E3B06E7e53fc9e7dbA56",
-    "privateAidrop": "0x7EfE41334ef01319CABe340669A028516cD2f9b0",
-    "approve": ""
+    "nft": "0xC5752C944802e59cbbeD746894393bE04A6AC056",
+    "plonkVerifier": "0x77337a65C93808529D1B53C4af9f1f7259AA1b3A",
+    "privateAidrop": "0xAD9dAD9A1889432ad0A1eDD88F1DE1DbC81e4829",
+    "approve": "0x123aEd2E6aFD7aa070cA45d63b259c7f28E778c8"
   }
 }
