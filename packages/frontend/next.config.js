@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-const withTM = require('next-transpile-modules')(['contracts']);
+const withTM = require('next-transpile-modules')(['@famed-airdrop-prototype/frontend']);
 
 const nextConfig = withTM({
   reactStrictMode: true,

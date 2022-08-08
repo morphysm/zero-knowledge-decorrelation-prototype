@@ -1,7 +1,7 @@
 import {
   getContractAddresses,
   NetworkName,
-} from 'contracts/utils/AddressStore';
+} from '@famed-airdrop-prototype/contracts/utils/AddressStore';
 import { ethers } from 'ethers';
 
 export const getNFTAddress = async (

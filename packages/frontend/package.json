@@ -12,8 +12,8 @@
   "dependencies": {
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
-    "@famed-airdrop-prototype/contracts": "@famed-airdrop-prototype/contracts",
-    "@famed-airdrop-prototype/zkp-merkle-airdrop-lib": "file:@famed-airdrop-prototype/zkp-merkle-airdrop-lib",
+    "@famed-airdrop-prototype/contracts": "^1.0.0",
+    "@famed-airdrop-prototype/zkp-merkle-airdrop-lib": "1.0.0",
     "@metamask/detect-provider": "^1.2.0",
     "@metamask/jazzicon": "^2.0.0",
     "@metamask/providers": "^9.0.0",
