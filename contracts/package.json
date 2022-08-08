@@ -11,8 +11,10 @@
     "test": "npx hardhat test",
     "deploy": "npx hardhat run --network localhost scripts/deploy.ts",
     "mint": "npx hardhat run --network localhost scripts/mint.ts",
-    "compileGo": "mkdir ./go/tmp && solcjs --bin ./contracts/PrivateAirdrop.sol --include-path ./node_modules/ --base-path ./contracts/ -o ./go/tmp && solcjs --abi ./contracts/PrivateAirdrop.sol --include-path ./node_modules/ --base-path ./contracts/ -o ./go/tmp && abigen --bin=./go/tmp/PrivateAirdrop_sol_PrivateAirdrop.bin --abi=./go/tmp/PrivateAirdrop_sol_PrivateAirdrop.abi --pkg=privateairdrop --out=./go/PrivateAirdrop.go && rm -r ./go/tmp"
+    "compileGo": "mkdir ./go/tmp && solcjs --bin ./contracts/PrivateAirdrop.sol --include-path ./node_modules/ --base-path ./contracts/ -o ./go/tmp && solcjs --abi ./contracts/PrivateAirdrop.sol --include-path ./node_modules/ --base-path ./contracts/ -o ./go/tmp && abigen --bin=./go/tmp/PrivateAirdrop_sol_PrivateAirdrop.bin --abi=./go/tmp/PrivateAirdrop_sol_PrivateAirdrop.abi --pkg=privateairdrop --out=./go/PrivateAirdrop.go && rm -r ./go/tmp",
+    "typechain": "hardhat typechain"
   },
+  "install": "npm run typechain",
   "author": "Kilian Käslin @morphysm",
   "license": "ISC",
   "devDependencies": {
