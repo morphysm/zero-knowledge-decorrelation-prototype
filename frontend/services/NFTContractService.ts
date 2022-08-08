@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { ZekoGenerativeNFT__factory } from 'contracts/typechain';
+import { ZekoGenerativeNFT__factory } from '../typechain';
 import { getNFTAddress } from './AddressService';
 
 export interface ZekoGenerativeNFT {

@@ -1,6 +1,6 @@
 import { ethers, utils } from 'ethers';
 // import detectEthereumProvider from '@metamask/detect-provider';
-import { PrivateAirdrop__factory } from 'contracts/typechain';
+import { PrivateAirdrop__factory } from '../typechain';
 import { getAirdropAddress } from './AddressService';
 import { toHex } from 'zkp-merkle-airdrop-lib';
 

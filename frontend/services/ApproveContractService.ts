@@ -1,5 +1,5 @@
 import { ethers, utils } from 'ethers';
-import { ApprovedRewards__factory } from 'contracts/typechain';
+import { ApprovedRewards__factory } from '../typechain';
 import { getApproveAddress } from './AddressService';
 import { toHex } from 'zkp-merkle-airdrop-lib/';
 
