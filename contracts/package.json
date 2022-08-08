@@ -5,7 +5,7 @@
   "exports": {
     ".":  "./deployments.json",
     "./utils/*": "./utils/*.ts",
-    "./typechain": "./typechain"
+    "./typechain/*": "./typechain/*/*.ts"
   },
   "scripts": {
     "test": "npx hardhat test",
