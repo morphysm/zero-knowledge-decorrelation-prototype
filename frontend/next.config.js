@@ -2,6 +2,7 @@
 const withTM = require('next-transpile-modules')(['contracts']);
 
 const nextConfig = withTM({
+  resolveSymlinks: false,
   reactStrictMode: true,
   webpack: function (config, options) {
     if (!options.isServer) {
