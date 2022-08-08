@@ -1,0 +1,27 @@
+{
+  "name": "@famed-airdrop-prototype/zkp-merkle-airdrop-lib",
+  "version": "1.0.0",
+  "description": "Library for interacting with the zk merkle tree.",
+  "main": "./lib/index.js",
+  "scripts": {
+    "dev": "tsc -w",
+    "build": "tsc",
+    "test": "jest"
+  },
+  "author": "sragss",
+  "types": "./lib/index.d.ts",
+  "prepare": "npm run build",
+  "files": [
+    "./lib"
+  ],
+  "devDependencies": {
+    "@types/jest": "^27.5.1",
+    "@types/node": "^17.0.36",
+    "ts-jest": "^28.0.3",
+    "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "circomlibjs": "^0.1.2",
+    "snarkjs": "^0.4.19"
+  }
+}
