@@ -1,0 +1,13 @@
+{
+  "name": "famed-airdrop-prototype",
+  "version": "1.0.0",
+  "description": "This repository contains the code for the famed zero knowledge prototypes. It is split into six sub-components:",
+  "workspaces": [
+    "packages/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/morphysm/famed-airdrop-prototype.git"
+  },
+  "author": "@morphysm Kilian Käslin"
+}
