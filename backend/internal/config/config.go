@@ -29,6 +29,10 @@ type Config struct {
 		Address        common.Address
 		AirdropAddress common.Address
 	}
+
+	Famed struct {
+		URL string
+	}
 }
 
 func Load() (*Config, error) {
@@ -93,6 +97,12 @@ func Load() (*Config, error) {
 		return nil, errors.New("aidrop address not found in .env file")
 	}
 	cfg.Ethereum.AirdropAddress = common.HexToAddress(airdropAddress)
+
+	famedGithubBackendURL, ok := os.LookupEnv("FAMED_GITHUB_BACKEND_URL")
+	if !ok {
+		return nil, errors.New("aidrop address not found in .env file")
+	}
+	cfg.Famed.URL = famedGithubBackendURL
 
 	return &cfg, nil
 }

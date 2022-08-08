@@ -1,6 +1,9 @@
 // TODO use env variable
 // You have to add the protocol name here see https://stackoverflow.com/questions/69150593/next-js-localhost-is-prepended-when-making-external-api-call
-const baseURL: string = 'http://127.0.0.1:8081';
+let baseURL = process.env.NEXT_PUBLIC_BACKEND_URL;
+if (!baseURL) { 
+  throw new Error('backend url is undefined');
+}
 
 export const getUser = async (accessToken: string): Promise<User> => {
   const requestOptions: RequestInit = {
