@@ -2,7 +2,11 @@
   "name": "famed-airdrop-prototype-contracts",
   "version": "0.0.2",
   "description": "",
-  "main": "\"\"",
+  "exports": {
+    ".":  "./deployments.json",
+    "./utils/*": "./utils/*.ts",
+    "./typechain": "./typechain"
+  },
   "scripts": {
     "test": "npx hardhat test",
     "deploy": "npx hardhat run --network localhost scripts/deploy.ts",
