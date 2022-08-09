@@ -36,10 +36,10 @@ export const getReward = async (
 };
 
 export const getOwner = async (): Promise<string> => {
-  const provider = getProvider()
+  const {provider, signer} = getProvider()
   const approve = ApprovedRewards__factory.connect(
     await getApproveAddress(provider),
-    provider
+    signer
   );
 
   const owner = await approve.owner();
@@ -51,8 +51,7 @@ export const postApproval = async (
   rewardType: number,
   rewardValue: number
 ): Promise<void> => {
-  const provider = getProvider()
-  const signer = provider.getSigner();
+  const {provider, signer} = getProvider()
   const approve = ApprovedRewards__factory.connect(
     await getApproveAddress(provider),
     signer
