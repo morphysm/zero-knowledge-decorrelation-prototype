@@ -29,7 +29,7 @@ func NewBackendServer(cfg *config.Config) (*echo.Echo, error) {
 	e.Use(
 		middleware.CORSWithConfig(middleware.CORSConfig{
 			// TODO set depending on development or production via config
-			AllowOrigins:     []string{"http://localhost:3000"},
+			AllowOrigins:     []string{"http://localhost:3000", "https://famed-zk-prototype.vercel.app/"},
 			AllowCredentials: true,
 			AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 			AllowMethods:     []string{"GET", "POST"},
@@ -40,7 +40,7 @@ func NewBackendServer(cfg *config.Config) (*echo.Echo, error) {
 
 	// TODO set via config
 	// New famedGithubClient client; handles request to the famed-github-backend
-	famedGithubClient := famedgithub.NewClient("http://localhost:8080/famed/")
+	famedGithubClient := famedgithub.NewClient(cfg.Famed.URL)
 	// New GitHub client; handles requests to GitHub
 	githubClient := github.NewClient(cfg.Github.ClientID, cfg.Github.ClientSecret)
 	// New Ethereum client; handles requests to a L1 or L2
@@ -49,7 +49,7 @@ func NewBackendServer(cfg *config.Config) (*echo.Echo, error) {
 		return nil, err
 	}
 	ethereumClient := ethereum.NewClient(ethClient, cfg.Ethereum.Address, cfg.Ethereum.PrivateKey, cfg.Ethereum.AirdropAddress)
-	
+
 	// Airdrop endpoints exposed for airdrop I/O
 	airdropGroup := e.Group("/airdrop")
 	{
