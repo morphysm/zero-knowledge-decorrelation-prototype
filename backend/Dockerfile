@@ -12,5 +12,8 @@ RUN go build -ldflags="-s -w" -o /go/bin/famed-zk-prototype
 FROM node
 
 COPY --from=build-env /go/bin/famed-zk-prototype /
+COPY --from=build-env /go/src/app/zeroknowledge /zeroknowledge
+
+RUN rm -rf /zeroknowledge/node_modules /zeroknowledge/package-lock.json && npm --prefix /zeroknowledge install
 
 CMD ["/famed-zk-prototype"]
