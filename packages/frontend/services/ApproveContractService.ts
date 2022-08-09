@@ -1,6 +1,6 @@
-import { ethers, utils } from 'ethers';
 import { ApprovedRewards__factory } from '../typechain';
 import { getApproveAddress } from './AddressService';
+import { getProvider } from './ProviderService';
 import { toHex } from '@famed-airdrop-prototype/zkp-merkle-airdrop-lib';
 
 export enum RewardType {
@@ -19,11 +19,7 @@ export const getReward = async (
   rewardId: string
 ): Promise<ApprovedResponse> => {
   console.log(window.ethereum);
-  if (!window.ethereum) {
-    throw new Error('could not connect to metamask');
-  }
-
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const provider = getProvider()
   const approve = ApprovedRewards__factory.connect(
     await getApproveAddress(provider),
     provider
@@ -40,11 +36,7 @@ export const getReward = async (
 };
 
 export const getOwner = async (): Promise<string> => {
-  if (!window.ethereum) {
-    throw new Error('could not connect to metamask');
-  }
-
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const provider = getProvider()
   const approve = ApprovedRewards__factory.connect(
     await getApproveAddress(provider),
     provider
@@ -59,11 +51,7 @@ export const postApproval = async (
   rewardType: number,
   rewardValue: number
 ): Promise<void> => {
-  if (!window.ethereum) {
-    throw new Error('could not connect to metamask');
-  }
-
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const provider = getProvider()
   const signer = provider.getSigner();
   const approve = ApprovedRewards__factory.connect(
     await getApproveAddress(provider),

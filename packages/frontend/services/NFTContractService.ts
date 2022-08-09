@@ -1,6 +1,7 @@
-import { ethers } from 'ethers';
+
 import { ZekoGenerativeNFT__factory } from '../typechain';
 import { getNFTAddress } from './AddressService';
+import { getProvider } from './ProviderService';
 
 export interface ZekoGenerativeNFT {
   Dao: string;
@@ -18,11 +19,7 @@ interface Attributes {
 export const getNFTs = async (
   address: string
 ): Promise<ZekoGenerativeNFT[]> => {
-  if (!window.ethereum) {
-    throw new Error('could not connect to metamask');
-  }
-
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const provider = getProvider()
 
   // TODO load address from source of truth
   const airdrop = ZekoGenerativeNFT__factory.connect(
