@@ -12,6 +12,6 @@
     "minimist-lite": "^2.2.1",
     "ts-node": "^10.8.1",
     "typescript": "^4.7.3",
-    "zkp-merkle-airdrop-lib": "file:../../zkp-merkle-airdrop-lib"
+    "zkp-merkle-airdrop-lib": "file:../zkp-merkle-airdrop-lib"
   }
 }
