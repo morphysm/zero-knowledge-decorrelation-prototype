@@ -19,12 +19,12 @@ interface Attributes {
 export const getNFTs = async (
   address: string
 ): Promise<ZekoGenerativeNFT[]> => {
-  const provider = getProvider()
+  const {provider, signer} = getProvider()
 
   // TODO load address from source of truth
   const airdrop = ZekoGenerativeNFT__factory.connect(
     await getNFTAddress(provider),
-    provider
+    signer
   );
 
   const balance = await airdrop.balanceOf(address);

@@ -8,8 +8,7 @@ export const collectAirdrop = async (
   nullifierHash: string,
   rewardID: string
 ) => {
-  const provider = getProvider()
-  const signer = provider.getSigner();
+  const {provider, signer} = getProvider()
   // TODO load address from source of truth
   const airdrop = PrivateAirdrop__factory.connect(
     await getAirdropAddress(provider),

@@ -4,8 +4,6 @@ import {
 } from '@famed-airdrop-prototype/contracts/utils/AddressStore';
 import { ethers } from 'ethers';
 
-let oprimisimKovanRpcUrl = process.env.NEXT_PUBLIC_OPTIMIS_KOVAN_RPC_URL;
-
 export const getNFTAddress = async (
   provider: ethers.providers.JsonRpcProvider
 ): Promise<string> => {

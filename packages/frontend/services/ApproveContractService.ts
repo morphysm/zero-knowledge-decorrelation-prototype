@@ -19,10 +19,10 @@ export const getReward = async (
   rewardId: string
 ): Promise<ApprovedResponse> => {
   console.log(window.ethereum);
-  const provider = getProvider()
+  const {provider, signer} = getProvider()
   const approve = ApprovedRewards__factory.connect(
     await getApproveAddress(provider),
-    provider
+    signer
   );
 
   const [approved, type, value] = await approve.rewards(
