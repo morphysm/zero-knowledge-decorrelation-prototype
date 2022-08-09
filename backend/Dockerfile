@@ -15,6 +15,7 @@ COPY --from=build-env /go/bin/famed-zk-prototype /
 COPY --from=build-env /go/src/app/zeroknowledge /zeroknowledge
 COPY --from=build-env /go/src/app/zkp-merkle-airdrop-lib /zkp-merkle-airdrop-lib
 
-RUN rm -rf /zeroknowledge/node_modules /zeroknowledge/package-lock.json && npm --prefix /zeroknowledge install
+RUN npm install -g ts-node 
+RUN rm -rf /zeroknowledge/node_modules /zeroknowledge/package-lock.json && npm --prefix /zeroknowledge install && npm --prefix /zkp-merkle-airdrop-lib install 
 
 CMD ["/famed-zk-prototype"]
