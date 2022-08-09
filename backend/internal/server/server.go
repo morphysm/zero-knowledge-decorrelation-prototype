@@ -29,7 +29,7 @@ func NewBackendServer(cfg *config.Config) (*echo.Echo, error) {
 	e.Use(
 		middleware.CORSWithConfig(middleware.CORSConfig{
 			// TODO set depending on development or production via config
-			AllowOrigins:     []string{"http://localhost:3000", "https://famed-zk-prototype.vercel.app/"},
+			AllowOrigins:     []string{"http://localhost:3000", "https://famed-zk-prototype.vercel.app"},
 			AllowCredentials: true,
 			AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 			AllowMethods:     []string{"GET", "POST"},
