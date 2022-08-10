@@ -11,12 +11,6 @@ const Navigation: React.FC = () => {
   const { session, user, logOut } = useContext(SessionContext);
   const { address } = useContext(MetamaskContext);
 
-  useEffect(
-    () => {
-      console.log(user);
-    }, [user]
-  )
-
   const handleLogoutClick = async () => {
     await logOut();
   };

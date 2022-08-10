@@ -34,6 +34,7 @@ export const SessionProvider: React.FC<Props> = ({ children }: Props) => {
     // Listen for changes on auth state (logged in, signed out, etc.)
     const { data: listener } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        setSession(session);
         loadUser(session?.provider_token)
       }
     )
