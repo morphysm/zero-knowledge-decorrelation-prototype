@@ -52,7 +52,7 @@
     "zkp-merkle-airdrop-lib": "file:../zkp-merkle-airdrop-lib"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.7.1",
+    "@openzeppelin/contracts": "^4.9.2",
     "circuits": "file:../circuits",
     "ethers": "^5.6.8"
   }
