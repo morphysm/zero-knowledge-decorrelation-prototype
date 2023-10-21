@@ -12,6 +12,6 @@
   "author": "Kilian Kälsin @morphysm.com",
   "license": "ISC",
   "dependencies": {
-    "circomlib": "^2.0.3"
+    "circomlib": "^2.0.5"
   }
 }
